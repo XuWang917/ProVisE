@@ -3,7 +3,24 @@ name: CI
 on:
   push:
     branches: [main]
+    paths-ignore:
+      - "**/*.md"
+      - "assets/**"
+      - "docs/**"
+      - ".env.example"
+      - ".gitignore"
+      - "CITATION.cff"
+      - "LICENSE"
   pull_request:
+    paths-ignore:
+      - "**/*.md"
+      - "assets/**"
+      - "docs/**"
+      - ".env.example"
+      - ".gitignore"
+      - "CITATION.cff"
+      - "LICENSE"
+  workflow_dispatch:
 
 permissions:
   contents: read
