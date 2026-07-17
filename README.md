@@ -2,13 +2,10 @@
   <h1><img src="assets/provise-mark.svg" alt="ProVisE logo" height="50" align="absmiddle">&nbsp; Show, Don't Tell</h1>
   <p><img src="assets/provise-subtitle.svg" alt="Evaluating Spatial Cognition in Generative Pixels Rather Than LLM Text" width="900"></p>
   <p>
-    <span title="arXiv link pending"><img src="https://cdn.simpleicons.org/arxiv/B31B1B/B31B1B" alt="" width="17" align="absmiddle"> arXiv</span>
-    &nbsp;&nbsp;&nbsp;
-    <a href="https://xuwang917.github.io/ProVisE/"><img src="https://cdn.simpleicons.org/googlechrome/4285F4/4285F4" alt="" width="17" align="absmiddle"> Project Page</a>
-    &nbsp;&nbsp;&nbsp;
-    <a href="https://huggingface.co/datasets/wx91726/SpatialGen-Bench"><img src="https://huggingface.co/front/assets/huggingface_logo-noborder.svg" alt="" width="18" align="absmiddle"> SpatialGen-Bench</a>
-    &nbsp;&nbsp;&nbsp;
-    <a href="https://github.com/XuWang917/ProVisE"><img src="https://cdn.simpleicons.org/github/181717/FFFFFF" alt="" width="17" align="absmiddle"> Code</a>
+    <img src="https://img.shields.io/badge/-arXiv-B31B1B?style=for-the-badge&amp;logo=arxiv&amp;logoColor=white" alt="arXiv link pending">
+    <a href="https://xuwang917.github.io/ProVisE/"><img src="https://img.shields.io/badge/-Project_Page-0F5354?style=for-the-badge&amp;logo=googlechrome&amp;logoColor=white" alt="Project page"></a>
+    <a href="https://huggingface.co/datasets/wx91726/SpatialGen-Bench"><img src="https://img.shields.io/badge/-SpatialGen--Bench-FFD21E?style=for-the-badge&amp;logo=huggingface&amp;logoColor=black" alt="SpatialGen-Bench"></a>
+    <a href="https://github.com/XuWang917/ProVisE"><img src="https://img.shields.io/badge/-Code-171B1F?style=for-the-badge&amp;logo=github&amp;logoColor=white" alt="Code"></a>
   </p>
   <p>
     <a href="pyproject.toml"><img src="https://img.shields.io/badge/Python-3.10%2B-3776AB?logo=python&amp;logoColor=white" alt="Python 3.10+"></a>
