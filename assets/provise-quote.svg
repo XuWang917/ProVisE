@@ -1,0 +1,28 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 920 68" role="img" aria-labelledby="title desc">
+  <title id="title">When words fall short, images give form to spatial intent.</title>
+  <desc id="desc">Xici Zhuan, Great Treatise, The Book of Changes.</desc>
+  <style>
+    .quote {
+      fill: #4f6269;
+      font-family: Georgia, "Noto Serif CJK SC", "Songti SC", SimSun, "Times New Roman", serif;
+      font-size: 22px;
+      font-style: italic;
+      font-weight: 500;
+      letter-spacing: 0;
+    }
+    .source {
+      fill: #718087;
+      font-family: Georgia, "Noto Serif CJK SC", "Songti SC", SimSun, "Times New Roman", serif;
+      font-size: 14px;
+      font-weight: 400;
+      letter-spacing: 0;
+    }
+    .book { font-style: italic; }
+    @media (prefers-color-scheme: dark) {
+      .quote { fill: #a9b5bb; }
+      .source { fill: #8f9ca2; }
+    }
+  </style>
+  <text class="quote" x="460" y="26" text-anchor="middle">&#8220;When words fall short, images give form to spatial intent.&#8221; <tspan lang="zh-CN">(立象以尽意)</tspan></text>
+  <text class="source" x="460" y="53" text-anchor="middle">&#8212; <tspan class="book">Xici Zhuan</tspan> (Great Treatise), <tspan class="book">The Book of Changes</tspan> <tspan lang="zh-CN">(《周易·系辞》)</tspan></text>
+</svg>

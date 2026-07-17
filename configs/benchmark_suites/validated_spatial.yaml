@@ -1,0 +1,40 @@
+schema_version: provise.suite.v1
+name: validated_spatial
+description: >-
+  Benchmarks with audited, published protocol artifacts in this repository.
+
+benchmarks:
+  - id: spatialgen_bench
+    source: SpatialGen-Bench-HF
+    source_env: PROVISE_SPATIALGEN_SOURCE
+    family: spatial cognition across perception, understanding, reasoning, and interaction
+
+  - id: embspatial
+    source: EmbSpatial-Bench
+    source_env: PROVISE_EMBSPATIAL_SOURCE
+    family: egocentric object relations and distance
+
+  - id: omnispatial
+    source: OmniSpatial
+    source_env: PROVISE_OMNISPATIAL_SOURCE
+    family: dynamic, geometric, interaction, and perspective reasoning
+
+  - id: q_spatial_plus
+    source: Q-Spatial-Plus
+    source_env: PROVISE_Q_SPATIAL_PLUS_SOURCE
+    family: quantitative horizontal and vertical distance
+
+  - id: robospatial_home
+    source: RoboSpatial-Home
+    source_env: PROVISE_ROBOSPATIAL_HOME_SOURCE
+    family: geometric feasibility, configuration, and grounding
+
+  - id: sat
+    source: SAT
+    source_env: PROVISE_SAT_SOURCE
+    family: static and dynamic embodied spatial reasoning
+
+  - id: roboafford
+    source: RoboAfford
+    source_env: PROVISE_ROBOAFFORD_SOURCE
+    family: object, reference, and spatial affordance grounding

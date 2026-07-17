@@ -1,0 +1,66 @@
+name: generic_vlm_fallback
+description: >
+  Generic fallback protocol for tasks without a stable manual or verified
+  agent-constructed parser. A universal VLM-assisted parser recovers the final
+  benchmark answer from the generated image.
+
+default_config:
+  eval_mode: vlm
+  vlm_timeout: 60
+
+prompts:
+  universal_visual_response:
+    config:
+      parse_prompt: |
+        You are a parser for protocolized visual evaluation.
+
+        Your task is NOT to solve the original problem yourself.
+        Your task is to infer what answer the image-generation model expressed in its generated visual response.
+
+        You are given:
+        1. The original task instruction.
+        2. The expected answer format.
+        3. The candidate options, if any.
+        4. The original input image, if needed for context.
+        5. The generated visual response from the image-generation model.
+
+        Original task instruction:
+        {question}
+
+        Expected answer format:
+        {answer_format}
+
+        Candidate options, if any:
+        {choices}
+
+        Rules:
+        - Only use the generated visual response to infer the model's intended answer.
+        - Do not answer the task based on your own reasoning.
+        - If the generated response clearly indicates one answer, convert it into the required answer format.
+        - If the response is ambiguous, incomplete, contradictory, or does not express an answer, return INVALID.
+        - Do not evaluate whether the answer is correct.
+
+        Return your result in JSON:
+        {
+          "status": "valid" | "invalid" | "ambiguous",
+          "prediction": "...",
+          "evidence": "briefly describe the visual evidence used",
+          "confidence": "high" | "medium" | "low"
+        }
+    template: |
+      You are answering a spatial reasoning task using an image.
+
+      Please generate a visual response that clearly indicates your answer.
+      Do not change irrelevant parts of the image.
+      Use simple visual annotations to express your answer:
+      - Highlight the selected region if the answer is a location or area.
+      - Mark the selected object if the answer is an object.
+      - Draw an arrow if the answer involves direction or movement.
+      - Use a clear label marker if the answer corresponds to one of the candidate options.
+
+      Your output should make your intended answer visually clear.
+      Do not add unrelated objects, text, decorations, or explanations.
+
+      Original task instruction: "{question}"
+      Expected answer format: {answer_format}
+      Candidate options, if any: {choices}

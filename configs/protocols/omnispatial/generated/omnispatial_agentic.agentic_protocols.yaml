@@ -1,0 +1,259 @@
+protocols:
+- id: generated_omnispatial_agentic_Dynamic_Reasoning_vlm_fallback
+  task: Dynamic_Reasoning
+  decision: fallback
+  generation_prompt: 'Given the source image and the question: {question}
+
+    Create a single clean explanatory visual answer image that shows only the scene-based
+    evidence needed to support the chosen option. Do not write the option label or
+    any answer code. Instead, depict the inferred physical situation directly: for
+    example, highlight the relevant object(s), show the key distance or extent being
+    considered with large clear overlays, indicate the compared or resulting state
+    if needed, and add short numeric annotations only when the question explicitly
+    asks about a measurable quantity such as time, speed, or size. Keep the edit sparse,
+    legible, and grounded in the source image.
+
+
+    Candidate answers:
+
+    {choices}'
+  parse_prompt: Read only what the generated image explicitly expresses. Identify
+    the highlighted object(s), any shown distance/extent overlays, resulting state,
+    and any short numeric annotation that appears in the image. Then choose the benchmark
+    option whose text best matches that expressed visual evidence. Do not solve the
+    original question from the source image alone; rely on the generated evidence
+    and annotations.
+  parser_inputs:
+  - generated_response
+  visual_evidence: Grounded scene objects plus explicit visualized measurement, comparison,
+    or resulting state sufficient to distinguish one choice from the others.
+  invalid_conditions:
+  - The generated image shows only an answer label, check mark, yes/no symbol, or
+    other generic verdict code without grounded scene evidence.
+  - The generated image lacks enough visible evidence to distinguish among choices,
+    such as missing the relevant object, measurement overlay, resulting state, or
+    numeric annotation when needed.
+  - The parser bases its choice on the source image instead of the generated image’s
+    expressed evidence.
+  - The generated image contains dense prose or ambiguous tiny text that cannot be
+    reliably read as the intended evidence.
+  metric_contract:
+    metric: accuracy
+    config: {}
+    formal_evaluation: true
+  rationale: The task mixes open-ended dynamic and physical reasoning questions whose
+    answers are multiple-choice labels but whose evidence may require estimating distance,
+    time, speed, size, or possibility from scene semantics. No registered deterministic
+    recipe or Parser Ops pipeline can preserve this heterogeneous choice-selection
+    contract without solving the task inside the parser; a task-level visual-semantic
+    readout is needed.
+- id: generated_perspective_taking_v2
+  task: Perspective_Taking
+  decision: build
+  build_mode: recipe
+  recipe: semantic_visual_choice
+  visual_contract:
+    recipe: semantic_visual_choice
+    mode: reference_synthesis
+    primitives:
+    - selected egocentric spatial arrangement from the named person's perspective
+    - viewer-centered placement of the referenced object in the correct left/right/front/rear
+      position
+    - clear depiction of indeterminate view only when the scene genuinely lacks enough
+      information
+    parameters: {}
+  generation_prompt: 'Use the supplied image or ordered images to answer this spatial
+    task: "{question}". Choices: {choices}. Produce one clean visual realization of
+    the selected option''s actual spatial state, relation, action, or result. Do not
+    write option letters, answer labels, or explanatory text. Preserve recognizable
+    task-relevant objects. Output only the visual answer.'
+  readout:
+    recipe: semantic_visual_choice
+    output_kind: choice_label
+    pipeline:
+      steps:
+      - id: generated
+        op: load_generated
+      - id: choice
+        op: clip_match_choices
+        inputs:
+        - generated
+        params:
+          model:
+            $config: clip_model
+            default: ''
+          min_score:
+            $config: clip_min_score
+            default: 0.0
+          min_margin:
+            $config: clip_min_margin
+            default: 0.015
+      output: choice
+  metric_contract:
+    metric: accuracy
+    config: {}
+    formal_evaluation: true
+  rationale: The task is single-image multiple choice about egocentric spatial semantics
+    like left/right/front/rear from a named person's perspective. A clean visual realization
+    of the selected spatial state can preserve the answer contract without answer
+    codes, and semantic_visual_choice is the closest registered recipe for mapping
+    generated spatial evidence to choice labels.
+- id: generated_omnispatial_agentic_Perspective_Taking_vlm_fallback
+  task: Perspective_Taking
+  decision: fallback
+  generation_prompt: 'Use the supplied image or ordered images to answer this spatial
+    task: "{question}". Choices: {choices}. Produce one clean visual realization of
+    the selected option''s actual spatial state, relation, action, or result. Do not
+    write option letters, answer labels, or explanatory text. Preserve recognizable
+    task-relevant objects. Output only the visual answer.'
+  parse_prompt: Read only the concrete spatial evidence expressed in the generated
+    visual response. Identify the marked objects, regions, arrows, path, measurement,
+    correspondence, or generated state, then recover the answer in the benchmark's
+    required format. Candidate choices may be used only to map that visible evidence
+    to a label. Do not independently solve the original task from the source image
+    and do not accept a bare answer label as evidence.
+  parser_inputs:
+  - generated_response
+  visual_evidence: selected egocentric spatial arrangement from the named person's
+    perspective; viewer-centered placement of the referenced object in the correct
+    left/right/front/rear position; clear depiction of indeterminate view only when
+    the scene genuinely lacks enough information
+  invalid_conditions:
+  - no task-relevant spatial mark or generated state is visible
+  - the visible evidence is ambiguous or contradicts itself
+  - the response contains only an answer label or prose
+  metric_contract:
+    metric: accuracy
+    config: {}
+    formal_evaluation: true
+  rationale: 'The deterministic or fixed-model visual readout failed mechanical smoke
+    checks: parse_success_rate, parser_agreement_rate, spatial_evidence_rate, metric_compatibility_rate'
+  generation_protocol_preserved: true
+- id: generated_omnispatial_agentic_Spatial_Interaction_vlm_fallback
+  task: Spatial_Interaction
+  decision: fallback
+  generation_prompt: 'Given the driving scene and the question: {question}
+
+    Create a simple, clean visual answer image that depicts only the selected answer''s
+    task-relevant driving state or road meaning. Do not write letters, words, checkmarks,
+    X marks, or verdict symbols. For safety questions, show the concrete safe or unsafe
+    spacing/interaction itself as a large, unambiguous driving scene edit or synthesized
+    scene. For road-type questions, show the distinctive visible road configuration
+    and access structure of the selected road type. Keep the composition sparse and
+    focused on the decisive spatial evidence.
+
+
+    Candidate answers:
+
+    {choices}'
+  parse_prompt: Read only what the generated image depicts. Ignore the source image
+    except as context for the generation task. Determine which answer choice text
+    is best matched by the visible driving state, spacing, interaction, or road-type
+    scene shown in the generated image. Output exactly one choice label.
+  parser_inputs:
+  - generated_response
+  visual_evidence: A clearly depicted selected driving state, such as visibly safe
+    or unsafe following distance, or a distinctive entered road configuration corresponding
+    to one option's semantics.
+  invalid_conditions:
+  - The image answers using only letters, words, checkmarks, X marks, traffic-light
+    colors, or other generic verdict symbols.
+  - The image merely highlights an object or region from the source without depicting
+    the selected option's semantic driving state or road meaning.
+  - The image is too similar to multiple options and lacks decisive spatial cues for
+    a unique match.
+  metric_contract:
+    metric: accuracy
+    config: {}
+    formal_evaluation: true
+  rationale: The task mixes open-ended driving semantics, safety judgments, and road-type
+    recognition into a single choice-selection format. No deterministic recipe or
+    parser-op plan can preserve the answer contract across these heterogeneous questions
+    without the parser effectively solving the original task; a task-level visual-semantic
+    readout is needed.
+- id: generated_omnispatial_agentic_complex_logic__choice_selection__accuracy_vlm_fallback
+  task: complex_logic__choice_selection__accuracy
+  decision: fallback
+  generation_prompt: 'Create a clean, sparse solution board for the problem shown
+    in the source image and described by {question}. Re-express the key visual reasoning
+    steps needed to solve it using large, legible diagrams, equations, counts, folds,
+    or geometric constructions as appropriate to the specific problem type. Include
+    the final selected option by reproducing the chosen option''s task-relevant content
+    visibly on the board (for example the correct number, quantity, configuration,
+    length expression, or resulting state), not by writing only its letter label.
+    If useful, also show elimination marks or intermediate constructions grounded
+    in the source figure. Keep the layout simple and high-contrast.
+
+
+    Candidate answers:
+
+    {choices}'
+  parse_prompt: Read only the generated solution board. Determine which benchmark
+    choice is selected by matching the visibly expressed final answer content on the
+    board to the provided choice texts. Use the worked visual evidence, equations,
+    counts, or constructed state shown in the generated image; do not solve the original
+    source problem independently and do not rely on an isolated answer letter unless
+    it is attached to matching task-relevant final content.
+  parser_inputs:
+  - generated_response
+  visual_evidence: A generated board containing explicit task-grounded reasoning artifacts
+    such as counted valid cases, completed numeric pattern relations, or geometric
+    constructions/measurements, plus a final visible answer content matching one choice
+    text.
+  invalid_conditions:
+  - The generated image shows only an answer code such as A/B/C/D, a checkmark, or
+    a generic verdict without task-relevant final content.
+  - The generated board lacks enough visible reasoning or final grounded result to
+    uniquely match one choice text.
+  - The final visible result conflicts internally across different parts of the board.
+  - The image is too cluttered, tiny, or illegible for reliable matching of the expressed
+    answer content.
+  metric_contract:
+    metric: accuracy
+    config: {}
+    formal_evaluation: true
+  rationale: Samples span heterogeneous visual logic problems (net folding, number
+    pattern, geometry word/problem diagrams) with no single deterministic recipe or
+    parser-ops contract that preserves the choice-selection answer across the task.
+    A task-level visual reasoning parser is needed to read the generated worked visual
+    evidence rather than answer codes.
+- id: generated_omnispatial_agentic_complex_logic__structured_or_text__accuracy_vlm_fallback
+  task: complex_logic__structured_or_text__accuracy
+  decision: fallback
+  generation_prompt: 'Use the supplied source image or ordered images to produce one
+    clear visual answer to this spatial task:
+
+    {question}
+
+
+    Candidate answers, when present:
+
+    {choices}
+
+
+    Express the answer through large, task-relevant visual evidence in the image itself.
+    Use only the primitives that fit the task, such as object outlines, a region overlay,
+    arrows between referenced objects, a path, measurement marks, correspondence marks,
+    or a visibly rendered next spatial state. Preserve unrelated scene content. Do
+    not merely print an answer label, option text, or prose explanation.'
+  parse_prompt: Read only the concrete spatial evidence expressed in the generated
+    visual response. Identify the marked objects, regions, arrows, path, measurement,
+    correspondence, or generated state, then recover the answer in the benchmark's
+    required format. Candidate choices may be used only to map that visible evidence
+    to a label. Do not independently solve the original task from the source image
+    and do not accept a bare answer label as evidence.
+  parser_inputs:
+  - generated_response
+  visual_evidence: task-grounded object outlines, region overlays, arrows, paths,
+    measurement marks, correspondence marks, or a visibly changed spatial state
+  invalid_conditions:
+  - no task-relevant spatial mark or generated state is visible
+  - the visible evidence is ambiguous or contradicts itself
+  - the response contains only an answer label or prose
+  metric_contract:
+    metric: accuracy
+    config: {}
+    formal_evaluation: true
+  rationale: 'No validated deterministic visual readout remained after protocol construction:
+    fallback may not use a pure answer-code layout; fallback must require concrete
+    task-grounded spatial evidence'

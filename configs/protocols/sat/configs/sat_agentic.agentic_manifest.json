@@ -1,0 +1,1404 @@
+{
+  "benchmark": "sat_agentic",
+  "builder": "agentic_protocol_builder_v2",
+  "total_samples": 150,
+  "task_count": 8,
+  "completed_task_count": 8,
+  "active_task_count": 8,
+  "active_sample_count": 150,
+  "decision_counts": {
+    "build": 5,
+    "fallback": 3
+  },
+  "route_rows": [
+    {
+      "task": "action_conseq__binary_boolean__accuracy",
+      "decision": "build",
+      "build_mode": "recipe",
+      "active": true,
+      "sample_count": 32,
+      "confidence": "high",
+      "recipe": "relation_zone_boolean",
+      "protocol": "agentic_parser_ops_protocol",
+      "parser_backend": "deterministic",
+      "parser_output_kind": "boolean",
+      "metric": "accuracy",
+      "formal_evaluation": true,
+      "reason": "This is a single-image binary spatial/action consequence task. A grounded yes/no readout can be preserved by depicting the queried acted-upon state with subject/reference anchors and the full valid relation region, then deterministically recovering the boolean geometrically without answer codes."
+    },
+    {
+      "task": "action_conseq__choice_selection__accuracy",
+      "decision": "fallback",
+      "active": true,
+      "sample_count": 5,
+      "confidence": "medium",
+      "protocol_id": "generated_sat_agentic_action_conseq__choice_selection__accuracy_vlm_fallback",
+      "protocol": "agentic_vlm_protocol",
+      "parser_backend": "vlm_fallback",
+      "parser_inputs": [
+        "generated_response"
+      ],
+      "metric": "accuracy",
+      "formal_evaluation": true,
+      "reason": "No validated deterministic visual readout remained after protocol construction: fallback may not use a generic verdict symbol as the yes/no answer",
+      "source": "automatic_vlm_fallback",
+      "fallback_origin": "compile:fallback_validation",
+      "pre_fallback_decision": "unsupported",
+      "pre_fallback_source": "fallback_validation",
+      "pre_fallback_reason": "fallback may not use a generic verdict symbol as the yes/no answer"
+    },
+    {
+      "task": "ego_movement",
+      "decision": "fallback",
+      "active": true,
+      "sample_count": 23,
+      "confidence": "medium",
+      "protocol_id": "generated_sat_agentic_ego_movement_vlm_fallback",
+      "protocol": "agentic_vlm_protocol",
+      "parser_backend": "vlm_fallback",
+      "parser_inputs": [
+        "generated_response"
+      ],
+      "metric": "accuracy",
+      "formal_evaluation": true,
+      "reason": "No validated deterministic visual readout remained after protocol construction: fallback may not use a generic verdict symbol as the yes/no answer; fallback must require concrete task-grounded spatial evidence",
+      "source": "automatic_vlm_fallback",
+      "fallback_origin": "compile:fallback_validation",
+      "pre_fallback_decision": "unsupported",
+      "pre_fallback_source": "fallback_validation",
+      "pre_fallback_reason": "fallback may not use a generic verdict symbol as the yes/no answer; fallback must require concrete task-grounded spatial evidence"
+    },
+    {
+      "task": "goal_aim__binary_boolean__accuracy",
+      "decision": "build",
+      "build_mode": "recipe",
+      "active": true,
+      "sample_count": 4,
+      "confidence": "high",
+      "recipe": "relation_zone_boolean",
+      "protocol": "agentic_parser_ops_protocol",
+      "parser_backend": "deterministic",
+      "parser_output_kind": "boolean",
+      "metric": "accuracy",
+      "formal_evaluation": true,
+      "reason": "This is a single-image binary spatial-relation task about whether a post-turn facing direction would be away from a target object. The relation_zone_boolean recipe matches the binary boolean contract and preserves geometric evidence without using verdict symbols."
+    },
+    {
+      "task": "goal_aim__choice_selection__accuracy",
+      "decision": "build",
+      "build_mode": "recipe",
+      "active": true,
+      "sample_count": 30,
+      "confidence": "high",
+      "recipe": "dual_anchor_relation",
+      "protocol": "agentic_parser_ops_protocol",
+      "parser_backend": "deterministic",
+      "parser_output_kind": "choice_label",
+      "metric": "accuracy",
+      "formal_evaluation": true,
+      "reason": "This is a single-image left/right facing-direction choice task. A deterministic spatial relation protocol can preserve the answer by marking the current subject and target object and recovering whether the target lies to the left or right of the subject's facing direction, without using answer codes."
+    },
+    {
+      "task": "obj_movement",
+      "decision": "fallback",
+      "active": true,
+      "sample_count": 23,
+      "confidence": "medium",
+      "protocol_id": "generated_sat_agentic_obj_movement_vlm_fallback",
+      "protocol": "agentic_vlm_protocol",
+      "parser_backend": "vlm_fallback",
+      "parser_inputs": [
+        "generated_response"
+      ],
+      "metric": "accuracy",
+      "formal_evaluation": true,
+      "reason": "No validated deterministic visual readout remained after protocol construction: fallback may not use a generic verdict symbol as the yes/no answer",
+      "source": "automatic_vlm_fallback",
+      "fallback_origin": "compile:fallback_validation",
+      "pre_fallback_decision": "unsupported",
+      "pre_fallback_source": "fallback_validation",
+      "pre_fallback_reason": "fallback may not use a generic verdict symbol as the yes/no answer"
+    },
+    {
+      "task": "perspective__binary_boolean__accuracy",
+      "decision": "build",
+      "build_mode": "recipe",
+      "active": true,
+      "sample_count": 7,
+      "confidence": "high",
+      "recipe": "relation_zone_boolean",
+      "protocol": "agentic_parser_ops_protocol",
+      "parser_backend": "deterministic",
+      "parser_output_kind": "boolean",
+      "metric": "accuracy",
+      "formal_evaluation": true,
+      "reason": "This is a single-image binary spatial perspective task. The relation_zone_boolean recipe matches the binary_boolean contract and avoids answer-code symbols by expressing subject, reference, and the valid perspective-dependent relation region geometrically."
+    },
+    {
+      "task": "perspective__choice_selection__accuracy",
+      "decision": "build",
+      "build_mode": "recipe",
+      "active": true,
+      "sample_count": 26,
+      "confidence": "high",
+      "recipe": "dual_anchor_relation",
+      "protocol": "agentic_parser_ops_protocol",
+      "parser_backend": "deterministic",
+      "parser_output_kind": "choice_label",
+      "metric": "accuracy",
+      "formal_evaluation": true,
+      "reason": "This is a single-image left/right perspective choice task. A deterministic relation recipe can preserve the choice contract by grounding the person/agent and referenced object, then mapping recovered geometry to the matching textual choice."
+    }
+  ],
+  "task_contexts": {
+    "action_conseq__binary_boolean__accuracy": {
+      "representative_sample_ids": [
+        "sample_000024",
+        "sample_000029",
+        "sample_000033"
+      ],
+      "attached_media_count": 3,
+      "attached_media": [
+        {
+          "image_index": 1,
+          "sample_id": "sample_000024",
+          "media_index": 1,
+          "role": "primary",
+          "label": ""
+        },
+        {
+          "image_index": 2,
+          "sample_id": "sample_000029",
+          "media_index": 1,
+          "role": "primary",
+          "label": ""
+        },
+        {
+          "image_index": 3,
+          "sample_id": "sample_000033",
+          "media_index": 1,
+          "role": "primary",
+          "label": ""
+        }
+      ],
+      "missing_media": []
+    },
+    "action_conseq__choice_selection__accuracy": {
+      "representative_sample_ids": [
+        "sample_000038",
+        "sample_000098",
+        "sample_000099"
+      ],
+      "attached_media_count": 3,
+      "attached_media": [
+        {
+          "image_index": 1,
+          "sample_id": "sample_000038",
+          "media_index": 1,
+          "role": "primary",
+          "label": ""
+        },
+        {
+          "image_index": 2,
+          "sample_id": "sample_000098",
+          "media_index": 1,
+          "role": "primary",
+          "label": ""
+        },
+        {
+          "image_index": 3,
+          "sample_id": "sample_000099",
+          "media_index": 1,
+          "role": "primary",
+          "label": ""
+        }
+      ],
+      "missing_media": []
+    },
+    "ego_movement": {
+      "representative_sample_ids": [
+        "sample_000002",
+        "sample_000003",
+        "sample_000004"
+      ],
+      "attached_media_count": 6,
+      "attached_media": [
+        {
+          "image_index": 1,
+          "sample_id": "sample_000002",
+          "media_index": 1,
+          "role": "primary",
+          "label": "Image 1"
+        },
+        {
+          "image_index": 2,
+          "sample_id": "sample_000002",
+          "media_index": 2,
+          "role": "primary",
+          "label": "Image 2"
+        },
+        {
+          "image_index": 3,
+          "sample_id": "sample_000003",
+          "media_index": 1,
+          "role": "primary",
+          "label": "Image 1"
+        },
+        {
+          "image_index": 4,
+          "sample_id": "sample_000003",
+          "media_index": 2,
+          "role": "primary",
+          "label": "Image 2"
+        },
+        {
+          "image_index": 5,
+          "sample_id": "sample_000004",
+          "media_index": 1,
+          "role": "primary",
+          "label": "Image 1"
+        },
+        {
+          "image_index": 6,
+          "sample_id": "sample_000004",
+          "media_index": 2,
+          "role": "primary",
+          "label": "Image 2"
+        }
+      ],
+      "missing_media": []
+    },
+    "goal_aim__binary_boolean__accuracy": {
+      "representative_sample_ids": [
+        "sample_000028",
+        "sample_000049",
+        "sample_000061"
+      ],
+      "attached_media_count": 3,
+      "attached_media": [
+        {
+          "image_index": 1,
+          "sample_id": "sample_000028",
+          "media_index": 1,
+          "role": "primary",
+          "label": ""
+        },
+        {
+          "image_index": 2,
+          "sample_id": "sample_000049",
+          "media_index": 1,
+          "role": "primary",
+          "label": ""
+        },
+        {
+          "image_index": 3,
+          "sample_id": "sample_000061",
+          "media_index": 1,
+          "role": "primary",
+          "label": ""
+        }
+      ],
+      "missing_media": []
+    },
+    "goal_aim__choice_selection__accuracy": {
+      "representative_sample_ids": [
+        "sample_000027",
+        "sample_000037",
+        "sample_000039"
+      ],
+      "attached_media_count": 3,
+      "attached_media": [
+        {
+          "image_index": 1,
+          "sample_id": "sample_000027",
+          "media_index": 1,
+          "role": "primary",
+          "label": ""
+        },
+        {
+          "image_index": 2,
+          "sample_id": "sample_000037",
+          "media_index": 1,
+          "role": "primary",
+          "label": ""
+        },
+        {
+          "image_index": 3,
+          "sample_id": "sample_000039",
+          "media_index": 1,
+          "role": "primary",
+          "label": ""
+        }
+      ],
+      "missing_media": []
+    },
+    "obj_movement": {
+      "representative_sample_ids": [
+        "sample_000000",
+        "sample_000001",
+        "sample_000008"
+      ],
+      "attached_media_count": 6,
+      "attached_media": [
+        {
+          "image_index": 1,
+          "sample_id": "sample_000000",
+          "media_index": 1,
+          "role": "primary",
+          "label": "Image 1"
+        },
+        {
+          "image_index": 2,
+          "sample_id": "sample_000000",
+          "media_index": 2,
+          "role": "primary",
+          "label": "Image 2"
+        },
+        {
+          "image_index": 3,
+          "sample_id": "sample_000001",
+          "media_index": 1,
+          "role": "primary",
+          "label": "Image 1"
+        },
+        {
+          "image_index": 4,
+          "sample_id": "sample_000001",
+          "media_index": 2,
+          "role": "primary",
+          "label": "Image 2"
+        },
+        {
+          "image_index": 5,
+          "sample_id": "sample_000008",
+          "media_index": 1,
+          "role": "primary",
+          "label": "Image 1"
+        },
+        {
+          "image_index": 6,
+          "sample_id": "sample_000008",
+          "media_index": 2,
+          "role": "primary",
+          "label": "Image 2"
+        }
+      ],
+      "missing_media": []
+    },
+    "perspective__binary_boolean__accuracy": {
+      "representative_sample_ids": [
+        "sample_000030",
+        "sample_000032",
+        "sample_000035"
+      ],
+      "attached_media_count": 3,
+      "attached_media": [
+        {
+          "image_index": 1,
+          "sample_id": "sample_000030",
+          "media_index": 1,
+          "role": "primary",
+          "label": ""
+        },
+        {
+          "image_index": 2,
+          "sample_id": "sample_000032",
+          "media_index": 1,
+          "role": "primary",
+          "label": ""
+        },
+        {
+          "image_index": 3,
+          "sample_id": "sample_000035",
+          "media_index": 1,
+          "role": "primary",
+          "label": ""
+        }
+      ],
+      "missing_media": []
+    },
+    "perspective__choice_selection__accuracy": {
+      "representative_sample_ids": [
+        "sample_000025",
+        "sample_000026",
+        "sample_000031"
+      ],
+      "attached_media_count": 3,
+      "attached_media": [
+        {
+          "image_index": 1,
+          "sample_id": "sample_000025",
+          "media_index": 1,
+          "role": "primary",
+          "label": ""
+        },
+        {
+          "image_index": 2,
+          "sample_id": "sample_000026",
+          "media_index": 1,
+          "role": "primary",
+          "label": ""
+        },
+        {
+          "image_index": 3,
+          "sample_id": "sample_000031",
+          "media_index": 1,
+          "role": "primary",
+          "label": ""
+        }
+      ],
+      "missing_media": []
+    }
+  },
+  "task_contracts": {
+    "action_conseq__binary_boolean__accuracy": {
+      "task": "action_conseq__binary_boolean__accuracy",
+      "sample_count": 32,
+      "answer_schemas": [
+        "binary_boolean"
+      ],
+      "answer_types": [
+        "choice"
+      ],
+      "input_mode": "single",
+      "media_counts": [
+        1
+      ],
+      "metric": "accuracy",
+      "metric_config": {},
+      "formal_evaluation": true
+    },
+    "action_conseq__choice_selection__accuracy": {
+      "task": "action_conseq__choice_selection__accuracy",
+      "sample_count": 5,
+      "answer_schemas": [
+        "choice_selection"
+      ],
+      "answer_types": [
+        "choice"
+      ],
+      "input_mode": "single",
+      "media_counts": [
+        1
+      ],
+      "metric": "accuracy",
+      "metric_config": {},
+      "formal_evaluation": true
+    },
+    "ego_movement": {
+      "task": "ego_movement",
+      "sample_count": 23,
+      "answer_schemas": [
+        "choice_selection"
+      ],
+      "answer_types": [
+        "choice"
+      ],
+      "input_mode": "metadata_images",
+      "media_counts": [
+        2
+      ],
+      "metric": "accuracy",
+      "metric_config": {},
+      "formal_evaluation": true
+    },
+    "goal_aim__binary_boolean__accuracy": {
+      "task": "goal_aim__binary_boolean__accuracy",
+      "sample_count": 4,
+      "answer_schemas": [
+        "binary_boolean"
+      ],
+      "answer_types": [
+        "choice"
+      ],
+      "input_mode": "single",
+      "media_counts": [
+        1
+      ],
+      "metric": "accuracy",
+      "metric_config": {},
+      "formal_evaluation": true
+    },
+    "goal_aim__choice_selection__accuracy": {
+      "task": "goal_aim__choice_selection__accuracy",
+      "sample_count": 30,
+      "answer_schemas": [
+        "choice_selection"
+      ],
+      "answer_types": [
+        "choice"
+      ],
+      "input_mode": "single",
+      "media_counts": [
+        1
+      ],
+      "metric": "accuracy",
+      "metric_config": {},
+      "formal_evaluation": true
+    },
+    "obj_movement": {
+      "task": "obj_movement",
+      "sample_count": 23,
+      "answer_schemas": [
+        "choice_selection"
+      ],
+      "answer_types": [
+        "choice"
+      ],
+      "input_mode": "metadata_images",
+      "media_counts": [
+        2
+      ],
+      "metric": "accuracy",
+      "metric_config": {},
+      "formal_evaluation": true
+    },
+    "perspective__binary_boolean__accuracy": {
+      "task": "perspective__binary_boolean__accuracy",
+      "sample_count": 7,
+      "answer_schemas": [
+        "binary_boolean"
+      ],
+      "answer_types": [
+        "choice"
+      ],
+      "input_mode": "single",
+      "media_counts": [
+        1
+      ],
+      "metric": "accuracy",
+      "metric_config": {},
+      "formal_evaluation": true
+    },
+    "perspective__choice_selection__accuracy": {
+      "task": "perspective__choice_selection__accuracy",
+      "sample_count": 26,
+      "answer_schemas": [
+        "choice_selection"
+      ],
+      "answer_types": [
+        "choice"
+      ],
+      "input_mode": "single",
+      "media_counts": [
+        1
+      ],
+      "metric": "accuracy",
+      "metric_config": {},
+      "formal_evaluation": true
+    }
+  },
+  "revision_counts": {
+    "action_conseq__choice_selection__accuracy": 1,
+    "ego_movement": 1,
+    "obj_movement": 1
+  },
+  "revision_history": [
+    {
+      "task": "action_conseq__choice_selection__accuracy",
+      "phase": "smoke",
+      "previous_diagnostics": {
+        "failed_checks": [
+          "parse_success_rate",
+          "parser_agreement_rate"
+        ],
+        "failure_category_counts": {
+          "parser_failure": 2
+        },
+        "parser_disagreements": [
+          {
+            "id": "sample_000038",
+            "prediction_pass1": "",
+            "prediction_pass2": ""
+          },
+          {
+            "id": "sample_000099",
+            "prediction_pass1": "",
+            "prediction_pass2": ""
+          }
+        ],
+        "failed_samples": [
+          {
+            "id": "sample_000038",
+            "generation_success": true,
+            "generation_error_type": "",
+            "generation_error_message": "",
+            "parse_success": false,
+            "parse_error_type": "ambiguous_clip_match",
+            "parse_error_message": "CLIP choice match is ambiguous",
+            "parser_ops": {
+              "output": "choice",
+              "steps": {
+                "generated": {
+                  "op": "load_generated",
+                  "status": "ok",
+                  "kind": "image_bgr",
+                  "width": 640,
+                  "height": 423,
+                  "channels": 3
+                },
+                "choice": {
+                  "op": "clip_match_choices",
+                  "status": "failed",
+                  "error": "CLIP choice match is ambiguous",
+                  "error_type": "ambiguous_clip_match",
+                  "scores": [
+                    0.1816614270210266,
+                    0.18384777009487152
+                  ],
+                  "best_score": 0.18384777009487152,
+                  "margin": 0.0021863430738449097
+                }
+              }
+            }
+          },
+          {
+            "id": "sample_000099",
+            "generation_success": true,
+            "generation_error_type": "",
+            "generation_error_message": "",
+            "parse_success": false,
+            "parse_error_type": "ambiguous_clip_match",
+            "parse_error_message": "CLIP choice match is ambiguous",
+            "parser_ops": {
+              "output": "choice",
+              "steps": {
+                "generated": {
+                  "op": "load_generated",
+                  "status": "ok",
+                  "kind": "image_bgr",
+                  "width": 640,
+                  "height": 443,
+                  "channels": 3
+                },
+                "choice": {
+                  "op": "clip_match_choices",
+                  "status": "failed",
+                  "error": "CLIP choice match is ambiguous",
+                  "error_type": "ambiguous_clip_match",
+                  "scores": [
+                    0.17574302852153778,
+                    0.1791510432958603
+                  ],
+                  "best_score": 0.1791510432958603,
+                  "margin": 0.0034080147743225098
+                }
+              }
+            }
+          }
+        ]
+      }
+    },
+    {
+      "task": "ego_movement",
+      "phase": "smoke",
+      "previous_diagnostics": {
+        "failed_checks": [
+          "parse_success_rate",
+          "parser_agreement_rate",
+          "spatial_evidence_rate",
+          "metric_compatibility_rate"
+        ],
+        "failure_category_counts": {
+          "parser_failure": 3
+        },
+        "parser_disagreements": [
+          {
+            "id": "sample_000002",
+            "prediction_pass1": "",
+            "prediction_pass2": ""
+          },
+          {
+            "id": "sample_000003",
+            "prediction_pass1": "",
+            "prediction_pass2": ""
+          },
+          {
+            "id": "sample_000004",
+            "prediction_pass1": "",
+            "prediction_pass2": ""
+          }
+        ],
+        "failed_samples": [
+          {
+            "id": "sample_000002",
+            "generation_success": true,
+            "generation_error_type": "",
+            "generation_error_message": "",
+            "parse_success": false,
+            "parse_error_type": "ambiguous_clip_match",
+            "parse_error_message": "CLIP choice match is ambiguous",
+            "parser_ops": {
+              "output": "choice",
+              "steps": {
+                "generated": {
+                  "op": "load_generated",
+                  "status": "ok",
+                  "kind": "image_bgr",
+                  "width": 1448,
+                  "height": 1086,
+                  "channels": 3
+                },
+                "choice": {
+                  "op": "clip_match_choices",
+                  "status": "failed",
+                  "error": "CLIP choice match is ambiguous",
+                  "error_type": "ambiguous_clip_match",
+                  "scores": [
+                    0.20855753123760223,
+                    0.19784021377563477
+                  ],
+                  "best_score": 0.20855753123760223,
+                  "margin": 0.010717317461967468
+                }
+              }
+            }
+          },
+          {
+            "id": "sample_000003",
+            "generation_success": true,
+            "generation_error_type": "",
+            "generation_error_message": "",
+            "parse_success": false,
+            "parse_error_type": "ambiguous_clip_match",
+            "parse_error_message": "CLIP choice match is ambiguous",
+            "parser_ops": {
+              "output": "choice",
+              "steps": {
+                "generated": {
+                  "op": "load_generated",
+                  "status": "ok",
+                  "kind": "image_bgr",
+                  "width": 1448,
+                  "height": 1086,
+                  "channels": 3
+                },
+                "choice": {
+                  "op": "clip_match_choices",
+                  "status": "failed",
+                  "error": "CLIP choice match is ambiguous",
+                  "error_type": "ambiguous_clip_match",
+                  "scores": [
+                    0.21460053324699402,
+                    0.22739635407924652
+                  ],
+                  "best_score": 0.22739635407924652,
+                  "margin": 0.012795820832252502
+                }
+              }
+            }
+          },
+          {
+            "id": "sample_000004",
+            "generation_success": true,
+            "generation_error_type": "",
+            "generation_error_message": "",
+            "parse_success": false,
+            "parse_error_type": "ambiguous_clip_match",
+            "parse_error_message": "CLIP choice match is ambiguous",
+            "parser_ops": {
+              "output": "choice",
+              "steps": {
+                "generated": {
+                  "op": "load_generated",
+                  "status": "ok",
+                  "kind": "image_bgr",
+                  "width": 1774,
+                  "height": 887,
+                  "channels": 3
+                },
+                "choice": {
+                  "op": "clip_match_choices",
+                  "status": "failed",
+                  "error": "CLIP choice match is ambiguous",
+                  "error_type": "ambiguous_clip_match",
+                  "scores": [
+                    0.21120283007621765,
+                    0.20989884436130524
+                  ],
+                  "best_score": 0.21120283007621765,
+                  "margin": 0.0013039857149124146
+                }
+              }
+            }
+          }
+        ]
+      }
+    },
+    {
+      "task": "obj_movement",
+      "phase": "smoke",
+      "previous_diagnostics": {
+        "failed_checks": [
+          "parse_success_rate",
+          "parser_agreement_rate",
+          "spatial_evidence_rate",
+          "metric_compatibility_rate"
+        ],
+        "failure_category_counts": {
+          "parser_failure": 3
+        },
+        "parser_disagreements": [
+          {
+            "id": "sample_000000",
+            "prediction_pass1": "",
+            "prediction_pass2": ""
+          },
+          {
+            "id": "sample_000001",
+            "prediction_pass1": "",
+            "prediction_pass2": ""
+          },
+          {
+            "id": "sample_000008",
+            "prediction_pass1": "",
+            "prediction_pass2": ""
+          }
+        ],
+        "failed_samples": [
+          {
+            "id": "sample_000000",
+            "generation_success": true,
+            "generation_error_type": "",
+            "generation_error_message": "",
+            "parse_success": false,
+            "parse_error_type": "ambiguous_clip_match",
+            "parse_error_message": "CLIP choice match is ambiguous",
+            "parser_ops": {
+              "output": "choice",
+              "steps": {
+                "generated": {
+                  "op": "load_generated",
+                  "status": "ok",
+                  "kind": "image_bgr",
+                  "width": 1448,
+                  "height": 1086,
+                  "channels": 3
+                },
+                "choice": {
+                  "op": "clip_match_choices",
+                  "status": "failed",
+                  "error": "CLIP choice match is ambiguous",
+                  "error_type": "ambiguous_clip_match",
+                  "scores": [
+                    0.24500080943107605,
+                    0.24299302697181702
+                  ],
+                  "best_score": 0.24500080943107605,
+                  "margin": 0.002007782459259033
+                }
+              }
+            }
+          },
+          {
+            "id": "sample_000001",
+            "generation_success": true,
+            "generation_error_type": "",
+            "generation_error_message": "",
+            "parse_success": false,
+            "parse_error_type": "ambiguous_clip_match",
+            "parse_error_message": "CLIP choice match is ambiguous",
+            "parser_ops": {
+              "output": "choice",
+              "steps": {
+                "generated": {
+                  "op": "load_generated",
+                  "status": "ok",
+                  "kind": "image_bgr",
+                  "width": 1448,
+                  "height": 1086,
+                  "channels": 3
+                },
+                "choice": {
+                  "op": "clip_match_choices",
+                  "status": "failed",
+                  "error": "CLIP choice match is ambiguous",
+                  "error_type": "ambiguous_clip_match",
+                  "scores": [
+                    0.23299086093902588,
+                    0.23057958483695984
+                  ],
+                  "best_score": 0.23299086093902588,
+                  "margin": 0.00241127610206604
+                }
+              }
+            }
+          },
+          {
+            "id": "sample_000008",
+            "generation_success": true,
+            "generation_error_type": "",
+            "generation_error_message": "",
+            "parse_success": false,
+            "parse_error_type": "ambiguous_clip_match",
+            "parse_error_message": "CLIP choice match is ambiguous",
+            "parser_ops": {
+              "output": "choice",
+              "steps": {
+                "generated": {
+                  "op": "load_generated",
+                  "status": "ok",
+                  "kind": "image_bgr",
+                  "width": 1448,
+                  "height": 1086,
+                  "channels": 3
+                },
+                "choice": {
+                  "op": "clip_match_choices",
+                  "status": "failed",
+                  "error": "CLIP choice match is ambiguous",
+                  "error_type": "ambiguous_clip_match",
+                  "scores": [
+                    0.2044270783662796,
+                    0.19619829952716827
+                  ],
+                  "best_score": 0.2044270783662796,
+                  "margin": 0.008228778839111328
+                }
+              }
+            }
+          }
+        ]
+      }
+    }
+  ],
+  "automatic_vlm_fallback_tasks": [
+    "action_conseq__choice_selection__accuracy",
+    "ego_movement",
+    "obj_movement"
+  ],
+  "fallback_history": [
+    {
+      "task": "action_conseq__choice_selection__accuracy",
+      "origin": "compile:fallback_validation",
+      "reason": "No validated deterministic visual readout remained after protocol construction: fallback may not use a generic verdict symbol as the yes/no answer"
+    },
+    {
+      "task": "ego_movement",
+      "origin": "compile:fallback_validation",
+      "reason": "No validated deterministic visual readout remained after protocol construction: fallback may not use a generic verdict symbol as the yes/no answer; fallback must require concrete task-grounded spatial evidence"
+    },
+    {
+      "task": "obj_movement",
+      "origin": "compile:fallback_validation",
+      "reason": "No validated deterministic visual readout remained after protocol construction: fallback may not use a generic verdict symbol as the yes/no answer"
+    }
+  ],
+  "disabled_tasks": [],
+  "deferred_external_failure_tasks": [],
+  "warnings": [
+    "Rejected VLM fallback for task=action_conseq__choice_selection__accuracy: fallback may not use a generic verdict symbol as the yes/no answer",
+    "Task action_conseq__choice_selection__accuracy entered automatic VLM fallback after compile:fallback_validation.",
+    "Rejected VLM fallback for task=ego_movement: fallback may not use a generic verdict symbol as the yes/no answer; fallback must require concrete task-grounded spatial evidence",
+    "Task ego_movement entered automatic VLM fallback after compile:fallback_validation.",
+    "Rejected VLM fallback for task=obj_movement: fallback may not use a generic verdict symbol as the yes/no answer",
+    "Task obj_movement entered automatic VLM fallback after compile:fallback_validation."
+  ],
+  "smoke_validation": {
+    "model": "gpt-image-2",
+    "limit": 3,
+    "smoke_data_file": "smoke/smoke_samples.jsonl",
+    "sample_ids": {
+      "action_conseq__binary_boolean__accuracy": [
+        "sample_000024",
+        "sample_000029",
+        "sample_000033"
+      ],
+      "action_conseq__choice_selection__accuracy": [
+        "sample_000038",
+        "sample_000098",
+        "sample_000099"
+      ],
+      "ego_movement": [
+        "sample_000002",
+        "sample_000003",
+        "sample_000004"
+      ],
+      "goal_aim__binary_boolean__accuracy": [
+        "sample_000028",
+        "sample_000049",
+        "sample_000061"
+      ],
+      "goal_aim__choice_selection__accuracy": [
+        "sample_000027",
+        "sample_000037",
+        "sample_000039"
+      ],
+      "obj_movement": [
+        "sample_000000",
+        "sample_000001",
+        "sample_000008"
+      ],
+      "perspective__binary_boolean__accuracy": [
+        "sample_000030",
+        "sample_000032",
+        "sample_000035"
+      ],
+      "perspective__choice_selection__accuracy": [
+        "sample_000025",
+        "sample_000026",
+        "sample_000031"
+      ]
+    },
+    "tasks": {
+      "action_conseq__binary_boolean__accuracy": {
+        "status": "passed",
+        "phase": "initial",
+        "valid_parse_rate": 100.0,
+        "valid_parse_rate_pass1": 100.0,
+        "valid_parse_rate_pass2": 100.0,
+        "readout_operational_rate": 100.0,
+        "readout_operational_rate_pass1": 100.0,
+        "readout_operational_rate_pass2": 100.0,
+        "generated_rate": 100.0,
+        "parser_agreement_rate": 100.0,
+        "spatial_evidence_rate": 100.0,
+        "spatial_evidence_rate_pass1": 100.0,
+        "spatial_evidence_rate_pass2": 100.0,
+        "metric_compatibility_rate": 100.0,
+        "mean_score": 0.3333333333333333,
+        "correct_count": 1,
+        "initial_generation_failure_count": 0,
+        "generation_retry_count": 0,
+        "failed_checks": [],
+        "parser_disagreements": [],
+        "failure_category_counts": {
+          "incorrect_prediction": 2
+        },
+        "failure_reasons": [],
+        "results_pass1": "smoke/action_conseq__binary_boolean__accuracy/results_pass1.json",
+        "results_pass2": "smoke/action_conseq__binary_boolean__accuracy/results_pass2.json"
+      },
+      "action_conseq__choice_selection__accuracy": {
+        "status": "passed",
+        "phase": "revision",
+        "valid_parse_rate": 100.0,
+        "valid_parse_rate_pass1": 100.0,
+        "valid_parse_rate_pass2": 100.0,
+        "readout_operational_rate": 100.0,
+        "readout_operational_rate_pass1": 100.0,
+        "readout_operational_rate_pass2": 100.0,
+        "generated_rate": 100.0,
+        "parser_agreement_rate": 100.0,
+        "spatial_evidence_rate": 100.0,
+        "spatial_evidence_rate_pass1": 100.0,
+        "spatial_evidence_rate_pass2": 100.0,
+        "metric_compatibility_rate": 100.0,
+        "mean_score": 0.6666666666666666,
+        "correct_count": 2,
+        "initial_generation_failure_count": 0,
+        "generation_retry_count": 0,
+        "failed_checks": [],
+        "parser_disagreements": [],
+        "failure_category_counts": {
+          "incorrect_prediction": 1
+        },
+        "failure_reasons": [],
+        "results_pass1": "smoke_revision1/action_conseq__choice_selection__accuracy/results_pass1.json",
+        "results_pass2": "smoke_revision1/action_conseq__choice_selection__accuracy/results_pass2.json"
+      },
+      "ego_movement": {
+        "status": "passed",
+        "phase": "revision",
+        "valid_parse_rate": 100.0,
+        "valid_parse_rate_pass1": 100.0,
+        "valid_parse_rate_pass2": 100.0,
+        "readout_operational_rate": 100.0,
+        "readout_operational_rate_pass1": 100.0,
+        "readout_operational_rate_pass2": 100.0,
+        "generated_rate": 100.0,
+        "parser_agreement_rate": 100.0,
+        "spatial_evidence_rate": 100.0,
+        "spatial_evidence_rate_pass1": 100.0,
+        "spatial_evidence_rate_pass2": 100.0,
+        "metric_compatibility_rate": 100.0,
+        "mean_score": 1.0,
+        "correct_count": 3,
+        "initial_generation_failure_count": 0,
+        "generation_retry_count": 0,
+        "failed_checks": [],
+        "parser_disagreements": [],
+        "failure_category_counts": {},
+        "failure_reasons": [],
+        "results_pass1": "smoke_revision1/ego_movement/results_pass1.json",
+        "results_pass2": "smoke_revision1/ego_movement/results_pass2.json"
+      },
+      "goal_aim__binary_boolean__accuracy": {
+        "status": "passed",
+        "phase": "initial",
+        "valid_parse_rate": 100.0,
+        "valid_parse_rate_pass1": 100.0,
+        "valid_parse_rate_pass2": 100.0,
+        "readout_operational_rate": 100.0,
+        "readout_operational_rate_pass1": 100.0,
+        "readout_operational_rate_pass2": 100.0,
+        "generated_rate": 100.0,
+        "parser_agreement_rate": 100.0,
+        "spatial_evidence_rate": 100.0,
+        "spatial_evidence_rate_pass1": 100.0,
+        "spatial_evidence_rate_pass2": 100.0,
+        "metric_compatibility_rate": 100.0,
+        "mean_score": 0.6666666666666666,
+        "correct_count": 2,
+        "initial_generation_failure_count": 0,
+        "generation_retry_count": 0,
+        "failed_checks": [],
+        "parser_disagreements": [],
+        "failure_category_counts": {
+          "incorrect_prediction": 1
+        },
+        "failure_reasons": [],
+        "results_pass1": "smoke/goal_aim__binary_boolean__accuracy/results_pass1.json",
+        "results_pass2": "smoke/goal_aim__binary_boolean__accuracy/results_pass2.json"
+      },
+      "goal_aim__choice_selection__accuracy": {
+        "status": "passed",
+        "phase": "initial",
+        "valid_parse_rate": 100.0,
+        "valid_parse_rate_pass1": 100.0,
+        "valid_parse_rate_pass2": 100.0,
+        "readout_operational_rate": 100.0,
+        "readout_operational_rate_pass1": 100.0,
+        "readout_operational_rate_pass2": 100.0,
+        "generated_rate": 100.0,
+        "parser_agreement_rate": 100.0,
+        "spatial_evidence_rate": 100.0,
+        "spatial_evidence_rate_pass1": 100.0,
+        "spatial_evidence_rate_pass2": 100.0,
+        "metric_compatibility_rate": 100.0,
+        "mean_score": 1.0,
+        "correct_count": 3,
+        "initial_generation_failure_count": 0,
+        "generation_retry_count": 0,
+        "failed_checks": [],
+        "parser_disagreements": [],
+        "failure_category_counts": {},
+        "failure_reasons": [],
+        "results_pass1": "smoke/goal_aim__choice_selection__accuracy/results_pass1.json",
+        "results_pass2": "smoke/goal_aim__choice_selection__accuracy/results_pass2.json"
+      },
+      "obj_movement": {
+        "status": "passed",
+        "phase": "revision",
+        "valid_parse_rate": 100.0,
+        "valid_parse_rate_pass1": 100.0,
+        "valid_parse_rate_pass2": 100.0,
+        "readout_operational_rate": 100.0,
+        "readout_operational_rate_pass1": 100.0,
+        "readout_operational_rate_pass2": 100.0,
+        "generated_rate": 100.0,
+        "parser_agreement_rate": 100.0,
+        "spatial_evidence_rate": 100.0,
+        "spatial_evidence_rate_pass1": 100.0,
+        "spatial_evidence_rate_pass2": 100.0,
+        "metric_compatibility_rate": 100.0,
+        "mean_score": 0.6666666666666666,
+        "correct_count": 2,
+        "initial_generation_failure_count": 0,
+        "generation_retry_count": 0,
+        "failed_checks": [],
+        "parser_disagreements": [],
+        "failure_category_counts": {
+          "incorrect_prediction": 1
+        },
+        "failure_reasons": [],
+        "results_pass1": "smoke_revision1/obj_movement/results_pass1.json",
+        "results_pass2": "smoke_revision1/obj_movement/results_pass2.json"
+      },
+      "perspective__binary_boolean__accuracy": {
+        "status": "passed",
+        "phase": "initial",
+        "valid_parse_rate": 100.0,
+        "valid_parse_rate_pass1": 100.0,
+        "valid_parse_rate_pass2": 100.0,
+        "readout_operational_rate": 100.0,
+        "readout_operational_rate_pass1": 100.0,
+        "readout_operational_rate_pass2": 100.0,
+        "generated_rate": 100.0,
+        "parser_agreement_rate": 100.0,
+        "spatial_evidence_rate": 100.0,
+        "spatial_evidence_rate_pass1": 100.0,
+        "spatial_evidence_rate_pass2": 100.0,
+        "metric_compatibility_rate": 100.0,
+        "mean_score": 0.6666666666666666,
+        "correct_count": 2,
+        "initial_generation_failure_count": 0,
+        "generation_retry_count": 0,
+        "failed_checks": [],
+        "parser_disagreements": [],
+        "failure_category_counts": {
+          "incorrect_prediction": 1
+        },
+        "failure_reasons": [],
+        "results_pass1": "smoke/perspective__binary_boolean__accuracy/results_pass1.json",
+        "results_pass2": "smoke/perspective__binary_boolean__accuracy/results_pass2.json"
+      },
+      "perspective__choice_selection__accuracy": {
+        "status": "passed",
+        "phase": "initial",
+        "valid_parse_rate": 66.66666666666667,
+        "valid_parse_rate_pass1": 66.66666666666667,
+        "valid_parse_rate_pass2": 66.66666666666667,
+        "readout_operational_rate": 66.66666666666667,
+        "readout_operational_rate_pass1": 66.66666666666667,
+        "readout_operational_rate_pass2": 66.66666666666667,
+        "generated_rate": 100.0,
+        "parser_agreement_rate": 66.66666666666667,
+        "spatial_evidence_rate": 100.0,
+        "spatial_evidence_rate_pass1": 100.0,
+        "spatial_evidence_rate_pass2": 100.0,
+        "metric_compatibility_rate": 100.0,
+        "mean_score": 0.6666666666666666,
+        "correct_count": 2,
+        "initial_generation_failure_count": 0,
+        "generation_retry_count": 0,
+        "failed_checks": [],
+        "parser_disagreements": [
+          {
+            "id": "sample_000026",
+            "prediction_pass1": "",
+            "prediction_pass2": ""
+          }
+        ],
+        "failure_category_counts": {
+          "parser_failure": 1
+        },
+        "failure_reasons": [
+          "ambiguous_choice_mapping"
+        ],
+        "results_pass1": "smoke/perspective__choice_selection__accuracy/results_pass1.json",
+        "results_pass2": "smoke/perspective__choice_selection__accuracy/results_pass2.json"
+      }
+    },
+    "revision_runs": [
+      {
+        "model": "gpt-image-2",
+        "limit": 3,
+        "smoke_data_file": "smoke_revision1/smoke_samples.jsonl",
+        "sample_ids": {
+          "action_conseq__choice_selection__accuracy": [
+            "sample_000038",
+            "sample_000098",
+            "sample_000099"
+          ]
+        },
+        "tasks": {
+          "action_conseq__choice_selection__accuracy": {
+            "status": "passed",
+            "phase": "revision",
+            "valid_parse_rate": 100.0,
+            "valid_parse_rate_pass1": 100.0,
+            "valid_parse_rate_pass2": 100.0,
+            "readout_operational_rate": 100.0,
+            "readout_operational_rate_pass1": 100.0,
+            "readout_operational_rate_pass2": 100.0,
+            "generated_rate": 100.0,
+            "parser_agreement_rate": 100.0,
+            "spatial_evidence_rate": 100.0,
+            "spatial_evidence_rate_pass1": 100.0,
+            "spatial_evidence_rate_pass2": 100.0,
+            "metric_compatibility_rate": 100.0,
+            "mean_score": 0.6666666666666666,
+            "correct_count": 2,
+            "initial_generation_failure_count": 0,
+            "generation_retry_count": 0,
+            "failed_checks": [],
+            "parser_disagreements": [],
+            "failure_category_counts": {
+              "incorrect_prediction": 1
+            },
+            "failure_reasons": [],
+            "results_pass1": "smoke_revision1/action_conseq__choice_selection__accuracy/results_pass1.json",
+            "results_pass2": "smoke_revision1/action_conseq__choice_selection__accuracy/results_pass2.json"
+          }
+        }
+      },
+      {
+        "model": "gpt-image-2",
+        "limit": 3,
+        "smoke_data_file": "smoke_revision1/smoke_samples.jsonl",
+        "sample_ids": {
+          "ego_movement": [
+            "sample_000002",
+            "sample_000003",
+            "sample_000004"
+          ]
+        },
+        "tasks": {
+          "ego_movement": {
+            "status": "passed",
+            "phase": "revision",
+            "valid_parse_rate": 100.0,
+            "valid_parse_rate_pass1": 100.0,
+            "valid_parse_rate_pass2": 100.0,
+            "readout_operational_rate": 100.0,
+            "readout_operational_rate_pass1": 100.0,
+            "readout_operational_rate_pass2": 100.0,
+            "generated_rate": 100.0,
+            "parser_agreement_rate": 100.0,
+            "spatial_evidence_rate": 100.0,
+            "spatial_evidence_rate_pass1": 100.0,
+            "spatial_evidence_rate_pass2": 100.0,
+            "metric_compatibility_rate": 100.0,
+            "mean_score": 1.0,
+            "correct_count": 3,
+            "initial_generation_failure_count": 0,
+            "generation_retry_count": 0,
+            "failed_checks": [],
+            "parser_disagreements": [],
+            "failure_category_counts": {},
+            "failure_reasons": [],
+            "results_pass1": "smoke_revision1/ego_movement/results_pass1.json",
+            "results_pass2": "smoke_revision1/ego_movement/results_pass2.json"
+          }
+        }
+      },
+      {
+        "model": "gpt-image-2",
+        "limit": 3,
+        "smoke_data_file": "smoke_revision1/smoke_samples.jsonl",
+        "sample_ids": {
+          "obj_movement": [
+            "sample_000000",
+            "sample_000001",
+            "sample_000008"
+          ]
+        },
+        "tasks": {
+          "obj_movement": {
+            "status": "passed",
+            "phase": "revision",
+            "valid_parse_rate": 100.0,
+            "valid_parse_rate_pass1": 100.0,
+            "valid_parse_rate_pass2": 100.0,
+            "readout_operational_rate": 100.0,
+            "readout_operational_rate_pass1": 100.0,
+            "readout_operational_rate_pass2": 100.0,
+            "generated_rate": 100.0,
+            "parser_agreement_rate": 100.0,
+            "spatial_evidence_rate": 100.0,
+            "spatial_evidence_rate_pass1": 100.0,
+            "spatial_evidence_rate_pass2": 100.0,
+            "metric_compatibility_rate": 100.0,
+            "mean_score": 0.6666666666666666,
+            "correct_count": 2,
+            "initial_generation_failure_count": 0,
+            "generation_retry_count": 0,
+            "failed_checks": [],
+            "parser_disagreements": [],
+            "failure_category_counts": {
+              "incorrect_prediction": 1
+            },
+            "failure_reasons": [],
+            "results_pass1": "smoke_revision1/obj_movement/results_pass1.json",
+            "results_pass2": "smoke_revision1/obj_movement/results_pass2.json"
+          }
+        }
+      }
+    ]
+  },
+  "protocol_artifact": {
+    "schema_version": "provise.protocol.v1",
+    "config_sha256": "b4da35a96f8278ede27a2ee4d6fe9ef5891bbcae6ccd419a0815cc8a7c617355"
+  }
+}

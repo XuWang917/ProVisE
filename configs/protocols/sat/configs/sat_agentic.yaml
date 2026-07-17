@@ -1,0 +1,1182 @@
+benchmark: sat_agentic
+data_file: benchmark/data.jsonl
+benchmark_root: benchmark
+protocol_build:
+  schema_version: provise.protocol.v1
+  frozen: true
+  agent_model: gpt-5.4
+  parser_model: gpt-5.4
+  validation_model: gpt-image-2
+tasks:
+  action_conseq__binary_boolean__accuracy:
+    protocol: agentic_parser_ops_protocol
+    prompt_variant: generated
+    prompt: 'Answer the binary spatial-relation question: "{question}". Keep the source
+      image unchanged. Place one solid magenta disk (#FF00FF) at the center of the
+      subject object and one solid cyan disk (#00FFFF) at the center of the reference
+      object. Overlay one large translucent vivid-green filled region (#00FF00) covering
+      the image locations where the subject would satisfy exactly the relation asked
+      in the question. Keep the two disks visible above the region. Do not move either
+      object. Do not add a check mark, X, yes/no text, option label, or other verdict
+      symbol. Output only the annotated image.
+
+
+      Candidate answers:
+
+      {choices}'
+    input:
+      mode: single
+    metric: accuracy
+    metric_config: &id005 {}
+    formal_evaluation: true
+    protocol_config:
+      parser_pipeline:
+        steps:
+        - id: generated
+          op: load_generated
+        - id: source
+          op: load_source
+          params:
+            index: 0
+        - id: aligned
+          op: align_to_reference
+          inputs:
+          - generated
+          - source
+          params:
+            motion: euclidean
+        - id: subject_generated_mask
+          op: hsv_color_mask
+          inputs:
+          - aligned
+          params:
+            lower: &id001
+            - 140
+            - 80
+            - 80
+            upper: &id002
+            - 179
+            - 255
+            - 255
+        - id: subject_source_mask
+          op: hsv_color_mask
+          inputs:
+          - source
+          params:
+            lower: *id001
+            upper: *id002
+        - id: subject_source_guard
+          op: morphology
+          inputs:
+          - subject_source_mask
+          params:
+            operation: dilate
+            kernel_size: 5
+            iterations: 1
+        - id: subject_novel_mask
+          op: mask_subtract
+          inputs:
+          - subject_generated_mask
+          - subject_source_guard
+        - id: subject_clean_mask
+          op: morphology
+          inputs:
+          - subject_novel_mask
+          params:
+            operation: close
+            kernel_size: 5
+            iterations: 1
+        - id: subject_components
+          op: connected_components
+          inputs:
+          - subject_clean_mask
+        - id: subject_candidates
+          op: filter_components
+          inputs:
+          - subject_components
+          params:
+            min_area: 40
+        - id: subject_component
+          op: select_largest
+          inputs:
+          - subject_candidates
+          params:
+            ambiguity_ratio: 1.0
+        - id: reference_generated_mask
+          op: hsv_color_mask
+          inputs:
+          - aligned
+          params:
+            lower: &id003
+            - 80
+            - 80
+            - 80
+            upper: &id004
+            - 100
+            - 255
+            - 255
+        - id: reference_source_mask
+          op: hsv_color_mask
+          inputs:
+          - source
+          params:
+            lower: *id003
+            upper: *id004
+        - id: reference_source_guard
+          op: morphology
+          inputs:
+          - reference_source_mask
+          params:
+            operation: dilate
+            kernel_size: 5
+            iterations: 1
+        - id: reference_novel_mask
+          op: mask_subtract
+          inputs:
+          - reference_generated_mask
+          - reference_source_guard
+        - id: reference_clean_mask
+          op: morphology
+          inputs:
+          - reference_novel_mask
+          params:
+            operation: close
+            kernel_size: 5
+            iterations: 1
+        - id: reference_components
+          op: connected_components
+          inputs:
+          - reference_clean_mask
+        - id: reference_candidates
+          op: filter_components
+          inputs:
+          - reference_components
+          params:
+            min_area: 40
+        - id: reference_component
+          op: select_largest
+          inputs:
+          - reference_candidates
+          params:
+            ambiguity_ratio: 1.0
+        - id: target_region_generated_mask
+          op: hsv_color_mask
+          inputs:
+          - aligned
+          params:
+            lower:
+            - 35
+            - 50
+            - 50
+            upper:
+            - 90
+            - 255
+            - 255
+        - id: target_region_source_mask
+          op: hsv_color_mask
+          inputs:
+          - source
+          params:
+            lower:
+            - 35
+            - 50
+            - 50
+            upper:
+            - 90
+            - 255
+            - 255
+        - id: target_region_source_guard
+          op: morphology
+          inputs:
+          - target_region_source_mask
+          params:
+            operation: dilate
+            kernel_size: 5
+            iterations: 1
+        - id: target_region_novel_mask
+          op: mask_subtract
+          inputs:
+          - target_region_generated_mask
+          - target_region_source_guard
+        - id: target_region_mask
+          op: morphology
+          inputs:
+          - target_region_novel_mask
+          params:
+            operation: close
+            kernel_size: 7
+            iterations: 1
+        - id: subject_point
+          op: component_centroid
+          inputs:
+          - subject_component
+        - id: relation_holds
+          op: point_in_mask
+          inputs:
+          - subject_point
+          - target_region_mask
+          params:
+            radius:
+              $config: membership_radius
+              default: 24
+            min_fraction:
+              $config: membership_min_fraction
+              default: 0.03
+            min_mask_pixels:
+              $config: target_region_min_pixels
+              default: 200
+        output: relation_holds
+      parser_output_kind: boolean
+      metric: accuracy
+      metric_config: *id005
+  action_conseq__choice_selection__accuracy:
+    protocol: agentic_vlm_protocol
+    prompt_variant: generated
+    prompt: 'Use the supplied source image or ordered images to produce one clear
+      visual answer to this spatial task:
+
+      {question}
+
+
+      Candidate answers, when present:
+
+      {choices}
+
+
+      Express the answer through large, task-relevant visual evidence in the image
+      itself. Use only the primitives that fit the task, such as object outlines,
+      a region overlay, arrows between referenced objects, a path, measurement marks,
+      correspondence marks, or a visibly rendered next spatial state. Preserve unrelated
+      scene content. Do not merely print an answer label, option text, or prose explanation.'
+    input:
+      mode: single
+    metric: accuracy
+    metric_config: &id007 {}
+    formal_evaluation: true
+    protocol_config:
+      generated_protocol_id: generated_sat_agentic_action_conseq__choice_selection__accuracy_vlm_fallback
+      include_source_images: false
+      parse_prompt: Read only the concrete spatial evidence expressed in the generated
+        visual response. Identify the marked objects, regions, arrows, path, measurement,
+        correspondence, or generated state, then recover the answer in the benchmark's
+        required format. Candidate choices may be used only to map that visible evidence
+        to a label. Do not independently solve the original task from the source image
+        and do not accept a bare answer label as evidence.
+      answer_format: 'one candidate option label from: A, B'
+      invalid_conditions:
+      - no task-relevant spatial mark or generated state is visible
+      - the visible evidence is ambiguous or contradicts itself
+      - the response contains only an answer label or prose
+      visual_strategy: other_spatial
+      visual_evidence: task-grounded object outlines, region overlays, arrows, paths,
+        measurement marks, correspondence marks, or a visibly changed spatial state
+      parser_observation: Read only the visible task-grounded task-grounded object
+        outlines, region overlays, arrows, paths, measurement marks, correspondence
+        marks, or a visibly changed spatial state, then map that evidence to the required
+        answer schema.
+      answer_recovery:
+      - answer_schema: choice_selection
+        visual_readout: Recover the answer only from the required task-grounded spatial
+          evidence.
+      label_role: none
+      rationale: 'No validated deterministic visual readout remained after protocol
+        construction: fallback may not use a generic verdict symbol as the yes/no
+        answer'
+      metric: accuracy
+      metric_config: *id007
+  ego_movement:
+    protocol: agentic_vlm_protocol
+    prompt_variant: generated
+    prompt: 'Use the supplied source image or ordered images to produce one clear
+      visual answer to this spatial task:
+
+      {question}
+
+
+      Candidate answers, when present:
+
+      {choices}
+
+
+      Express the answer through large, task-relevant visual evidence in the image
+      itself. Use only the primitives that fit the task, such as object outlines,
+      a region overlay, arrows between referenced objects, a path, measurement marks,
+      correspondence marks, or a visibly rendered next spatial state. Preserve unrelated
+      scene content. Do not merely print an answer label, option text, or prose explanation.'
+    input:
+      mode: metadata_images
+    metric: accuracy
+    metric_config: &id009 {}
+    formal_evaluation: true
+    protocol_config:
+      generated_protocol_id: generated_sat_agentic_ego_movement_vlm_fallback
+      include_source_images: false
+      parse_prompt: Read only the concrete spatial evidence expressed in the generated
+        visual response. Identify the marked objects, regions, arrows, path, measurement,
+        correspondence, or generated state, then recover the answer in the benchmark's
+        required format. Candidate choices may be used only to map that visible evidence
+        to a label. Do not independently solve the original task from the source image
+        and do not accept a bare answer label as evidence.
+      answer_format: 'one candidate option label from: A, B'
+      invalid_conditions:
+      - no task-relevant spatial mark or generated state is visible
+      - the visible evidence is ambiguous or contradicts itself
+      - the response contains only an answer label or prose
+      visual_strategy: other_spatial
+      visual_evidence: task-grounded object outlines, region overlays, arrows, paths,
+        measurement marks, correspondence marks, or a visibly changed spatial state
+      parser_observation: Read only the visible task-grounded task-grounded object
+        outlines, region overlays, arrows, paths, measurement marks, correspondence
+        marks, or a visibly changed spatial state, then map that evidence to the required
+        answer schema.
+      answer_recovery:
+      - answer_schema: choice_selection
+        visual_readout: Recover the answer only from the required task-grounded spatial
+          evidence.
+      label_role: none
+      rationale: 'No validated deterministic visual readout remained after protocol
+        construction: fallback may not use a generic verdict symbol as the yes/no
+        answer; fallback must require concrete task-grounded spatial evidence'
+      metric: accuracy
+      metric_config: *id009
+  goal_aim__binary_boolean__accuracy:
+    protocol: agentic_parser_ops_protocol
+    prompt_variant: generated
+    prompt: 'Answer the binary spatial-relation question: "{question}". Keep the source
+      image unchanged. Place one solid magenta disk (#FF00FF) at the center of the
+      subject object and one solid cyan disk (#00FFFF) at the center of the reference
+      object. Overlay one large translucent vivid-green filled region (#00FF00) covering
+      the image locations where the subject would satisfy exactly the relation asked
+      in the question. Keep the two disks visible above the region. Do not move either
+      object. Do not add a check mark, X, yes/no text, option label, or other verdict
+      symbol. Output only the annotated image.
+
+
+      Candidate answers:
+
+      {choices}'
+    input:
+      mode: single
+    metric: accuracy
+    metric_config: &id015 {}
+    formal_evaluation: true
+    protocol_config:
+      parser_pipeline:
+        steps:
+        - id: generated
+          op: load_generated
+        - id: source
+          op: load_source
+          params:
+            index: 0
+        - id: aligned
+          op: align_to_reference
+          inputs:
+          - generated
+          - source
+          params:
+            motion: euclidean
+        - id: subject_generated_mask
+          op: hsv_color_mask
+          inputs:
+          - aligned
+          params:
+            lower: &id011
+            - 140
+            - 80
+            - 80
+            upper: &id012
+            - 179
+            - 255
+            - 255
+        - id: subject_source_mask
+          op: hsv_color_mask
+          inputs:
+          - source
+          params:
+            lower: *id011
+            upper: *id012
+        - id: subject_source_guard
+          op: morphology
+          inputs:
+          - subject_source_mask
+          params:
+            operation: dilate
+            kernel_size: 5
+            iterations: 1
+        - id: subject_novel_mask
+          op: mask_subtract
+          inputs:
+          - subject_generated_mask
+          - subject_source_guard
+        - id: subject_clean_mask
+          op: morphology
+          inputs:
+          - subject_novel_mask
+          params:
+            operation: close
+            kernel_size: 5
+            iterations: 1
+        - id: subject_components
+          op: connected_components
+          inputs:
+          - subject_clean_mask
+        - id: subject_candidates
+          op: filter_components
+          inputs:
+          - subject_components
+          params:
+            min_area: 40
+        - id: subject_component
+          op: select_largest
+          inputs:
+          - subject_candidates
+          params:
+            ambiguity_ratio: 1.0
+        - id: reference_generated_mask
+          op: hsv_color_mask
+          inputs:
+          - aligned
+          params:
+            lower: &id013
+            - 80
+            - 80
+            - 80
+            upper: &id014
+            - 100
+            - 255
+            - 255
+        - id: reference_source_mask
+          op: hsv_color_mask
+          inputs:
+          - source
+          params:
+            lower: *id013
+            upper: *id014
+        - id: reference_source_guard
+          op: morphology
+          inputs:
+          - reference_source_mask
+          params:
+            operation: dilate
+            kernel_size: 5
+            iterations: 1
+        - id: reference_novel_mask
+          op: mask_subtract
+          inputs:
+          - reference_generated_mask
+          - reference_source_guard
+        - id: reference_clean_mask
+          op: morphology
+          inputs:
+          - reference_novel_mask
+          params:
+            operation: close
+            kernel_size: 5
+            iterations: 1
+        - id: reference_components
+          op: connected_components
+          inputs:
+          - reference_clean_mask
+        - id: reference_candidates
+          op: filter_components
+          inputs:
+          - reference_components
+          params:
+            min_area: 40
+        - id: reference_component
+          op: select_largest
+          inputs:
+          - reference_candidates
+          params:
+            ambiguity_ratio: 1.0
+        - id: target_region_generated_mask
+          op: hsv_color_mask
+          inputs:
+          - aligned
+          params:
+            lower:
+            - 35
+            - 50
+            - 50
+            upper:
+            - 90
+            - 255
+            - 255
+        - id: target_region_source_mask
+          op: hsv_color_mask
+          inputs:
+          - source
+          params:
+            lower:
+            - 35
+            - 50
+            - 50
+            upper:
+            - 90
+            - 255
+            - 255
+        - id: target_region_source_guard
+          op: morphology
+          inputs:
+          - target_region_source_mask
+          params:
+            operation: dilate
+            kernel_size: 5
+            iterations: 1
+        - id: target_region_novel_mask
+          op: mask_subtract
+          inputs:
+          - target_region_generated_mask
+          - target_region_source_guard
+        - id: target_region_mask
+          op: morphology
+          inputs:
+          - target_region_novel_mask
+          params:
+            operation: close
+            kernel_size: 7
+            iterations: 1
+        - id: subject_point
+          op: component_centroid
+          inputs:
+          - subject_component
+        - id: relation_holds
+          op: point_in_mask
+          inputs:
+          - subject_point
+          - target_region_mask
+          params:
+            radius:
+              $config: membership_radius
+              default: 24
+            min_fraction:
+              $config: membership_min_fraction
+              default: 0.03
+            min_mask_pixels:
+              $config: target_region_min_pixels
+              default: 200
+        output: relation_holds
+      parser_output_kind: boolean
+      metric: accuracy
+      metric_config: *id015
+  goal_aim__choice_selection__accuracy:
+    protocol: agentic_parser_ops_protocol
+    prompt_variant: generated
+    prompt: 'Solve the spatial relation in: "{question}". Keep the source image unchanged
+      except for two thick outlines. Outline the subject named by the question in
+      solid magenta (#FF00FF), and outline the reference object in solid cyan (#00FFFF).
+      Use exactly one outline for each role. Do not write an answer label or explanatory
+      text. Output only the annotated image.
+
+
+      Candidate answers:
+
+      {choices}'
+    input:
+      mode: single
+    metric: accuracy
+    metric_config: &id021 {}
+    formal_evaluation: true
+    protocol_config:
+      relation_mode: horizontal
+      parser_pipeline:
+        steps:
+        - id: generated
+          op: load_generated
+        - id: source
+          op: load_source
+          params:
+            index: 0
+        - id: aligned
+          op: align_to_reference
+          inputs:
+          - generated
+          - source
+          params:
+            motion: euclidean
+        - id: subject_generated_mask
+          op: hsv_color_mask
+          inputs:
+          - aligned
+          params:
+            lower: &id017
+            - 140
+            - 70
+            - 70
+            upper: &id018
+            - 179
+            - 255
+            - 255
+        - id: subject_source_mask
+          op: hsv_color_mask
+          inputs:
+          - source
+          params:
+            lower: *id017
+            upper: *id018
+        - id: subject_source_guard
+          op: morphology
+          inputs:
+          - subject_source_mask
+          params:
+            operation: dilate
+            kernel_size: 5
+            iterations: 1
+        - id: subject_novel_mask
+          op: mask_subtract
+          inputs:
+          - subject_generated_mask
+          - subject_source_guard
+        - id: subject_clean_mask
+          op: morphology
+          inputs:
+          - subject_novel_mask
+          params:
+            operation: close
+            kernel_size: 5
+            iterations: 1
+        - id: subject_components
+          op: connected_components
+          inputs:
+          - subject_clean_mask
+        - id: subject_candidates
+          op: filter_components
+          inputs:
+          - subject_components
+          params:
+            min_area: 30
+        - id: subject_component
+          op: select_largest
+          inputs:
+          - subject_candidates
+          params:
+            ambiguity_ratio: 1.0
+        - id: reference_generated_mask
+          op: hsv_color_mask
+          inputs:
+          - aligned
+          params:
+            lower: &id019
+            - 80
+            - 70
+            - 70
+            upper: &id020
+            - 100
+            - 255
+            - 255
+        - id: reference_source_mask
+          op: hsv_color_mask
+          inputs:
+          - source
+          params:
+            lower: *id019
+            upper: *id020
+        - id: reference_source_guard
+          op: morphology
+          inputs:
+          - reference_source_mask
+          params:
+            operation: dilate
+            kernel_size: 5
+            iterations: 1
+        - id: reference_novel_mask
+          op: mask_subtract
+          inputs:
+          - reference_generated_mask
+          - reference_source_guard
+        - id: reference_clean_mask
+          op: morphology
+          inputs:
+          - reference_novel_mask
+          params:
+            operation: close
+            kernel_size: 5
+            iterations: 1
+        - id: reference_components
+          op: connected_components
+          inputs:
+          - reference_clean_mask
+        - id: reference_candidates
+          op: filter_components
+          inputs:
+          - reference_components
+          params:
+            min_area: 30
+        - id: reference_component
+          op: select_largest
+          inputs:
+          - reference_candidates
+          params:
+            ambiguity_ratio: 1.0
+        - id: relation
+          op: component_relation
+          inputs:
+          - subject_component
+          - reference_component
+          params:
+            mode:
+              $config: relation_mode
+              default: horizontal
+            overlap_threshold:
+              $config: overlap_threshold
+              default: 0.25
+            near_threshold:
+              $config: near_threshold
+              default: 0.2
+        - id: choice
+          op: map_relation_to_choice
+          inputs:
+          - relation
+        output: choice
+      parser_output_kind: choice_label
+      metric: accuracy
+      metric_config: *id021
+  obj_movement:
+    protocol: agentic_vlm_protocol
+    prompt_variant: generated
+    prompt: 'Use the supplied source image or ordered images to produce one clear
+      visual answer to this spatial task:
+
+      {question}
+
+
+      Candidate answers, when present:
+
+      {choices}
+
+
+      Express the answer through large, task-relevant visual evidence in the image
+      itself. Use only the primitives that fit the task, such as object outlines,
+      a region overlay, arrows between referenced objects, a path, measurement marks,
+      correspondence marks, or a visibly rendered next spatial state. Preserve unrelated
+      scene content. Do not merely print an answer label, option text, or prose explanation.'
+    input:
+      mode: metadata_images
+    metric: accuracy
+    metric_config: &id023 {}
+    formal_evaluation: true
+    protocol_config:
+      generated_protocol_id: generated_sat_agentic_obj_movement_vlm_fallback
+      include_source_images: false
+      parse_prompt: Read only the concrete spatial evidence expressed in the generated
+        visual response. Identify the marked objects, regions, arrows, path, measurement,
+        correspondence, or generated state, then recover the answer in the benchmark's
+        required format. Candidate choices may be used only to map that visible evidence
+        to a label. Do not independently solve the original task from the source image
+        and do not accept a bare answer label as evidence.
+      answer_format: 'one candidate option label from: A, B'
+      invalid_conditions:
+      - no task-relevant spatial mark or generated state is visible
+      - the visible evidence is ambiguous or contradicts itself
+      - the response contains only an answer label or prose
+      visual_strategy: other_spatial
+      visual_evidence: task-grounded object outlines, region overlays, arrows, paths,
+        measurement marks, correspondence marks, or a visibly changed spatial state
+      parser_observation: Read only the visible task-grounded task-grounded object
+        outlines, region overlays, arrows, paths, measurement marks, correspondence
+        marks, or a visibly changed spatial state, then map that evidence to the required
+        answer schema.
+      answer_recovery:
+      - answer_schema: choice_selection
+        visual_readout: Recover the answer only from the required task-grounded spatial
+          evidence.
+      label_role: none
+      rationale: 'No validated deterministic visual readout remained after protocol
+        construction: fallback may not use a generic verdict symbol as the yes/no
+        answer'
+      metric: accuracy
+      metric_config: *id023
+  perspective__binary_boolean__accuracy:
+    protocol: agentic_parser_ops_protocol
+    prompt_variant: generated
+    prompt: 'Answer the binary spatial-relation question: "{question}". Keep the source
+      image unchanged. Place one solid magenta disk (#FF00FF) at the center of the
+      subject object and one solid cyan disk (#00FFFF) at the center of the reference
+      object. Overlay one large translucent vivid-green filled region (#00FF00) covering
+      the image locations where the subject would satisfy exactly the relation asked
+      in the question. Keep the two disks visible above the region. Do not move either
+      object. Do not add a check mark, X, yes/no text, option label, or other verdict
+      symbol. Output only the annotated image.
+
+
+      Candidate answers:
+
+      {choices}'
+    input:
+      mode: single
+    metric: accuracy
+    metric_config: &id029 {}
+    formal_evaluation: true
+    protocol_config:
+      parser_pipeline:
+        steps:
+        - id: generated
+          op: load_generated
+        - id: source
+          op: load_source
+          params:
+            index: 0
+        - id: aligned
+          op: align_to_reference
+          inputs:
+          - generated
+          - source
+          params:
+            motion: euclidean
+        - id: subject_generated_mask
+          op: hsv_color_mask
+          inputs:
+          - aligned
+          params:
+            lower: &id025
+            - 140
+            - 80
+            - 80
+            upper: &id026
+            - 179
+            - 255
+            - 255
+        - id: subject_source_mask
+          op: hsv_color_mask
+          inputs:
+          - source
+          params:
+            lower: *id025
+            upper: *id026
+        - id: subject_source_guard
+          op: morphology
+          inputs:
+          - subject_source_mask
+          params:
+            operation: dilate
+            kernel_size: 5
+            iterations: 1
+        - id: subject_novel_mask
+          op: mask_subtract
+          inputs:
+          - subject_generated_mask
+          - subject_source_guard
+        - id: subject_clean_mask
+          op: morphology
+          inputs:
+          - subject_novel_mask
+          params:
+            operation: close
+            kernel_size: 5
+            iterations: 1
+        - id: subject_components
+          op: connected_components
+          inputs:
+          - subject_clean_mask
+        - id: subject_candidates
+          op: filter_components
+          inputs:
+          - subject_components
+          params:
+            min_area: 40
+        - id: subject_component
+          op: select_largest
+          inputs:
+          - subject_candidates
+          params:
+            ambiguity_ratio: 1.0
+        - id: reference_generated_mask
+          op: hsv_color_mask
+          inputs:
+          - aligned
+          params:
+            lower: &id027
+            - 80
+            - 80
+            - 80
+            upper: &id028
+            - 100
+            - 255
+            - 255
+        - id: reference_source_mask
+          op: hsv_color_mask
+          inputs:
+          - source
+          params:
+            lower: *id027
+            upper: *id028
+        - id: reference_source_guard
+          op: morphology
+          inputs:
+          - reference_source_mask
+          params:
+            operation: dilate
+            kernel_size: 5
+            iterations: 1
+        - id: reference_novel_mask
+          op: mask_subtract
+          inputs:
+          - reference_generated_mask
+          - reference_source_guard
+        - id: reference_clean_mask
+          op: morphology
+          inputs:
+          - reference_novel_mask
+          params:
+            operation: close
+            kernel_size: 5
+            iterations: 1
+        - id: reference_components
+          op: connected_components
+          inputs:
+          - reference_clean_mask
+        - id: reference_candidates
+          op: filter_components
+          inputs:
+          - reference_components
+          params:
+            min_area: 40
+        - id: reference_component
+          op: select_largest
+          inputs:
+          - reference_candidates
+          params:
+            ambiguity_ratio: 1.0
+        - id: target_region_generated_mask
+          op: hsv_color_mask
+          inputs:
+          - aligned
+          params:
+            lower:
+            - 35
+            - 50
+            - 50
+            upper:
+            - 90
+            - 255
+            - 255
+        - id: target_region_source_mask
+          op: hsv_color_mask
+          inputs:
+          - source
+          params:
+            lower:
+            - 35
+            - 50
+            - 50
+            upper:
+            - 90
+            - 255
+            - 255
+        - id: target_region_source_guard
+          op: morphology
+          inputs:
+          - target_region_source_mask
+          params:
+            operation: dilate
+            kernel_size: 5
+            iterations: 1
+        - id: target_region_novel_mask
+          op: mask_subtract
+          inputs:
+          - target_region_generated_mask
+          - target_region_source_guard
+        - id: target_region_mask
+          op: morphology
+          inputs:
+          - target_region_novel_mask
+          params:
+            operation: close
+            kernel_size: 7
+            iterations: 1
+        - id: subject_point
+          op: component_centroid
+          inputs:
+          - subject_component
+        - id: relation_holds
+          op: point_in_mask
+          inputs:
+          - subject_point
+          - target_region_mask
+          params:
+            radius:
+              $config: membership_radius
+              default: 24
+            min_fraction:
+              $config: membership_min_fraction
+              default: 0.03
+            min_mask_pixels:
+              $config: target_region_min_pixels
+              default: 200
+        output: relation_holds
+      parser_output_kind: boolean
+      metric: accuracy
+      metric_config: *id029
+  perspective__choice_selection__accuracy:
+    protocol: agentic_parser_ops_protocol
+    prompt_variant: generated
+    prompt: 'Solve the spatial relation in: "{question}". Keep the source image unchanged
+      except for two thick outlines. Outline the subject named by the question in
+      solid magenta (#FF00FF), and outline the reference object in solid cyan (#00FFFF).
+      Use exactly one outline for each role. Do not write an answer label or explanatory
+      text. Output only the annotated image.
+
+
+      Candidate answers:
+
+      {choices}'
+    input:
+      mode: single
+    metric: accuracy
+    metric_config: &id035 {}
+    formal_evaluation: true
+    protocol_config:
+      relation_mode: horizontal
+      parser_pipeline:
+        steps:
+        - id: generated
+          op: load_generated
+        - id: source
+          op: load_source
+          params:
+            index: 0
+        - id: aligned
+          op: align_to_reference
+          inputs:
+          - generated
+          - source
+          params:
+            motion: euclidean
+        - id: subject_generated_mask
+          op: hsv_color_mask
+          inputs:
+          - aligned
+          params:
+            lower: &id031
+            - 140
+            - 70
+            - 70
+            upper: &id032
+            - 179
+            - 255
+            - 255
+        - id: subject_source_mask
+          op: hsv_color_mask
+          inputs:
+          - source
+          params:
+            lower: *id031
+            upper: *id032
+        - id: subject_source_guard
+          op: morphology
+          inputs:
+          - subject_source_mask
+          params:
+            operation: dilate
+            kernel_size: 5
+            iterations: 1
+        - id: subject_novel_mask
+          op: mask_subtract
+          inputs:
+          - subject_generated_mask
+          - subject_source_guard
+        - id: subject_clean_mask
+          op: morphology
+          inputs:
+          - subject_novel_mask
+          params:
+            operation: close
+            kernel_size: 5
+            iterations: 1
+        - id: subject_components
+          op: connected_components
+          inputs:
+          - subject_clean_mask
+        - id: subject_candidates
+          op: filter_components
+          inputs:
+          - subject_components
+          params:
+            min_area: 30
+        - id: subject_component
+          op: select_largest
+          inputs:
+          - subject_candidates
+          params:
+            ambiguity_ratio: 1.0
+        - id: reference_generated_mask
+          op: hsv_color_mask
+          inputs:
+          - aligned
+          params:
+            lower: &id033
+            - 80
+            - 70
+            - 70
+            upper: &id034
+            - 100
+            - 255
+            - 255
+        - id: reference_source_mask
+          op: hsv_color_mask
+          inputs:
+          - source
+          params:
+            lower: *id033
+            upper: *id034
+        - id: reference_source_guard
+          op: morphology
+          inputs:
+          - reference_source_mask
+          params:
+            operation: dilate
+            kernel_size: 5
+            iterations: 1
+        - id: reference_novel_mask
+          op: mask_subtract
+          inputs:
+          - reference_generated_mask
+          - reference_source_guard
+        - id: reference_clean_mask
+          op: morphology
+          inputs:
+          - reference_novel_mask
+          params:
+            operation: close
+            kernel_size: 5
+            iterations: 1
+        - id: reference_components
+          op: connected_components
+          inputs:
+          - reference_clean_mask
+        - id: reference_candidates
+          op: filter_components
+          inputs:
+          - reference_components
+          params:
+            min_area: 30
+        - id: reference_component
+          op: select_largest
+          inputs:
+          - reference_candidates
+          params:
+            ambiguity_ratio: 1.0
+        - id: relation
+          op: component_relation
+          inputs:
+          - subject_component
+          - reference_component
+          params:
+            mode:
+              $config: relation_mode
+              default: horizontal
+            overlap_threshold:
+              $config: overlap_threshold
+              default: 0.25
+            near_threshold:
+              $config: near_threshold
+              default: 0.2
+        - id: choice
+          op: map_relation_to_choice
+          inputs:
+          - relation
+        output: choice
+      parser_output_kind: choice_label
+      metric: accuracy
+      metric_config: *id035

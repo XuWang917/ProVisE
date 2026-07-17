@@ -1,0 +1,22 @@
+name: dense_depth_ab
+description: >
+  Generate a grayscale depth map and compare brightness at two A/B coordinates.
+
+default_config:
+  eval_mode: coords
+  kernel_size: 5
+  vlm_model: ""
+  vlm_max_tokens: 64
+  coordinate_prompt: >
+    Two points are circled on the image, labeled by A and B beside each red
+    circle. Output the coordinates strictly in the format: [[x_A, y_A],
+    [x_B, y_B]], ranging from 0 to 1.
+  fallback_to_coords: false
+
+prompts:
+  grayscale_depth_map:
+    template: >
+      Generate a grayscale depth map from the input image, where brighter pixels
+      indicate surfaces closer to the camera and darker pixels indicate surfaces
+      farther away. Ignore any A/B text or marker overlays as 2D annotations.
+      Output only the depth map.

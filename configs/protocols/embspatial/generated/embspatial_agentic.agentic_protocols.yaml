@@ -1,0 +1,126 @@
+protocols:
+- id: generated_spatial_relationship_identification_v2
+  task: spatial relationship identification
+  decision: build
+  build_mode: recipe
+  recipe: marked_object_choice
+  visual_contract:
+    recipe: marked_object_choice
+    mode: edit_source
+    primitives:
+    - outline exactly one object from the listed candidates that best satisfies the
+      queried spatial relation to the viewer
+    parameters: {}
+  generation_prompt: 'Answer the object-selection spatial task: "{question}". Choices:
+    {choices}. Keep the source image unchanged except for one thick solid magenta
+    outline (#FF00FF) around exactly the selected answer object. Do not outline any
+    other object. Do not write an option letter, object name, answer label, or explanation.
+    Output only the annotated source image.'
+  readout:
+    recipe: marked_object_choice
+    output_kind: choice_label
+    pipeline:
+      steps:
+      - id: generated
+        op: load_generated
+      - id: source
+        op: load_source
+        params:
+          index: 0
+      - id: aligned
+        op: align_to_reference
+        inputs:
+        - generated
+        - source
+        params:
+          motion: euclidean
+      - id: selected_object_generated_mask
+        op: hsv_color_mask
+        inputs:
+        - aligned
+        params:
+          lower: &id001
+          - 140
+          - 70
+          - 70
+          upper: &id002
+          - 179
+          - 255
+          - 255
+      - id: selected_object_source_mask
+        op: hsv_color_mask
+        inputs:
+        - source
+        params:
+          lower: *id001
+          upper: *id002
+      - id: selected_object_source_guard
+        op: morphology
+        inputs:
+        - selected_object_source_mask
+        params:
+          operation: dilate
+          kernel_size: 5
+          iterations: 1
+      - id: selected_object_novel_mask
+        op: mask_subtract
+        inputs:
+        - selected_object_generated_mask
+        - selected_object_source_guard
+      - id: selected_object_clean_mask
+        op: morphology
+        inputs:
+        - selected_object_novel_mask
+        params:
+          operation: close
+          kernel_size: 5
+          iterations: 1
+      - id: selected_object_components
+        op: connected_components
+        inputs:
+        - selected_object_clean_mask
+      - id: selected_object_candidates
+        op: filter_components
+        inputs:
+        - selected_object_components
+        params:
+          min_area: 30
+      - id: selected_object_component
+        op: select_largest
+        inputs:
+        - selected_object_candidates
+        params:
+          ambiguity_ratio: 1.0
+      - id: object_crop
+        op: crop_around_component
+        inputs:
+        - source
+        - selected_object_component
+        params:
+          pad_x: 0.15
+          pad_y: 0.15
+          min_width: 96
+          min_height: 96
+      - id: choice
+        op: clip_match_choices
+        inputs:
+        - object_crop
+        params:
+          model:
+            $config: clip_model
+            default: ''
+          min_score:
+            $config: clip_min_score
+            default: 0.0
+          min_margin:
+            $config: clip_min_margin
+            default: 0.0
+      output: choice
+  metric_contract:
+    metric: accuracy
+    config: {}
+    formal_evaluation: true
+  rationale: The task is single-image multiple choice about grounded spatial semantics
+    such as closest/nearest object. No exact reusable protocol matches this generic
+    object-choice contract, but a registered recipe can express the selected object
+    visually and recover the choice with fixed CLIP without encoding answer labels.

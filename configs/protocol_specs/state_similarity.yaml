@@ -1,0 +1,17 @@
+name: state_similarity
+description: >
+  Generate a future/edited state image, then match it to candidate images with
+  an image similarity model.
+
+default_config:
+  labels: A-D
+  device: cpu
+
+prompts:
+  next_view:
+    template: >
+      Based on the input image containing an arrow indicating camera movement,
+      generate the next frame as if the camera has moved in that direction.
+      Keep perspective and scene layout consistent. Output only the predicted
+      next view image.
+

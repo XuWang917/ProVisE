@@ -1,0 +1,11 @@
+benchmark: generic_choice
+data_file: tests/fixtures/smoke_choice/data.jsonl
+benchmark_root: tests/fixtures/smoke_choice
+
+tasks:
+  choice_qa:
+    protocol: label_code
+    prompt_variant: choice_hstrip_from_choices
+    input:
+      mode: single
+    metric: accuracy

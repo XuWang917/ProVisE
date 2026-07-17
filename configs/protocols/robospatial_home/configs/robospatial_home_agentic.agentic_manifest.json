@@ -1,0 +1,331 @@
+{
+  "benchmark": "robospatial_home_agentic",
+  "builder": "agentic_protocol_builder_v2",
+  "total_samples": 350,
+  "task_count": 3,
+  "completed_task_count": 3,
+  "active_task_count": 3,
+  "active_sample_count": 350,
+  "decision_counts": {
+    "build": 2,
+    "reuse": 1
+  },
+  "route_rows": [
+    {
+      "task": "compatibility",
+      "decision": "build",
+      "build_mode": "recipe",
+      "active": true,
+      "sample_count": 105,
+      "confidence": "high",
+      "recipe": "relation_zone_boolean",
+      "protocol": "agentic_parser_ops_protocol",
+      "parser_backend": "deterministic",
+      "parser_output_kind": "boolean",
+      "metric": "accuracy",
+      "formal_evaluation": true,
+      "reason": "Binary spatial fit questions over a single image match the deterministic relation_zone_boolean recipe, which can express whether the named object would fit in the queried region without using answer-code symbols."
+    },
+    {
+      "task": "configuration",
+      "decision": "build",
+      "build_mode": "recipe",
+      "active": true,
+      "sample_count": 123,
+      "confidence": "high",
+      "recipe": "relation_zone_boolean",
+      "protocol": "agentic_parser_ops_protocol",
+      "parser_backend": "deterministic",
+      "parser_output_kind": "boolean",
+      "metric": "accuracy",
+      "formal_evaluation": true,
+      "reason": "This is a single-image binary spatial-relation task (yes/no) where deterministic geometric recovery is appropriate. The relation_zone_boolean recipe matches the boolean answer contract and avoids answer-code symbols by expressing subject, reference, and valid relation region visually."
+    },
+    {
+      "task": "context",
+      "decision": "reuse",
+      "active": true,
+      "sample_count": 122,
+      "confidence": "high",
+      "protocol": "agentic_point_marker",
+      "prompt_variant": "cyan_point_marker",
+      "metric": "point_in_mask",
+      "formal_evaluation": true,
+      "reason": "Task is single-image localization scored by official point_in_mask, where any one valid predicted point suffices; the existing cyan point marker protocol exactly matches the visual output, parser contract, and metric-preserving answer semantics."
+    }
+  ],
+  "task_contexts": {
+    "compatibility": {
+      "representative_sample_ids": [
+        "sample_data_compatibility_00000_of_00001_000000",
+        "sample_data_compatibility_00000_of_00001_000006",
+        "sample_data_compatibility_00000_of_00001_000001"
+      ],
+      "attached_media_count": 3,
+      "attached_media": [
+        {
+          "image_index": 1,
+          "sample_id": "sample_data_compatibility_00000_of_00001_000000",
+          "media_index": 1,
+          "role": "primary",
+          "label": ""
+        },
+        {
+          "image_index": 2,
+          "sample_id": "sample_data_compatibility_00000_of_00001_000006",
+          "media_index": 1,
+          "role": "primary",
+          "label": ""
+        },
+        {
+          "image_index": 3,
+          "sample_id": "sample_data_compatibility_00000_of_00001_000001",
+          "media_index": 1,
+          "role": "primary",
+          "label": ""
+        }
+      ],
+      "missing_media": []
+    },
+    "configuration": {
+      "representative_sample_ids": [
+        "sample_data_configuration_00000_of_00001_000000",
+        "sample_data_configuration_00000_of_00001_000001",
+        "sample_data_configuration_00000_of_00001_000002"
+      ],
+      "attached_media_count": 3,
+      "attached_media": [
+        {
+          "image_index": 1,
+          "sample_id": "sample_data_configuration_00000_of_00001_000000",
+          "media_index": 1,
+          "role": "primary",
+          "label": ""
+        },
+        {
+          "image_index": 2,
+          "sample_id": "sample_data_configuration_00000_of_00001_000001",
+          "media_index": 1,
+          "role": "primary",
+          "label": ""
+        },
+        {
+          "image_index": 3,
+          "sample_id": "sample_data_configuration_00000_of_00001_000002",
+          "media_index": 1,
+          "role": "primary",
+          "label": ""
+        }
+      ],
+      "missing_media": []
+    },
+    "context": {
+      "representative_sample_ids": [
+        "sample_data_context_00000_of_00001_000000",
+        "sample_data_context_00000_of_00001_000001",
+        "sample_data_context_00000_of_00001_000002"
+      ],
+      "attached_media_count": 3,
+      "attached_media": [
+        {
+          "image_index": 1,
+          "sample_id": "sample_data_context_00000_of_00001_000000",
+          "media_index": 1,
+          "role": "primary",
+          "label": ""
+        },
+        {
+          "image_index": 2,
+          "sample_id": "sample_data_context_00000_of_00001_000001",
+          "media_index": 1,
+          "role": "primary",
+          "label": ""
+        },
+        {
+          "image_index": 3,
+          "sample_id": "sample_data_context_00000_of_00001_000002",
+          "media_index": 1,
+          "role": "primary",
+          "label": ""
+        }
+      ],
+      "missing_media": []
+    }
+  },
+  "task_contracts": {
+    "compatibility": {
+      "task": "compatibility",
+      "sample_count": 105,
+      "answer_schemas": [
+        "binary_boolean"
+      ],
+      "answer_types": [
+        "boolean"
+      ],
+      "input_mode": "single",
+      "media_counts": [
+        1
+      ],
+      "metric": "accuracy",
+      "metric_config": {},
+      "formal_evaluation": true
+    },
+    "configuration": {
+      "task": "configuration",
+      "sample_count": 123,
+      "answer_schemas": [
+        "binary_boolean"
+      ],
+      "answer_types": [
+        "boolean"
+      ],
+      "input_mode": "single",
+      "media_counts": [
+        1
+      ],
+      "metric": "accuracy",
+      "metric_config": {},
+      "formal_evaluation": true
+    },
+    "context": {
+      "task": "context",
+      "sample_count": 122,
+      "answer_schemas": [
+        "localization"
+      ],
+      "answer_types": [
+        "points"
+      ],
+      "input_mode": "single",
+      "media_counts": [
+        1
+      ],
+      "metric": "point_in_mask",
+      "metric_config": {},
+      "formal_evaluation": true
+    }
+  },
+  "revision_counts": {},
+  "revision_history": [],
+  "automatic_vlm_fallback_tasks": [],
+  "fallback_history": [],
+  "disabled_tasks": [],
+  "deferred_external_failure_tasks": [],
+  "warnings": [
+    "Agent returned unknown task='configuration'; ignored",
+    "Agent returned unknown task='context'; ignored",
+    "Agent returned unknown task='compatibility'; ignored"
+  ],
+  "smoke_validation": {
+    "model": "gpt-image-2",
+    "limit": 3,
+    "smoke_data_file": "smoke/smoke_samples.jsonl",
+    "sample_ids": {
+      "compatibility": [
+        "sample_data_compatibility_00000_of_00001_000000",
+        "sample_data_compatibility_00000_of_00001_000006",
+        "sample_data_compatibility_00000_of_00001_000001"
+      ],
+      "configuration": [
+        "sample_data_configuration_00000_of_00001_000000",
+        "sample_data_configuration_00000_of_00001_000001",
+        "sample_data_configuration_00000_of_00001_000002"
+      ],
+      "context": [
+        "sample_data_context_00000_of_00001_000000",
+        "sample_data_context_00000_of_00001_000001",
+        "sample_data_context_00000_of_00001_000002"
+      ]
+    },
+    "tasks": {
+      "compatibility": {
+        "status": "passed",
+        "phase": "initial",
+        "valid_parse_rate": 100.0,
+        "valid_parse_rate_pass1": 100.0,
+        "valid_parse_rate_pass2": 100.0,
+        "readout_operational_rate": 100.0,
+        "readout_operational_rate_pass1": 100.0,
+        "readout_operational_rate_pass2": 100.0,
+        "generated_rate": 100.0,
+        "parser_agreement_rate": 100.0,
+        "spatial_evidence_rate": 100.0,
+        "spatial_evidence_rate_pass1": 100.0,
+        "spatial_evidence_rate_pass2": 100.0,
+        "metric_compatibility_rate": 100.0,
+        "mean_score": 0.6666666666666666,
+        "correct_count": 2,
+        "initial_generation_failure_count": 0,
+        "generation_retry_count": 0,
+        "failed_checks": [],
+        "parser_disagreements": [],
+        "failure_category_counts": {
+          "incorrect_prediction": 1
+        },
+        "failure_reasons": [],
+        "results_pass1": "smoke/compatibility/results_pass1.json",
+        "results_pass2": "smoke/compatibility/results_pass2.json"
+      },
+      "configuration": {
+        "status": "passed",
+        "phase": "initial",
+        "valid_parse_rate": 100.0,
+        "valid_parse_rate_pass1": 100.0,
+        "valid_parse_rate_pass2": 100.0,
+        "readout_operational_rate": 100.0,
+        "readout_operational_rate_pass1": 100.0,
+        "readout_operational_rate_pass2": 100.0,
+        "generated_rate": 100.0,
+        "parser_agreement_rate": 100.0,
+        "spatial_evidence_rate": 100.0,
+        "spatial_evidence_rate_pass1": 100.0,
+        "spatial_evidence_rate_pass2": 100.0,
+        "metric_compatibility_rate": 100.0,
+        "mean_score": 0.3333333333333333,
+        "correct_count": 1,
+        "initial_generation_failure_count": 0,
+        "generation_retry_count": 0,
+        "failed_checks": [],
+        "parser_disagreements": [],
+        "failure_category_counts": {
+          "incorrect_prediction": 2
+        },
+        "failure_reasons": [],
+        "results_pass1": "smoke/configuration/results_pass1.json",
+        "results_pass2": "smoke/configuration/results_pass2.json"
+      },
+      "context": {
+        "status": "passed",
+        "phase": "initial",
+        "valid_parse_rate": 100.0,
+        "valid_parse_rate_pass1": 100.0,
+        "valid_parse_rate_pass2": 100.0,
+        "readout_operational_rate": 100.0,
+        "readout_operational_rate_pass1": 100.0,
+        "readout_operational_rate_pass2": 100.0,
+        "generated_rate": 100.0,
+        "parser_agreement_rate": 100.0,
+        "spatial_evidence_rate": 100.0,
+        "spatial_evidence_rate_pass1": 100.0,
+        "spatial_evidence_rate_pass2": 100.0,
+        "metric_compatibility_rate": 100.0,
+        "mean_score": 0.3333333333333333,
+        "correct_count": 1,
+        "initial_generation_failure_count": 0,
+        "generation_retry_count": 0,
+        "failed_checks": [],
+        "parser_disagreements": [],
+        "failure_category_counts": {
+          "incorrect_prediction": 2
+        },
+        "failure_reasons": [],
+        "results_pass1": "smoke/context/results_pass1.json",
+        "results_pass2": "smoke/context/results_pass2.json"
+      }
+    }
+  },
+  "protocol_artifact": {
+    "schema_version": "provise.protocol.v1",
+    "config_sha256": "c4b2bae810bf4d7b6c17361117f0626a193cc0895d4587819c985aa91837e26d"
+  }
+}

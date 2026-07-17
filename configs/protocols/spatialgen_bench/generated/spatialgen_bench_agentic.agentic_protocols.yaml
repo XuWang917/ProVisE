@@ -1,0 +1,89 @@
+protocols:
+  - id: generated_spatialgen_bench_expansion_v3_agentic_size_vlm_fallback
+    task: size
+    decision: fallback
+    generation_prompt: >-
+      Use the supplied source image or ordered images to produce one clear
+      visual answer to this spatial task:
+
+      {question}
+
+      Candidate answers, when present:
+
+      {choices}
+
+      Express the answer through large, task-relevant visual evidence in the
+      image itself. Use only the primitives that fit the task, such as object
+      outlines, a region overlay, arrows between referenced objects, a path,
+      measurement marks, correspondence marks, or a visibly rendered next
+      spatial state. Preserve unrelated scene content. Do not merely print an
+      answer label, option text, or prose explanation.
+    parse_prompt: >-
+      Read only the concrete spatial evidence expressed in the generated visual
+      response. Identify the marked objects, regions, arrows, path, measurement,
+      correspondence, or generated state, then recover the answer in the
+      benchmark's required format. Candidate choices may be used only to map
+      that visible evidence to a label. Do not independently solve the original
+      task from the source image and do not accept a bare answer label as
+      evidence.
+    parser_inputs:
+      - generated_response
+    visual_evidence: >-
+      Task-grounded object outlines, region overlays, arrows, paths, measurement
+      marks, correspondence marks, or a visibly changed spatial state.
+    invalid_conditions:
+      - no task-relevant spatial mark or generated state is visible
+      - the visible evidence is ambiguous or contradicts itself
+      - the response contains only an answer label or prose
+    metric_contract:
+      metric: accuracy
+      config: {}
+      formal_evaluation: true
+    rationale: >-
+      No validated deterministic visual readout remained after protocol
+      construction, so the task uses the generated-image-only VLM fallback.
+
+  - id: spatialgen_bench_feasibility_agentic_v1
+    task: feasibility
+    decision: fallback
+    generation_prompt: >-
+      Given the source image and the question: {question}
+
+      Create a simple edited or overlaid image that shows the geometric
+      feasibility evidence directly. Highlight the relevant existing object(s)
+      and depict the queried object or person placed in the exact candidate
+      location or path implied by the question. Show the attempted fit or
+      placement at realistic scale, with clear visible overlap or clear remaining
+      clearance. If the question is about passing under, sitting between, placing
+      beside, fitting through, or similar, render the resulting spatial state so
+      that success is visible as non-overlap with adequate space and failure is
+      visible as collision or impossible overlap. Do not write yes/no, do not add
+      answer labels, and do not use generic verdict symbols.
+
+      Candidate answers:
+
+      {choices}
+    parse_prompt: >-
+      Read only the generated image. Determine whether the depicted attempted
+      placement or motion is geometrically feasible from the visible result:
+      output true if the inserted or positioned object fits in the shown target
+      location or path without collision and with clear intended placement;
+      otherwise output false. Do not answer from the original question alone.
+    parser_inputs:
+      - generated_response
+    visual_evidence: >-
+      Relevant scene anchors and a depicted attempted placement at realistic
+      scale, showing either collision and overlap or successful fit and clearance.
+    invalid_conditions:
+      - the image only shows a check mark, X, color verdict, or textual yes/no instead of the spatial result
+      - the generated image does not depict the attempted placement, fit, clearance, or collision state
+      - the inserted object is not shown at realistic scale or the target location is ambiguous
+      - parsing would require solving from the source image rather than reading the generated evidence
+    metric_contract:
+      metric: accuracy
+      config: {}
+      formal_evaluation: true
+    rationale: >-
+      Feasibility depends on inferred free space, scale compatibility, and
+      collision; available deterministic recipes cannot recover this contract
+      without re-solving the scene.

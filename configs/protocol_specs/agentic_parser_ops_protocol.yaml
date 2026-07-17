@@ -1,0 +1,17 @@
+name: agentic_parser_ops_protocol
+catalog_role: runtime_adapter
+description: >
+  Generic protocol compiled from a task-grounded Visual Contract. Its prompt
+  and typed Parser Ops pipeline are emitted together, and only registered
+  deterministic or fixed-model operators may execute.
+
+default_config: {}
+
+visual_contract:
+  source: generated_agentic_artifact
+  parser_priority: [deterministic, fixed_model]
+
+parser_ops:
+  dynamic_pipeline: true
+
+prompts: {}

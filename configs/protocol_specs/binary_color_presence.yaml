@@ -1,0 +1,16 @@
+name: binary_color_presence
+description: >
+  Encode a binary answer through the presence or absence of colored masks.
+
+default_config:
+  ratio_threshold: 0.005
+
+prompts:
+  relationship_mask_or_gray:
+    template: >
+      Determine whether the spatial statement "{caption}" is true. If it is
+      true, keep the image in color and overlay a semi-transparent green mask on
+      the subject "{subj}" and a semi-transparent blue mask on the object
+      "{obj}". If it is false, convert the whole image to grayscale and add no
+      colored masks. Output only the modified image.
+

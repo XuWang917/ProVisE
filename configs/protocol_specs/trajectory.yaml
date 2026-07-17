@@ -1,0 +1,19 @@
+name: trajectory
+description: >
+  Draw a red trajectory line and parse it into ordered points for trajectory
+  metrics.
+
+default_config:
+  success_dfd: 0.4
+  n_samples: 20
+
+prompts:
+  red_motion_path:
+    template: >
+      You are a robot motion planning expert. Look carefully at this image and
+      the task instruction: "{human_instruction_text}". The robot end-effector
+      START position is at normalized coordinate {start_point}. Draw exactly one
+      continuous solid bright red line (RGB 255,0,0) on the image from this
+      start point to the target location. Keep all original image content
+      unchanged. Output only the modified image.
+

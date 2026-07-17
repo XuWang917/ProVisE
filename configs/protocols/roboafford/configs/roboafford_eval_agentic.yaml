@@ -1,0 +1,50 @@
+benchmark: roboafford_eval_agentic
+data_file: benchmark/data.jsonl
+benchmark_root: benchmark
+protocol_build:
+  schema_version: provise.protocol.v1
+  frozen: true
+  agent_model: gpt-5.4
+  parser_model: gpt-5.4
+  validation_model: gpt-image-2
+tasks:
+  object affordance:
+    protocol: agentic_point_marker
+    prompt_variant: cyan_point_marker
+    input:
+      mode: single
+    metric: point_in_mask
+    parser_output_kind: normalized_point
+    metric_config:
+      aggregation: mean
+      correct_threshold: 1.0
+    formal_evaluation: true
+    protocol_config: {}
+  object reference:
+    protocol: agentic_point_marker
+    prompt_variant: cyan_point_marker
+    input:
+      mode: single
+    metric: point_in_mask
+    parser_output_kind: normalized_point
+    metric_config:
+      aggregation: mean
+      correct_threshold: 1.0
+    formal_evaluation: true
+    protocol_config: {}
+  spatial affordance:
+    protocol: agentic_point_marker
+    prompt_variant: cyan_point_marker
+    input:
+      mode: single
+    metric: point_in_mask
+    parser_output_kind: normalized_point
+    metric_config:
+      aggregation: mean
+      correct_threshold: 1.0
+    formal_evaluation: true
+    protocol_config:
+      min_pixels: 10
+      min_fill_ratio: 0.2
+      ambiguity_ratio: 0.85
+      distance_threshold: 0.05

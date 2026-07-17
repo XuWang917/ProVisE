@@ -1,0 +1,135 @@
+{
+  "benchmark": "embspatial_agentic",
+  "builder": "agentic_protocol_builder_v2",
+  "total_samples": 3640,
+  "task_count": 1,
+  "completed_task_count": 1,
+  "active_task_count": 1,
+  "active_sample_count": 3640,
+  "decision_counts": {
+    "build": 1
+  },
+  "route_rows": [
+    {
+      "task": "spatial relationship identification",
+      "decision": "build",
+      "build_mode": "recipe",
+      "active": true,
+      "sample_count": 3640,
+      "confidence": "medium",
+      "recipe": "marked_object_choice",
+      "protocol": "agentic_parser_ops_protocol",
+      "parser_backend": "fixed_model",
+      "parser_output_kind": "choice_label",
+      "metric": "accuracy",
+      "formal_evaluation": true,
+      "reason": "The task is single-image multiple choice about grounded spatial semantics such as closest/nearest object. No exact reusable protocol matches this generic object-choice contract, but a registered recipe can express the selected object visually and recover the choice with fixed CLIP without encoding answer labels."
+    }
+  ],
+  "task_contexts": {
+    "spatial relationship identification": {
+      "representative_sample_ids": [
+        "sample_mp3d_0",
+        "sample_mp3d_3",
+        "sample_mp3d_4"
+      ],
+      "attached_media_count": 3,
+      "attached_media": [
+        {
+          "image_index": 1,
+          "sample_id": "sample_mp3d_0",
+          "media_index": 1,
+          "role": "primary",
+          "label": ""
+        },
+        {
+          "image_index": 2,
+          "sample_id": "sample_mp3d_3",
+          "media_index": 1,
+          "role": "primary",
+          "label": ""
+        },
+        {
+          "image_index": 3,
+          "sample_id": "sample_mp3d_4",
+          "media_index": 1,
+          "role": "primary",
+          "label": ""
+        }
+      ],
+      "missing_media": []
+    }
+  },
+  "task_contracts": {
+    "spatial relationship identification": {
+      "task": "spatial relationship identification",
+      "sample_count": 3640,
+      "answer_schemas": [
+        "choice_selection"
+      ],
+      "answer_types": [
+        "choice"
+      ],
+      "input_mode": "single",
+      "media_counts": [
+        1
+      ],
+      "metric": "accuracy",
+      "metric_config": {},
+      "formal_evaluation": true
+    }
+  },
+  "revision_counts": {},
+  "revision_history": [],
+  "automatic_vlm_fallback_tasks": [],
+  "fallback_history": [],
+  "disabled_tasks": [],
+  "deferred_external_failure_tasks": [],
+  "warnings": [],
+  "smoke_validation": {
+    "model": "gpt-image-2",
+    "limit": 3,
+    "smoke_data_file": "smoke/smoke_samples.jsonl",
+    "sample_ids": {
+      "spatial relationship identification": [
+        "sample_mp3d_0",
+        "sample_mp3d_3",
+        "sample_mp3d_4"
+      ]
+    },
+    "tasks": {
+      "spatial relationship identification": {
+        "status": "passed",
+        "phase": "initial",
+        "valid_parse_rate": 100.0,
+        "valid_parse_rate_pass1": 100.0,
+        "valid_parse_rate_pass2": 100.0,
+        "readout_operational_rate": 100.0,
+        "readout_operational_rate_pass1": 100.0,
+        "readout_operational_rate_pass2": 100.0,
+        "generated_rate": 100.0,
+        "parser_agreement_rate": 100.0,
+        "spatial_evidence_rate": 100.0,
+        "spatial_evidence_rate_pass1": 100.0,
+        "spatial_evidence_rate_pass2": 100.0,
+        "metric_compatibility_rate": 100.0,
+        "mean_score": 0.6666666666666666,
+        "correct_count": 2,
+        "initial_generation_failure_count": 0,
+        "generation_retry_count": 0,
+        "failed_checks": [],
+        "parser_disagreements": [],
+        "failure_category_counts": {
+          "incorrect_prediction": 1
+        },
+        "failure_reasons": [],
+        "results_pass1": "smoke/spatial relationship identification/results_pass1.json",
+        "results_pass2": "smoke/spatial relationship identification/results_pass2.json"
+      }
+    }
+  },
+  "protocol_artifact": {
+    "schema_version": "provise.protocol.v1",
+    "config_sha256": "529c8cc397d00e7b0e8f30473419be924427c6976eff1946b84b8586290157b7"
+  }
+}

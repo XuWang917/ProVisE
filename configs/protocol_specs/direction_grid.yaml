@@ -1,0 +1,27 @@
+name: direction_grid
+description: >
+  Encode a direction by filling one outer cell in a 3x3 grid with solid blue.
+
+default_config:
+  min_pixels: 50
+
+prompts:
+  object_facing:
+    template: >
+      Analyze the {category}'s facing direction relative to the camera. Divide
+      the image into a 3x3 grid. Fill exactly one outer grid cell with solid blue
+      (RGB 0,0,255): front=bottom-center, back=top-center, left=left-center,
+      right=right-center, front-left=bottom-left, front-right=bottom-right,
+      back-left=top-left, back-right=top-right. Keep all other content
+      unchanged. Output only the modified image.
+
+  perspective_choice:
+    template: >
+      Answer the spatial perspective question: "{question}" Choices: {choices}.
+      Divide the image into a 3x3 grid and fill exactly one outer grid cell with
+      solid blue (RGB 0,0,255) for the chosen direction: front=bottom-center,
+      back=top-center, left=left-center, right=right-center,
+      front-left=bottom-left, front-right=bottom-right, back-left=top-left,
+      back-right=top-right. Keep all other content unchanged. Output only the
+      modified image.
+

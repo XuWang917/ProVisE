@@ -1,0 +1,217 @@
+{
+  "benchmark": "spatialgen_bench",
+  "builder": "hybrid_protocol_release_v1",
+  "total_samples": 470,
+  "task_count": 14,
+  "completed_task_count": 14,
+  "active_task_count": 14,
+  "active_sample_count": 470,
+  "protocol_sources": {
+    "manual": {
+      "task_count": 11,
+      "description": "Protocols designed for the original SpatialGen-Bench evaluation before the Agentic Protocol Builder was introduced.",
+      "tasks": [
+        "counting",
+        "depth",
+        "orientation",
+        "relationship",
+        "perspective",
+        "mental_modeling",
+        "multihop",
+        "prediction",
+        "affordance",
+        "navigation",
+        "trajectory"
+      ]
+    },
+    "agentic": {
+      "task_count": 3,
+      "builder": "agentic_protocol_builder_v2",
+      "source_artifact": "spatialgen_bench_expansion_v3_agentic",
+      "agent_model": "gpt-5.4",
+      "parser_model": "gpt-5.4",
+      "validation_model": "gpt-image-2",
+      "tasks": [
+        "size",
+        "grounding",
+        "feasibility"
+      ]
+    }
+  },
+  "decision_counts": {
+    "manual": 11,
+    "fallback": 2,
+    "reuse": 1
+  },
+  "route_rows": [
+    {
+      "task": "counting",
+      "decision": "manual",
+      "active": true,
+      "sample_count": 40,
+      "protocol": "instance_marker_count",
+      "metric": "exact_count"
+    },
+    {
+      "task": "depth",
+      "decision": "manual",
+      "active": true,
+      "sample_count": 30,
+      "protocol": "dense_depth_ab",
+      "metric": "accuracy"
+    },
+    {
+      "task": "orientation",
+      "decision": "manual",
+      "active": true,
+      "sample_count": 40,
+      "protocol": "direction_grid",
+      "metric": "accuracy"
+    },
+    {
+      "task": "size",
+      "decision": "fallback",
+      "active": true,
+      "sample_count": 35,
+      "protocol": "agentic_vlm_protocol",
+      "parser_backend": "vlm_fallback",
+      "parser_inputs": [
+        "generated_response"
+      ],
+      "metric": "accuracy",
+      "reason": "No validated deterministic visual readout remained after protocol construction, so the task uses the generated-image-only VLM fallback."
+    },
+    {
+      "task": "relationship",
+      "decision": "manual",
+      "active": true,
+      "sample_count": 35,
+      "protocol": "binary_color_presence",
+      "metric": "accuracy"
+    },
+    {
+      "task": "perspective",
+      "decision": "manual",
+      "active": true,
+      "sample_count": 35,
+      "protocol": "direction_grid",
+      "metric": "accuracy"
+    },
+    {
+      "task": "mental_modeling",
+      "decision": "manual",
+      "active": true,
+      "sample_count": 35,
+      "protocol": "label_code",
+      "metric": "accuracy"
+    },
+    {
+      "task": "grounding",
+      "decision": "reuse",
+      "active": true,
+      "sample_count": 35,
+      "protocol": "agentic_point_marker",
+      "parser_backend": "parser_ops",
+      "parser_output_kind": "normalized_point",
+      "metric": "point_in_mask",
+      "reason": "The task exactly matches the deterministic point-marker localization protocol."
+    },
+    {
+      "task": "multihop",
+      "decision": "manual",
+      "active": true,
+      "sample_count": 30,
+      "protocol": "label_code",
+      "metric": "accuracy"
+    },
+    {
+      "task": "prediction",
+      "decision": "manual",
+      "active": true,
+      "sample_count": 25,
+      "protocol": "label_code",
+      "metric": "accuracy"
+    },
+    {
+      "task": "feasibility",
+      "decision": "fallback",
+      "active": true,
+      "sample_count": 35,
+      "protocol": "agentic_vlm_protocol",
+      "parser_backend": "vlm_fallback",
+      "parser_inputs": [
+        "generated_response"
+      ],
+      "metric": "accuracy",
+      "reason": "Feasibility requires reading depicted fit, clearance, or collision evidence that is not covered by a deterministic readout."
+    },
+    {
+      "task": "affordance",
+      "decision": "manual",
+      "active": true,
+      "sample_count": 35,
+      "protocol": "region_mask",
+      "metric": "mask_precision"
+    },
+    {
+      "task": "navigation",
+      "decision": "manual",
+      "active": true,
+      "sample_count": 30,
+      "protocol": "state_similarity",
+      "metric": "accuracy"
+    },
+    {
+      "task": "trajectory",
+      "decision": "manual",
+      "active": true,
+      "sample_count": 30,
+      "protocol": "trajectory",
+      "metric": "dfd"
+    }
+  ],
+  "agentic_validation": {
+    "model": "gpt-image-2",
+    "limit": 3,
+    "replay": {
+      "status": "passed",
+      "network_calls": false,
+      "automatic_vlm_fallback_tasks": [
+        "size"
+      ],
+      "tasks": [
+        "size",
+        "grounding",
+        "feasibility"
+      ]
+    },
+    "tasks": {
+      "size": {
+        "status": "passed",
+        "valid_parse_rate": 100.0,
+        "parser_agreement_rate": 100.0,
+        "spatial_evidence_rate": 100.0,
+        "mean_score": 1.0
+      },
+      "grounding": {
+        "status": "passed",
+        "valid_parse_rate": 100.0,
+        "parser_agreement_rate": 100.0,
+        "spatial_evidence_rate": 100.0,
+        "mean_score": 1.0
+      },
+      "feasibility": {
+        "status": "passed",
+        "valid_parse_rate": 100.0,
+        "parser_agreement_rate": 100.0,
+        "spatial_evidence_rate": 100.0,
+        "mean_score": 0.6666666666666666
+      }
+    }
+  },
+  "generated_protocols": "generated/spatialgen_bench_agentic.agentic_protocols.yaml",
+  "protocol_artifact": {
+    "schema_version": "provise.protocol.v1",
+    "config_sha256": "a5f000ebca46f0686c6635ca363ceebb2d5823dd93952fb273cfb8495d7e22a5"
+  }
+}

@@ -1,0 +1,15 @@
+name: region_mask
+description: >
+  Generate a binary mask for a target region and compare it with a GT mask.
+
+default_config:
+  success_precision: 0.5
+
+prompts:
+  binary_target_mask:
+    template: >
+      Generate a binary mask image with the same resolution as the input image
+      for the target region specified in the question: "{question}". Render the
+      target region in pure white (RGB 255,255,255) and everything else in pure
+      black (RGB 0,0,0). Output only the mask image.
+

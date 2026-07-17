@@ -1,0 +1,57 @@
+name: label_code
+description: >
+  Encode a discrete text answer as a fixed visual code in the generated image.
+  The original benchmark input is preserved; the generated image is parsed by
+  detecting one vivid magenta marker in predefined answer zones.
+
+default_config:
+  min_pixels: 30
+  layout: corners4
+
+prompts:
+  choice_4_corners:
+    config:
+      labels: A-D
+      layout: corners4
+    template: >
+      Read the input image(s) and answer the question: "{question}".
+      Do not answer in text. Output one image that encodes the answer using
+      exactly one solid vivid magenta square (#FF00FF): A=top-left corner,
+      B=top-right corner, C=bottom-left corner, D=bottom-right corner.
+      Add exactly one magenta square and no other magenta marks.
+
+  choice_hstrip_from_choices:
+    config:
+      labels: from_choices
+      layout: hstrip
+      strip_ratio: 0.18
+    template: >
+      Read the input image(s) and answer the question: "{question}".
+      Available choices and answer slots: {label_slots}. Do not answer in text.
+      Output one image that encodes the selected choice using exactly one solid
+      vivid magenta square (#FF00FF) in the bottom code strip. Divide the bottom
+      edge into {label_count} equal slots from left to right in that order. Put
+      the square only in the slot corresponding to the selected choice and add
+      no other magenta marks.
+
+  true_false_top:
+    config:
+      labels: true_false
+      layout: top2
+    template: >
+      Read the input image(s) and determine whether the statement is true:
+      "{question}". Do not answer in text. Output one image that encodes the
+      answer using exactly one solid vivid magenta square (#FF00FF):
+      true=top-left, false=top-right. Add no other magenta marks.
+
+  numeric_hstrip_12:
+    config:
+      labels: ["1", "2", "3", "4", "5", "6", "7", "8", "9", "10", "11", "12"]
+      layout: hstrip
+      strip_ratio: 0.18
+    template: >
+      Answer the question: "{question}". Do not answer in text. Output one image
+      that encodes the final numeric answer with exactly one solid vivid magenta
+      square (#FF00FF) in the bottom code strip. Divide the bottom edge into 12
+      equal slots from left to right, representing answers 1 to 12. Put the
+      square only in the slot corresponding to the predicted answer.

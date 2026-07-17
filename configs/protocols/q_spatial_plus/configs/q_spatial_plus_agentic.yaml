@@ -1,0 +1,736 @@
+benchmark: q_spatial_plus_agentic
+data_file: benchmark/data.jsonl
+benchmark_root: benchmark
+protocol_build:
+  schema_version: provise.protocol.v1
+  frozen: true
+  agent_model: gpt-5.4
+  parser_model: gpt-5.4
+  validation_model: gpt-image-2
+tasks:
+  1d_horizontal:
+    protocol: agentic_parser_ops_protocol
+    prompt_variant: generated
+    prompt: 'Answer the metric spatial question: "{question}". Edit the source image
+      minimally. Outline the first measured object with one thick solid magenta contour
+      (#FF00FF) and the second measured object with one thick solid cyan contour (#00FFFF).
+      Draw one thick solid yellow double-headed dimension line (#FFFF00) between the
+      requested nearest boundaries. Place one high-contrast white measurement tag
+      directly beside the line containing only the estimated number and its physical
+      unit. Do not place the answer elsewhere and add no other cyan, magenta, or yellow
+      marks. Output only the annotated image.'
+    input:
+      mode: single
+    metric: qspatial_ratio
+    metric_config: &id007
+      delta: 2
+      unit_field: answer_unit
+    formal_evaluation: true
+    protocol_config:
+      anchor_count: 2
+      unit: cm
+      parser_pipeline:
+        steps:
+        - id: generated
+          op: load_generated
+        - id: source
+          op: load_source
+          params:
+            index: 0
+        - id: aligned
+          op: align_to_reference
+          inputs:
+          - generated
+          - source
+          params:
+            motion: euclidean
+        - id: subject_generated_mask
+          op: hsv_color_mask
+          inputs:
+          - aligned
+          params:
+            lower: &id001
+            - 140
+            - 70
+            - 70
+            upper: &id002
+            - 179
+            - 255
+            - 255
+        - id: subject_source_mask
+          op: hsv_color_mask
+          inputs:
+          - source
+          params:
+            lower: *id001
+            upper: *id002
+        - id: subject_source_guard
+          op: morphology
+          inputs:
+          - subject_source_mask
+          params:
+            operation: dilate
+            kernel_size: 5
+            iterations: 1
+        - id: subject_novel_mask
+          op: mask_subtract
+          inputs:
+          - subject_generated_mask
+          - subject_source_guard
+        - id: subject_clean_mask
+          op: morphology
+          inputs:
+          - subject_novel_mask
+          params:
+            operation: close
+            kernel_size: 5
+            iterations: 1
+        - id: subject_components
+          op: connected_components
+          inputs:
+          - subject_clean_mask
+        - id: subject_candidates
+          op: filter_components
+          inputs:
+          - subject_components
+          params:
+            min_area: 30
+        - id: subject_component
+          op: select_largest
+          inputs:
+          - subject_candidates
+          params:
+            ambiguity_ratio: 1.0
+        - id: reference_generated_mask
+          op: hsv_color_mask
+          inputs:
+          - aligned
+          params:
+            lower: &id003
+            - 80
+            - 70
+            - 70
+            upper: &id004
+            - 100
+            - 255
+            - 255
+        - id: reference_source_mask
+          op: hsv_color_mask
+          inputs:
+          - source
+          params:
+            lower: *id003
+            upper: *id004
+        - id: reference_source_guard
+          op: morphology
+          inputs:
+          - reference_source_mask
+          params:
+            operation: dilate
+            kernel_size: 5
+            iterations: 1
+        - id: reference_novel_mask
+          op: mask_subtract
+          inputs:
+          - reference_generated_mask
+          - reference_source_guard
+        - id: reference_clean_mask
+          op: morphology
+          inputs:
+          - reference_novel_mask
+          params:
+            operation: close
+            kernel_size: 5
+            iterations: 1
+        - id: reference_components
+          op: connected_components
+          inputs:
+          - reference_clean_mask
+        - id: reference_candidates
+          op: filter_components
+          inputs:
+          - reference_components
+          params:
+            min_area: 30
+        - id: reference_component
+          op: select_largest
+          inputs:
+          - reference_candidates
+          params:
+            ambiguity_ratio: 1.0
+        - id: dimension_generated_mask
+          op: hsv_color_mask
+          inputs:
+          - aligned
+          params:
+            lower: &id005
+            - 18
+            - 80
+            - 100
+            upper: &id006
+            - 40
+            - 255
+            - 255
+        - id: dimension_source_mask
+          op: hsv_color_mask
+          inputs:
+          - source
+          params:
+            lower: *id005
+            upper: *id006
+        - id: dimension_source_guard
+          op: morphology
+          inputs:
+          - dimension_source_mask
+          params:
+            operation: dilate
+            kernel_size: 5
+            iterations: 1
+        - id: dimension_novel_mask
+          op: mask_subtract
+          inputs:
+          - dimension_generated_mask
+          - dimension_source_guard
+        - id: dimension_clean_mask
+          op: morphology
+          inputs:
+          - dimension_novel_mask
+          params:
+            operation: close
+            kernel_size: 5
+            iterations: 1
+        - id: dimension_components
+          op: connected_components
+          inputs:
+          - dimension_clean_mask
+        - id: dimension_candidates
+          op: filter_components
+          inputs:
+          - dimension_components
+          params:
+            min_area: 20
+        - id: dimension_component
+          op: select_largest
+          inputs:
+          - dimension_candidates
+          params:
+            ambiguity_ratio: 1.0
+        - id: label_crop
+          op: crop_dimension_label
+          inputs:
+          - aligned
+          - dimension_component
+          params:
+            minor_pad: 4.0
+            major_pad: 0.75
+            min_minor: 512
+            min_major: 192
+        - id: measurement
+          op: ocr_measurement
+          inputs:
+          - label_crop
+          params:
+            min_confidence:
+              $config: ocr_min_confidence
+              default: 0.35
+            unit_hint:
+              $config: unit
+              default: cm
+        - id: grounded_measurement
+          op: validate_dimension_between
+          inputs:
+          - measurement
+          - subject_component
+          - reference_component
+          - dimension_component
+          params:
+            min_line_elongation: 2.0
+            min_anchor_area: 30
+        output: grounded_measurement
+      parser_output_kind: scalar_measurement
+      metric: qspatial_ratio
+      metric_config: *id007
+  horizontal_distance:
+    protocol: agentic_parser_ops_protocol
+    prompt_variant: generated
+    prompt: 'Answer the metric spatial question: "{question}". Edit the source image
+      minimally. Outline the first measured object with one thick solid magenta contour
+      (#FF00FF) and the second measured object with one thick solid cyan contour (#00FFFF).
+      Draw one thick solid yellow double-headed dimension line (#FFFF00) between the
+      requested nearest boundaries. Place one high-contrast white measurement tag
+      directly beside the line containing only the estimated number and its physical
+      unit. Do not place the answer elsewhere and add no other cyan, magenta, or yellow
+      marks. Output only the annotated image.'
+    input:
+      mode: single
+    metric: qspatial_ratio
+    metric_config: &id015
+      delta: 2
+      unit_field: answer_unit
+    formal_evaluation: true
+    protocol_config:
+      anchor_count: 2
+      unit: cm
+      parser_pipeline:
+        steps:
+        - id: generated
+          op: load_generated
+        - id: source
+          op: load_source
+          params:
+            index: 0
+        - id: aligned
+          op: align_to_reference
+          inputs:
+          - generated
+          - source
+          params:
+            motion: euclidean
+        - id: subject_generated_mask
+          op: hsv_color_mask
+          inputs:
+          - aligned
+          params:
+            lower: &id009
+            - 140
+            - 70
+            - 70
+            upper: &id010
+            - 179
+            - 255
+            - 255
+        - id: subject_source_mask
+          op: hsv_color_mask
+          inputs:
+          - source
+          params:
+            lower: *id009
+            upper: *id010
+        - id: subject_source_guard
+          op: morphology
+          inputs:
+          - subject_source_mask
+          params:
+            operation: dilate
+            kernel_size: 5
+            iterations: 1
+        - id: subject_novel_mask
+          op: mask_subtract
+          inputs:
+          - subject_generated_mask
+          - subject_source_guard
+        - id: subject_clean_mask
+          op: morphology
+          inputs:
+          - subject_novel_mask
+          params:
+            operation: close
+            kernel_size: 5
+            iterations: 1
+        - id: subject_components
+          op: connected_components
+          inputs:
+          - subject_clean_mask
+        - id: subject_candidates
+          op: filter_components
+          inputs:
+          - subject_components
+          params:
+            min_area: 30
+        - id: subject_component
+          op: select_largest
+          inputs:
+          - subject_candidates
+          params:
+            ambiguity_ratio: 1.0
+        - id: reference_generated_mask
+          op: hsv_color_mask
+          inputs:
+          - aligned
+          params:
+            lower: &id011
+            - 80
+            - 70
+            - 70
+            upper: &id012
+            - 100
+            - 255
+            - 255
+        - id: reference_source_mask
+          op: hsv_color_mask
+          inputs:
+          - source
+          params:
+            lower: *id011
+            upper: *id012
+        - id: reference_source_guard
+          op: morphology
+          inputs:
+          - reference_source_mask
+          params:
+            operation: dilate
+            kernel_size: 5
+            iterations: 1
+        - id: reference_novel_mask
+          op: mask_subtract
+          inputs:
+          - reference_generated_mask
+          - reference_source_guard
+        - id: reference_clean_mask
+          op: morphology
+          inputs:
+          - reference_novel_mask
+          params:
+            operation: close
+            kernel_size: 5
+            iterations: 1
+        - id: reference_components
+          op: connected_components
+          inputs:
+          - reference_clean_mask
+        - id: reference_candidates
+          op: filter_components
+          inputs:
+          - reference_components
+          params:
+            min_area: 30
+        - id: reference_component
+          op: select_largest
+          inputs:
+          - reference_candidates
+          params:
+            ambiguity_ratio: 1.0
+        - id: dimension_generated_mask
+          op: hsv_color_mask
+          inputs:
+          - aligned
+          params:
+            lower: &id013
+            - 18
+            - 80
+            - 100
+            upper: &id014
+            - 40
+            - 255
+            - 255
+        - id: dimension_source_mask
+          op: hsv_color_mask
+          inputs:
+          - source
+          params:
+            lower: *id013
+            upper: *id014
+        - id: dimension_source_guard
+          op: morphology
+          inputs:
+          - dimension_source_mask
+          params:
+            operation: dilate
+            kernel_size: 5
+            iterations: 1
+        - id: dimension_novel_mask
+          op: mask_subtract
+          inputs:
+          - dimension_generated_mask
+          - dimension_source_guard
+        - id: dimension_clean_mask
+          op: morphology
+          inputs:
+          - dimension_novel_mask
+          params:
+            operation: close
+            kernel_size: 5
+            iterations: 1
+        - id: dimension_components
+          op: connected_components
+          inputs:
+          - dimension_clean_mask
+        - id: dimension_candidates
+          op: filter_components
+          inputs:
+          - dimension_components
+          params:
+            min_area: 20
+        - id: dimension_component
+          op: select_largest
+          inputs:
+          - dimension_candidates
+          params:
+            ambiguity_ratio: 1.0
+        - id: label_crop
+          op: crop_dimension_label
+          inputs:
+          - aligned
+          - dimension_component
+          params:
+            minor_pad: 4.0
+            major_pad: 0.75
+            min_minor: 512
+            min_major: 192
+        - id: measurement
+          op: ocr_measurement
+          inputs:
+          - label_crop
+          params:
+            min_confidence:
+              $config: ocr_min_confidence
+              default: 0.35
+            unit_hint:
+              $config: unit
+              default: cm
+        - id: grounded_measurement
+          op: validate_dimension_between
+          inputs:
+          - measurement
+          - subject_component
+          - reference_component
+          - dimension_component
+          params:
+            min_line_elongation: 2.0
+            min_anchor_area: 30
+        output: grounded_measurement
+      parser_output_kind: scalar_measurement
+      metric: qspatial_ratio
+      metric_config: *id015
+  vertical_distance:
+    protocol: agentic_parser_ops_protocol
+    prompt_variant: generated
+    prompt: 'Answer the metric spatial question: "{question}". Edit the source image
+      minimally. Outline the first measured object with one thick solid magenta contour
+      (#FF00FF) and the second measured object with one thick solid cyan contour (#00FFFF).
+      Draw one thick solid yellow double-headed dimension line (#FFFF00) between the
+      requested nearest boundaries. Place one high-contrast white measurement tag
+      directly beside the line containing only the estimated number and its physical
+      unit. Do not place the answer elsewhere and add no other cyan, magenta, or yellow
+      marks. Output only the annotated image.'
+    input:
+      mode: single
+    metric: qspatial_ratio
+    metric_config: &id023
+      delta: 2
+      unit_field: answer_unit
+    formal_evaluation: true
+    protocol_config:
+      anchor_count: 2
+      unit: cm
+      parser_pipeline:
+        steps:
+        - id: generated
+          op: load_generated
+        - id: source
+          op: load_source
+          params:
+            index: 0
+        - id: aligned
+          op: align_to_reference
+          inputs:
+          - generated
+          - source
+          params:
+            motion: euclidean
+        - id: subject_generated_mask
+          op: hsv_color_mask
+          inputs:
+          - aligned
+          params:
+            lower: &id017
+            - 140
+            - 70
+            - 70
+            upper: &id018
+            - 179
+            - 255
+            - 255
+        - id: subject_source_mask
+          op: hsv_color_mask
+          inputs:
+          - source
+          params:
+            lower: *id017
+            upper: *id018
+        - id: subject_source_guard
+          op: morphology
+          inputs:
+          - subject_source_mask
+          params:
+            operation: dilate
+            kernel_size: 5
+            iterations: 1
+        - id: subject_novel_mask
+          op: mask_subtract
+          inputs:
+          - subject_generated_mask
+          - subject_source_guard
+        - id: subject_clean_mask
+          op: morphology
+          inputs:
+          - subject_novel_mask
+          params:
+            operation: close
+            kernel_size: 5
+            iterations: 1
+        - id: subject_components
+          op: connected_components
+          inputs:
+          - subject_clean_mask
+        - id: subject_candidates
+          op: filter_components
+          inputs:
+          - subject_components
+          params:
+            min_area: 30
+        - id: subject_component
+          op: select_largest
+          inputs:
+          - subject_candidates
+          params:
+            ambiguity_ratio: 1.0
+        - id: reference_generated_mask
+          op: hsv_color_mask
+          inputs:
+          - aligned
+          params:
+            lower: &id019
+            - 80
+            - 70
+            - 70
+            upper: &id020
+            - 100
+            - 255
+            - 255
+        - id: reference_source_mask
+          op: hsv_color_mask
+          inputs:
+          - source
+          params:
+            lower: *id019
+            upper: *id020
+        - id: reference_source_guard
+          op: morphology
+          inputs:
+          - reference_source_mask
+          params:
+            operation: dilate
+            kernel_size: 5
+            iterations: 1
+        - id: reference_novel_mask
+          op: mask_subtract
+          inputs:
+          - reference_generated_mask
+          - reference_source_guard
+        - id: reference_clean_mask
+          op: morphology
+          inputs:
+          - reference_novel_mask
+          params:
+            operation: close
+            kernel_size: 5
+            iterations: 1
+        - id: reference_components
+          op: connected_components
+          inputs:
+          - reference_clean_mask
+        - id: reference_candidates
+          op: filter_components
+          inputs:
+          - reference_components
+          params:
+            min_area: 30
+        - id: reference_component
+          op: select_largest
+          inputs:
+          - reference_candidates
+          params:
+            ambiguity_ratio: 1.0
+        - id: dimension_generated_mask
+          op: hsv_color_mask
+          inputs:
+          - aligned
+          params:
+            lower: &id021
+            - 18
+            - 80
+            - 100
+            upper: &id022
+            - 40
+            - 255
+            - 255
+        - id: dimension_source_mask
+          op: hsv_color_mask
+          inputs:
+          - source
+          params:
+            lower: *id021
+            upper: *id022
+        - id: dimension_source_guard
+          op: morphology
+          inputs:
+          - dimension_source_mask
+          params:
+            operation: dilate
+            kernel_size: 5
+            iterations: 1
+        - id: dimension_novel_mask
+          op: mask_subtract
+          inputs:
+          - dimension_generated_mask
+          - dimension_source_guard
+        - id: dimension_clean_mask
+          op: morphology
+          inputs:
+          - dimension_novel_mask
+          params:
+            operation: close
+            kernel_size: 5
+            iterations: 1
+        - id: dimension_components
+          op: connected_components
+          inputs:
+          - dimension_clean_mask
+        - id: dimension_candidates
+          op: filter_components
+          inputs:
+          - dimension_components
+          params:
+            min_area: 20
+        - id: dimension_component
+          op: select_largest
+          inputs:
+          - dimension_candidates
+          params:
+            ambiguity_ratio: 1.0
+        - id: label_crop
+          op: crop_dimension_label
+          inputs:
+          - aligned
+          - dimension_component
+          params:
+            minor_pad: 4.0
+            major_pad: 0.75
+            min_minor: 512
+            min_major: 192
+        - id: measurement
+          op: ocr_measurement
+          inputs:
+          - label_crop
+          params:
+            min_confidence:
+              $config: ocr_min_confidence
+              default: 0.35
+            unit_hint:
+              $config: unit
+              default: cm
+        - id: grounded_measurement
+          op: validate_dimension_between
+          inputs:
+          - measurement
+          - subject_component
+          - reference_component
+          - dimension_component
+          params:
+            min_line_elongation: 2.0
+            min_anchor_area: 30
+        output: grounded_measurement
+      parser_output_kind: scalar_measurement
+      metric: qspatial_ratio
+      metric_config: *id023

@@ -1,0 +1,622 @@
+{
+  "benchmark": "omnispatial_agentic",
+  "builder": "agentic_protocol_builder_v2",
+  "total_samples": 1533,
+  "task_count": 5,
+  "completed_task_count": 5,
+  "active_task_count": 5,
+  "active_sample_count": 1533,
+  "decision_counts": {
+    "fallback": 5
+  },
+  "route_rows": [
+    {
+      "task": "Dynamic_Reasoning",
+      "decision": "fallback",
+      "active": true,
+      "sample_count": 420,
+      "confidence": "high",
+      "protocol_id": "generated_omnispatial_agentic_Dynamic_Reasoning_vlm_fallback",
+      "protocol": "agentic_vlm_protocol",
+      "parser_backend": "vlm_fallback",
+      "parser_inputs": [
+        "generated_response"
+      ],
+      "metric": "accuracy",
+      "formal_evaluation": true,
+      "reason": "The task mixes open-ended dynamic and physical reasoning questions whose answers are multiple-choice labels but whose evidence may require estimating distance, time, speed, size, or possibility from scene semantics. No registered deterministic recipe or Parser Ops pipeline can preserve this heterogeneous choice-selection contract without solving the task inside the parser; a task-level visual-semantic readout is needed."
+    },
+    {
+      "task": "Perspective_Taking",
+      "decision": "fallback",
+      "active": true,
+      "sample_count": 561,
+      "confidence": "medium",
+      "protocol_id": "generated_omnispatial_agentic_Perspective_Taking_vlm_fallback",
+      "protocol": "agentic_vlm_protocol",
+      "parser_backend": "vlm_fallback",
+      "parser_inputs": [
+        "generated_response"
+      ],
+      "metric": "accuracy",
+      "formal_evaluation": true,
+      "reason": "The deterministic or fixed-model visual readout failed mechanical smoke checks: parse_success_rate, parser_agreement_rate, spatial_evidence_rate, metric_compatibility_rate",
+      "generation_protocol_preserved": true,
+      "source": "automatic_vlm_fallback",
+      "fallback_origin": "smoke:deterministic_protocol_failed",
+      "pre_fallback_decision": "build",
+      "pre_fallback_source": "",
+      "pre_fallback_reason": "The task is single-image multiple choice about egocentric spatial semantics like left/right/front/rear from a named person's perspective. A clean visual realization of the selected spatial state can preserve the answer contract without answer codes, and semantic_visual_choice is the closest registered recipe for mapping generated spatial evidence to choice labels."
+    },
+    {
+      "task": "Spatial_Interaction",
+      "decision": "fallback",
+      "active": true,
+      "sample_count": 300,
+      "confidence": "medium",
+      "protocol_id": "generated_omnispatial_agentic_Spatial_Interaction_vlm_fallback",
+      "protocol": "agentic_vlm_protocol",
+      "parser_backend": "vlm_fallback",
+      "parser_inputs": [
+        "generated_response"
+      ],
+      "metric": "accuracy",
+      "formal_evaluation": true,
+      "reason": "The task mixes open-ended driving semantics, safety judgments, and road-type recognition into a single choice-selection format. No deterministic recipe or parser-op plan can preserve the answer contract across these heterogeneous questions without the parser effectively solving the original task; a task-level visual-semantic readout is needed."
+    },
+    {
+      "task": "complex_logic__choice_selection__accuracy",
+      "decision": "fallback",
+      "active": true,
+      "sample_count": 23,
+      "confidence": "high",
+      "protocol_id": "generated_omnispatial_agentic_complex_logic__choice_selection__accuracy_vlm_fallback",
+      "protocol": "agentic_vlm_protocol",
+      "parser_backend": "vlm_fallback",
+      "parser_inputs": [
+        "generated_response"
+      ],
+      "metric": "accuracy",
+      "formal_evaluation": true,
+      "reason": "Samples span heterogeneous visual logic problems (net folding, number pattern, geometry word/problem diagrams) with no single deterministic recipe or parser-ops contract that preserves the choice-selection answer across the task. A task-level visual reasoning parser is needed to read the generated worked visual evidence rather than answer codes."
+    },
+    {
+      "task": "complex_logic__structured_or_text__accuracy",
+      "decision": "fallback",
+      "active": true,
+      "sample_count": 229,
+      "confidence": "medium",
+      "protocol_id": "generated_omnispatial_agentic_complex_logic__structured_or_text__accuracy_vlm_fallback",
+      "protocol": "agentic_vlm_protocol",
+      "parser_backend": "vlm_fallback",
+      "parser_inputs": [
+        "generated_response"
+      ],
+      "metric": "accuracy",
+      "formal_evaluation": true,
+      "reason": "No validated deterministic visual readout remained after protocol construction: fallback may not use a pure answer-code layout; fallback must require concrete task-grounded spatial evidence",
+      "source": "automatic_vlm_fallback",
+      "fallback_origin": "compile:fallback_validation",
+      "pre_fallback_decision": "unsupported",
+      "pre_fallback_source": "fallback_validation",
+      "pre_fallback_reason": "fallback may not use a pure answer-code layout; fallback must require concrete task-grounded spatial evidence"
+    }
+  ],
+  "task_contexts": {
+    "Dynamic_Reasoning": {
+      "representative_sample_ids": [
+        "sample_0_0_dynamic_reasoning",
+        "sample_1_1_dynamic_reasoning",
+        "sample_3_0_dynamic_reasoning"
+      ],
+      "attached_media_count": 3,
+      "attached_media": [
+        {
+          "image_index": 1,
+          "sample_id": "sample_0_0_dynamic_reasoning",
+          "media_index": 1,
+          "role": "primary",
+          "label": ""
+        },
+        {
+          "image_index": 2,
+          "sample_id": "sample_1_1_dynamic_reasoning",
+          "media_index": 1,
+          "role": "primary",
+          "label": ""
+        },
+        {
+          "image_index": 3,
+          "sample_id": "sample_3_0_dynamic_reasoning",
+          "media_index": 1,
+          "role": "primary",
+          "label": ""
+        }
+      ],
+      "missing_media": []
+    },
+    "Perspective_Taking": {
+      "representative_sample_ids": [
+        "sample_0_0_perspective_taking",
+        "sample_1_0_perspective_taking",
+        "sample_2_0_perspective_taking"
+      ],
+      "attached_media_count": 3,
+      "attached_media": [
+        {
+          "image_index": 1,
+          "sample_id": "sample_0_0_perspective_taking",
+          "media_index": 1,
+          "role": "primary",
+          "label": ""
+        },
+        {
+          "image_index": 2,
+          "sample_id": "sample_1_0_perspective_taking",
+          "media_index": 1,
+          "role": "primary",
+          "label": ""
+        },
+        {
+          "image_index": 3,
+          "sample_id": "sample_2_0_perspective_taking",
+          "media_index": 1,
+          "role": "primary",
+          "label": ""
+        }
+      ],
+      "missing_media": []
+    },
+    "Spatial_Interaction": {
+      "representative_sample_ids": [
+        "sample_0_0_spatial_interaction",
+        "sample_0_1_spatial_interaction",
+        "sample_1_0_spatial_interaction"
+      ],
+      "attached_media_count": 3,
+      "attached_media": [
+        {
+          "image_index": 1,
+          "sample_id": "sample_0_0_spatial_interaction",
+          "media_index": 1,
+          "role": "primary",
+          "label": ""
+        },
+        {
+          "image_index": 2,
+          "sample_id": "sample_0_1_spatial_interaction",
+          "media_index": 1,
+          "role": "primary",
+          "label": ""
+        },
+        {
+          "image_index": 3,
+          "sample_id": "sample_1_0_spatial_interaction",
+          "media_index": 1,
+          "role": "primary",
+          "label": ""
+        }
+      ],
+      "missing_media": []
+    },
+    "complex_logic__choice_selection__accuracy": {
+      "representative_sample_ids": [
+        "sample_44_0_complex_logic",
+        "sample_88_0_complex_logic",
+        "sample_212_0_complex_logic"
+      ],
+      "attached_media_count": 3,
+      "attached_media": [
+        {
+          "image_index": 1,
+          "sample_id": "sample_44_0_complex_logic",
+          "media_index": 1,
+          "role": "primary",
+          "label": ""
+        },
+        {
+          "image_index": 2,
+          "sample_id": "sample_88_0_complex_logic",
+          "media_index": 1,
+          "role": "primary",
+          "label": ""
+        },
+        {
+          "image_index": 3,
+          "sample_id": "sample_212_0_complex_logic",
+          "media_index": 1,
+          "role": "primary",
+          "label": ""
+        }
+      ],
+      "missing_media": []
+    },
+    "complex_logic__structured_or_text__accuracy": {
+      "representative_sample_ids": [
+        "sample_0_0_complex_logic",
+        "sample_1_0_complex_logic",
+        "sample_2_0_complex_logic"
+      ],
+      "attached_media_count": 3,
+      "attached_media": [
+        {
+          "image_index": 1,
+          "sample_id": "sample_0_0_complex_logic",
+          "media_index": 1,
+          "role": "primary",
+          "label": ""
+        },
+        {
+          "image_index": 2,
+          "sample_id": "sample_1_0_complex_logic",
+          "media_index": 1,
+          "role": "primary",
+          "label": ""
+        },
+        {
+          "image_index": 3,
+          "sample_id": "sample_2_0_complex_logic",
+          "media_index": 1,
+          "role": "primary",
+          "label": ""
+        }
+      ],
+      "missing_media": []
+    }
+  },
+  "task_contracts": {
+    "Dynamic_Reasoning": {
+      "task": "Dynamic_Reasoning",
+      "sample_count": 420,
+      "answer_schemas": [
+        "choice_selection"
+      ],
+      "answer_types": [
+        "choice"
+      ],
+      "input_mode": "single",
+      "media_counts": [
+        1
+      ],
+      "metric": "accuracy",
+      "metric_config": {},
+      "formal_evaluation": true
+    },
+    "Perspective_Taking": {
+      "task": "Perspective_Taking",
+      "sample_count": 561,
+      "answer_schemas": [
+        "choice_selection"
+      ],
+      "answer_types": [
+        "choice"
+      ],
+      "input_mode": "single",
+      "media_counts": [
+        1
+      ],
+      "metric": "accuracy",
+      "metric_config": {},
+      "formal_evaluation": true
+    },
+    "Spatial_Interaction": {
+      "task": "Spatial_Interaction",
+      "sample_count": 300,
+      "answer_schemas": [
+        "choice_selection"
+      ],
+      "answer_types": [
+        "choice"
+      ],
+      "input_mode": "single",
+      "media_counts": [
+        1
+      ],
+      "metric": "accuracy",
+      "metric_config": {},
+      "formal_evaluation": true
+    },
+    "complex_logic__choice_selection__accuracy": {
+      "task": "complex_logic__choice_selection__accuracy",
+      "sample_count": 23,
+      "answer_schemas": [
+        "choice_selection"
+      ],
+      "answer_types": [
+        "choice"
+      ],
+      "input_mode": "single",
+      "media_counts": [
+        1
+      ],
+      "metric": "accuracy",
+      "metric_config": {},
+      "formal_evaluation": true
+    },
+    "complex_logic__structured_or_text__accuracy": {
+      "task": "complex_logic__structured_or_text__accuracy",
+      "sample_count": 229,
+      "answer_schemas": [
+        "structured_or_text"
+      ],
+      "answer_types": [
+        "choice"
+      ],
+      "input_mode": "single",
+      "media_counts": [
+        1
+      ],
+      "metric": "accuracy",
+      "metric_config": {},
+      "formal_evaluation": true
+    }
+  },
+  "revision_counts": {
+    "complex_logic__structured_or_text__accuracy": 1
+  },
+  "revision_history": [
+    {
+      "task": "complex_logic__structured_or_text__accuracy",
+      "phase": "compile",
+      "previous_diagnostics": {
+        "task": "complex_logic__structured_or_text__accuracy",
+        "decision": "unsupported",
+        "active": false,
+        "sample_count": 229,
+        "reason": "fallback must require concrete task-grounded spatial evidence",
+        "source": "fallback_validation"
+      }
+    }
+  ],
+  "automatic_vlm_fallback_tasks": [
+    "Perspective_Taking",
+    "complex_logic__structured_or_text__accuracy"
+  ],
+  "fallback_history": [
+    {
+      "task": "Perspective_Taking",
+      "origin": "smoke:deterministic_protocol_failed",
+      "reason": "The deterministic or fixed-model visual readout failed mechanical smoke checks: parse_success_rate, parser_agreement_rate, spatial_evidence_rate, metric_compatibility_rate"
+    },
+    {
+      "task": "complex_logic__structured_or_text__accuracy",
+      "origin": "compile:fallback_validation",
+      "reason": "No validated deterministic visual readout remained after protocol construction: fallback may not use a pure answer-code layout; fallback must require concrete task-grounded spatial evidence"
+    }
+  ],
+  "disabled_tasks": [],
+  "deferred_external_failure_tasks": [],
+  "warnings": [
+    "Task Perspective_Taking entered automatic VLM fallback after smoke:deterministic_protocol_failed.",
+    "Rejected VLM fallback for task=complex_logic__structured_or_text__accuracy: fallback may not use a pure answer-code layout; fallback must require concrete task-grounded spatial evidence",
+    "Task complex_logic__structured_or_text__accuracy entered automatic VLM fallback after compile:fallback_validation."
+  ],
+  "smoke_validation": {
+    "model": "gpt-image-2",
+    "limit": 3,
+    "smoke_data_file": "smoke/smoke_samples.jsonl",
+    "sample_ids": {
+      "Dynamic_Reasoning": [
+        "sample_0_0_dynamic_reasoning",
+        "sample_1_1_dynamic_reasoning",
+        "sample_3_0_dynamic_reasoning"
+      ],
+      "Perspective_Taking": [
+        "sample_0_0_perspective_taking",
+        "sample_1_0_perspective_taking",
+        "sample_2_0_perspective_taking"
+      ],
+      "Spatial_Interaction": [
+        "sample_0_0_spatial_interaction",
+        "sample_0_1_spatial_interaction",
+        "sample_1_0_spatial_interaction"
+      ],
+      "complex_logic__choice_selection__accuracy": [
+        "sample_44_0_complex_logic",
+        "sample_88_0_complex_logic",
+        "sample_212_0_complex_logic"
+      ],
+      "complex_logic__structured_or_text__accuracy": [
+        "sample_0_0_complex_logic",
+        "sample_1_0_complex_logic",
+        "sample_2_0_complex_logic"
+      ]
+    },
+    "tasks": {
+      "Dynamic_Reasoning": {
+        "status": "passed",
+        "phase": "initial",
+        "valid_parse_rate": 100.0,
+        "valid_parse_rate_pass1": 100.0,
+        "valid_parse_rate_pass2": 100.0,
+        "readout_operational_rate": 100.0,
+        "readout_operational_rate_pass1": 100.0,
+        "readout_operational_rate_pass2": 100.0,
+        "generated_rate": 100.0,
+        "parser_agreement_rate": 100.0,
+        "spatial_evidence_rate": 100.0,
+        "spatial_evidence_rate_pass1": 100.0,
+        "spatial_evidence_rate_pass2": 100.0,
+        "metric_compatibility_rate": 100.0,
+        "mean_score": 0.3333333333333333,
+        "correct_count": 1,
+        "initial_generation_failure_count": 0,
+        "generation_retry_count": 0,
+        "failed_checks": [],
+        "parser_disagreements": [],
+        "failure_category_counts": {
+          "incorrect_prediction": 2
+        },
+        "failure_reasons": [],
+        "results_pass1": "smoke/Dynamic_Reasoning/results_pass1.json",
+        "results_pass2": "smoke/Dynamic_Reasoning/results_pass2.json"
+      },
+      "Perspective_Taking": {
+        "status": "passed",
+        "phase": "fallback",
+        "valid_parse_rate": 66.66666666666667,
+        "valid_parse_rate_pass1": 66.66666666666667,
+        "valid_parse_rate_pass2": 66.66666666666667,
+        "readout_operational_rate": 100.0,
+        "readout_operational_rate_pass1": 100.0,
+        "readout_operational_rate_pass2": 100.0,
+        "generated_rate": 100.0,
+        "parser_agreement_rate": 100.0,
+        "spatial_evidence_rate": 100.0,
+        "spatial_evidence_rate_pass1": 100.0,
+        "spatial_evidence_rate_pass2": 100.0,
+        "metric_compatibility_rate": 100.0,
+        "mean_score": 0.3333333333333333,
+        "correct_count": 1,
+        "initial_generation_failure_count": 0,
+        "generation_retry_count": 0,
+        "failed_checks": [],
+        "parser_disagreements": [],
+        "failure_category_counts": {
+          "incorrect_prediction": 1,
+          "model_protocol_noncompliance": 1
+        },
+        "failure_reasons": [
+          "agentic_invalid_or_ambiguous"
+        ],
+        "results_pass1": "smoke_vlm_fallback/Perspective_Taking/results_pass1.json",
+        "results_pass2": "smoke_vlm_fallback/Perspective_Taking/results_pass2.json"
+      },
+      "Spatial_Interaction": {
+        "status": "passed",
+        "phase": "initial",
+        "valid_parse_rate": 100.0,
+        "valid_parse_rate_pass1": 100.0,
+        "valid_parse_rate_pass2": 100.0,
+        "readout_operational_rate": 100.0,
+        "readout_operational_rate_pass1": 100.0,
+        "readout_operational_rate_pass2": 100.0,
+        "generated_rate": 100.0,
+        "parser_agreement_rate": 100.0,
+        "spatial_evidence_rate": 100.0,
+        "spatial_evidence_rate_pass1": 100.0,
+        "spatial_evidence_rate_pass2": 100.0,
+        "metric_compatibility_rate": 100.0,
+        "mean_score": 0.3333333333333333,
+        "correct_count": 1,
+        "initial_generation_failure_count": 0,
+        "generation_retry_count": 0,
+        "failed_checks": [],
+        "parser_disagreements": [],
+        "failure_category_counts": {
+          "incorrect_prediction": 2
+        },
+        "failure_reasons": [],
+        "results_pass1": "smoke/Spatial_Interaction/results_pass1.json",
+        "results_pass2": "smoke/Spatial_Interaction/results_pass2.json"
+      },
+      "complex_logic__choice_selection__accuracy": {
+        "status": "passed",
+        "phase": "initial",
+        "valid_parse_rate": 100.0,
+        "valid_parse_rate_pass1": 100.0,
+        "valid_parse_rate_pass2": 100.0,
+        "readout_operational_rate": 100.0,
+        "readout_operational_rate_pass1": 100.0,
+        "readout_operational_rate_pass2": 100.0,
+        "generated_rate": 100.0,
+        "parser_agreement_rate": 100.0,
+        "spatial_evidence_rate": 100.0,
+        "spatial_evidence_rate_pass1": 100.0,
+        "spatial_evidence_rate_pass2": 100.0,
+        "metric_compatibility_rate": 100.0,
+        "mean_score": 0.3333333333333333,
+        "correct_count": 1,
+        "initial_generation_failure_count": 0,
+        "generation_retry_count": 0,
+        "failed_checks": [],
+        "parser_disagreements": [],
+        "failure_category_counts": {
+          "incorrect_prediction": 2
+        },
+        "failure_reasons": [],
+        "results_pass1": "smoke/complex_logic__choice_selection__accuracy/results_pass1.json",
+        "results_pass2": "smoke/complex_logic__choice_selection__accuracy/results_pass2.json"
+      },
+      "complex_logic__structured_or_text__accuracy": {
+        "status": "passed",
+        "phase": "initial",
+        "valid_parse_rate": 100.0,
+        "valid_parse_rate_pass1": 100.0,
+        "valid_parse_rate_pass2": 100.0,
+        "readout_operational_rate": 100.0,
+        "readout_operational_rate_pass1": 100.0,
+        "readout_operational_rate_pass2": 100.0,
+        "generated_rate": 100.0,
+        "parser_agreement_rate": 100.0,
+        "spatial_evidence_rate": 100.0,
+        "spatial_evidence_rate_pass1": 100.0,
+        "spatial_evidence_rate_pass2": 100.0,
+        "metric_compatibility_rate": 100.0,
+        "mean_score": 0.0,
+        "correct_count": 0,
+        "initial_generation_failure_count": 0,
+        "generation_retry_count": 0,
+        "failed_checks": [],
+        "parser_disagreements": [],
+        "failure_category_counts": {
+          "incorrect_prediction": 3
+        },
+        "failure_reasons": [],
+        "results_pass1": "smoke/complex_logic__structured_or_text__accuracy/results_pass1.json",
+        "results_pass2": "smoke/complex_logic__structured_or_text__accuracy/results_pass2.json"
+      }
+    },
+    "fallback_runs": [
+      {
+        "model": "gpt-image-2",
+        "limit": 3,
+        "smoke_data_file": "smoke_vlm_fallback/smoke_samples.jsonl",
+        "sample_ids": {
+          "Perspective_Taking": [
+            "sample_0_0_perspective_taking",
+            "sample_1_0_perspective_taking",
+            "sample_2_0_perspective_taking"
+          ]
+        },
+        "tasks": {
+          "Perspective_Taking": {
+            "status": "passed",
+            "phase": "fallback",
+            "valid_parse_rate": 66.66666666666667,
+            "valid_parse_rate_pass1": 66.66666666666667,
+            "valid_parse_rate_pass2": 66.66666666666667,
+            "readout_operational_rate": 100.0,
+            "readout_operational_rate_pass1": 100.0,
+            "readout_operational_rate_pass2": 100.0,
+            "generated_rate": 100.0,
+            "parser_agreement_rate": 100.0,
+            "spatial_evidence_rate": 100.0,
+            "spatial_evidence_rate_pass1": 100.0,
+            "spatial_evidence_rate_pass2": 100.0,
+            "metric_compatibility_rate": 100.0,
+            "mean_score": 0.3333333333333333,
+            "correct_count": 1,
+            "initial_generation_failure_count": 0,
+            "generation_retry_count": 0,
+            "failed_checks": [],
+            "parser_disagreements": [],
+            "failure_category_counts": {
+              "incorrect_prediction": 1,
+              "model_protocol_noncompliance": 1
+            },
+            "failure_reasons": [
+              "agentic_invalid_or_ambiguous"
+            ],
+            "results_pass1": "smoke_vlm_fallback/Perspective_Taking/results_pass1.json",
+            "results_pass2": "smoke_vlm_fallback/Perspective_Taking/results_pass2.json"
+          }
+        }
+      }
+    ]
+  },
+  "protocol_artifact": {
+    "schema_version": "provise.protocol.v1",
+    "config_sha256": "ec46166c04eeac2a0e13fbcc4c3d560b12ba614c93482ebf46c344821953141a"
+  }
+}

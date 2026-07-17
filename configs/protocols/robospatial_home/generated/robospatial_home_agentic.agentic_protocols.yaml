@@ -1,0 +1,467 @@
+protocols:
+- id: generated_compatibility_v2
+  task: compatibility
+  decision: build
+  build_mode: recipe
+  recipe: relation_zone_boolean
+  visual_contract:
+    recipe: relation_zone_boolean
+    mode: edit_source
+    primitives:
+    - subject anchor for the movable object named in the question
+    - reference anchor for the obstacle or anchor object named in the question
+    - full visible region behind/in front of/inside/under/next to the reference where
+      the subject could fit without collision
+    parameters: {}
+  generation_prompt: 'Answer the binary spatial-relation question: "{question}". Keep
+    the source image unchanged. Place one solid magenta disk (#FF00FF) at the center
+    of the subject object and one solid cyan disk (#00FFFF) at the center of the reference
+    object. Overlay one large translucent vivid-green filled region (#00FF00) covering
+    the image locations where the subject would satisfy exactly the relation asked
+    in the question. Keep the two disks visible above the region. Do not move either
+    object. Do not add a check mark, X, yes/no text, option label, or other verdict
+    symbol. Output only the annotated image.
+
+
+    Candidate answers:
+
+    {choices}'
+  readout:
+    recipe: relation_zone_boolean
+    output_kind: boolean
+    pipeline:
+      steps:
+      - id: generated
+        op: load_generated
+      - id: source
+        op: load_source
+        params:
+          index: 0
+      - id: aligned
+        op: align_to_reference
+        inputs:
+        - generated
+        - source
+        params:
+          motion: euclidean
+      - id: subject_generated_mask
+        op: hsv_color_mask
+        inputs:
+        - aligned
+        params:
+          lower: &id001
+          - 140
+          - 80
+          - 80
+          upper: &id002
+          - 179
+          - 255
+          - 255
+      - id: subject_source_mask
+        op: hsv_color_mask
+        inputs:
+        - source
+        params:
+          lower: *id001
+          upper: *id002
+      - id: subject_source_guard
+        op: morphology
+        inputs:
+        - subject_source_mask
+        params:
+          operation: dilate
+          kernel_size: 5
+          iterations: 1
+      - id: subject_novel_mask
+        op: mask_subtract
+        inputs:
+        - subject_generated_mask
+        - subject_source_guard
+      - id: subject_clean_mask
+        op: morphology
+        inputs:
+        - subject_novel_mask
+        params:
+          operation: close
+          kernel_size: 5
+          iterations: 1
+      - id: subject_components
+        op: connected_components
+        inputs:
+        - subject_clean_mask
+      - id: subject_candidates
+        op: filter_components
+        inputs:
+        - subject_components
+        params:
+          min_area: 40
+      - id: subject_component
+        op: select_largest
+        inputs:
+        - subject_candidates
+        params:
+          ambiguity_ratio: 1.0
+      - id: reference_generated_mask
+        op: hsv_color_mask
+        inputs:
+        - aligned
+        params:
+          lower: &id003
+          - 80
+          - 80
+          - 80
+          upper: &id004
+          - 100
+          - 255
+          - 255
+      - id: reference_source_mask
+        op: hsv_color_mask
+        inputs:
+        - source
+        params:
+          lower: *id003
+          upper: *id004
+      - id: reference_source_guard
+        op: morphology
+        inputs:
+        - reference_source_mask
+        params:
+          operation: dilate
+          kernel_size: 5
+          iterations: 1
+      - id: reference_novel_mask
+        op: mask_subtract
+        inputs:
+        - reference_generated_mask
+        - reference_source_guard
+      - id: reference_clean_mask
+        op: morphology
+        inputs:
+        - reference_novel_mask
+        params:
+          operation: close
+          kernel_size: 5
+          iterations: 1
+      - id: reference_components
+        op: connected_components
+        inputs:
+        - reference_clean_mask
+      - id: reference_candidates
+        op: filter_components
+        inputs:
+        - reference_components
+        params:
+          min_area: 40
+      - id: reference_component
+        op: select_largest
+        inputs:
+        - reference_candidates
+        params:
+          ambiguity_ratio: 1.0
+      - id: target_region_generated_mask
+        op: hsv_color_mask
+        inputs:
+        - aligned
+        params:
+          lower:
+          - 35
+          - 50
+          - 50
+          upper:
+          - 90
+          - 255
+          - 255
+      - id: target_region_source_mask
+        op: hsv_color_mask
+        inputs:
+        - source
+        params:
+          lower:
+          - 35
+          - 50
+          - 50
+          upper:
+          - 90
+          - 255
+          - 255
+      - id: target_region_source_guard
+        op: morphology
+        inputs:
+        - target_region_source_mask
+        params:
+          operation: dilate
+          kernel_size: 5
+          iterations: 1
+      - id: target_region_novel_mask
+        op: mask_subtract
+        inputs:
+        - target_region_generated_mask
+        - target_region_source_guard
+      - id: target_region_mask
+        op: morphology
+        inputs:
+        - target_region_novel_mask
+        params:
+          operation: close
+          kernel_size: 7
+          iterations: 1
+      - id: subject_point
+        op: component_centroid
+        inputs:
+        - subject_component
+      - id: relation_holds
+        op: point_in_mask
+        inputs:
+        - subject_point
+        - target_region_mask
+        params:
+          radius:
+            $config: membership_radius
+            default: 24
+          min_fraction:
+            $config: membership_min_fraction
+            default: 0.03
+          min_mask_pixels:
+            $config: target_region_min_pixels
+            default: 200
+      output: relation_holds
+  metric_contract:
+    metric: accuracy
+    config: {}
+    formal_evaluation: true
+  rationale: Binary spatial fit questions over a single image match the deterministic
+    relation_zone_boolean recipe, which can express whether the named object would
+    fit in the queried region without using answer-code symbols.
+- id: generated_configuration_v2
+  task: configuration
+  decision: build
+  build_mode: recipe
+  recipe: relation_zone_boolean
+  visual_contract:
+    recipe: relation_zone_boolean
+    mode: edit_source
+    primitives:
+    - subject anchor
+    - reference anchor
+    - valid relation region
+    parameters: {}
+  generation_prompt: 'Answer the binary spatial-relation question: "{question}". Keep
+    the source image unchanged. Place one solid magenta disk (#FF00FF) at the center
+    of the subject object and one solid cyan disk (#00FFFF) at the center of the reference
+    object. Overlay one large translucent vivid-green filled region (#00FF00) covering
+    the image locations where the subject would satisfy exactly the relation asked
+    in the question. Keep the two disks visible above the region. Do not move either
+    object. Do not add a check mark, X, yes/no text, option label, or other verdict
+    symbol. Output only the annotated image.
+
+
+    Candidate answers:
+
+    {choices}'
+  readout:
+    recipe: relation_zone_boolean
+    output_kind: boolean
+    pipeline:
+      steps:
+      - id: generated
+        op: load_generated
+      - id: source
+        op: load_source
+        params:
+          index: 0
+      - id: aligned
+        op: align_to_reference
+        inputs:
+        - generated
+        - source
+        params:
+          motion: euclidean
+      - id: subject_generated_mask
+        op: hsv_color_mask
+        inputs:
+        - aligned
+        params:
+          lower: &id005
+          - 140
+          - 80
+          - 80
+          upper: &id006
+          - 179
+          - 255
+          - 255
+      - id: subject_source_mask
+        op: hsv_color_mask
+        inputs:
+        - source
+        params:
+          lower: *id005
+          upper: *id006
+      - id: subject_source_guard
+        op: morphology
+        inputs:
+        - subject_source_mask
+        params:
+          operation: dilate
+          kernel_size: 5
+          iterations: 1
+      - id: subject_novel_mask
+        op: mask_subtract
+        inputs:
+        - subject_generated_mask
+        - subject_source_guard
+      - id: subject_clean_mask
+        op: morphology
+        inputs:
+        - subject_novel_mask
+        params:
+          operation: close
+          kernel_size: 5
+          iterations: 1
+      - id: subject_components
+        op: connected_components
+        inputs:
+        - subject_clean_mask
+      - id: subject_candidates
+        op: filter_components
+        inputs:
+        - subject_components
+        params:
+          min_area: 40
+      - id: subject_component
+        op: select_largest
+        inputs:
+        - subject_candidates
+        params:
+          ambiguity_ratio: 1.0
+      - id: reference_generated_mask
+        op: hsv_color_mask
+        inputs:
+        - aligned
+        params:
+          lower: &id007
+          - 80
+          - 80
+          - 80
+          upper: &id008
+          - 100
+          - 255
+          - 255
+      - id: reference_source_mask
+        op: hsv_color_mask
+        inputs:
+        - source
+        params:
+          lower: *id007
+          upper: *id008
+      - id: reference_source_guard
+        op: morphology
+        inputs:
+        - reference_source_mask
+        params:
+          operation: dilate
+          kernel_size: 5
+          iterations: 1
+      - id: reference_novel_mask
+        op: mask_subtract
+        inputs:
+        - reference_generated_mask
+        - reference_source_guard
+      - id: reference_clean_mask
+        op: morphology
+        inputs:
+        - reference_novel_mask
+        params:
+          operation: close
+          kernel_size: 5
+          iterations: 1
+      - id: reference_components
+        op: connected_components
+        inputs:
+        - reference_clean_mask
+      - id: reference_candidates
+        op: filter_components
+        inputs:
+        - reference_components
+        params:
+          min_area: 40
+      - id: reference_component
+        op: select_largest
+        inputs:
+        - reference_candidates
+        params:
+          ambiguity_ratio: 1.0
+      - id: target_region_generated_mask
+        op: hsv_color_mask
+        inputs:
+        - aligned
+        params:
+          lower:
+          - 35
+          - 50
+          - 50
+          upper:
+          - 90
+          - 255
+          - 255
+      - id: target_region_source_mask
+        op: hsv_color_mask
+        inputs:
+        - source
+        params:
+          lower:
+          - 35
+          - 50
+          - 50
+          upper:
+          - 90
+          - 255
+          - 255
+      - id: target_region_source_guard
+        op: morphology
+        inputs:
+        - target_region_source_mask
+        params:
+          operation: dilate
+          kernel_size: 5
+          iterations: 1
+      - id: target_region_novel_mask
+        op: mask_subtract
+        inputs:
+        - target_region_generated_mask
+        - target_region_source_guard
+      - id: target_region_mask
+        op: morphology
+        inputs:
+        - target_region_novel_mask
+        params:
+          operation: close
+          kernel_size: 7
+          iterations: 1
+      - id: subject_point
+        op: component_centroid
+        inputs:
+        - subject_component
+      - id: relation_holds
+        op: point_in_mask
+        inputs:
+        - subject_point
+        - target_region_mask
+        params:
+          radius:
+            $config: membership_radius
+            default: 24
+          min_fraction:
+            $config: membership_min_fraction
+            default: 0.03
+          min_mask_pixels:
+            $config: target_region_min_pixels
+            default: 200
+      output: relation_holds
+  metric_contract:
+    metric: accuracy
+    config: {}
+    formal_evaluation: true
+  rationale: This is a single-image binary spatial-relation task (yes/no) where deterministic
+    geometric recovery is appropriate. The relation_zone_boolean recipe matches the
+    boolean answer contract and avoids answer-code symbols by expressing subject,
+    reference, and valid relation region visually.

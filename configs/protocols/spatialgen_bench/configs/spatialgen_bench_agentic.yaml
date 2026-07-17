@@ -1,0 +1,260 @@
+benchmark: spatialgen_bench
+data_file: benchmark/data.jsonl
+benchmark_root: benchmark
+protocol_build:
+  schema_version: provise.protocol.v1
+  frozen: true
+  artifact_type: hybrid
+  agent_model: gpt-5.4
+  parser_model: gpt-5.4
+  validation_model: gpt-image-2
+  manual_tasks:
+    - counting
+    - depth
+    - orientation
+    - relationship
+    - perspective
+    - mental_modeling
+    - multihop
+    - prediction
+    - affordance
+    - navigation
+    - trajectory
+  agentic_tasks:
+    - size
+    - grounding
+    - feasibility
+tasks:
+  counting:
+    protocol_origin: manual
+    protocol: instance_marker_count
+    prompt_variant: green_star_count
+    input:
+      mode: single
+    metric: exact_count
+    formal_evaluation: true
+
+  depth:
+    protocol_origin: manual
+    protocol: dense_depth_ab
+    prompt_variant: grayscale_depth_map
+    input:
+      mode: single
+    metric: accuracy
+    formal_evaluation: true
+
+  orientation:
+    protocol_origin: manual
+    protocol: direction_grid
+    prompt_variant: object_facing
+    input:
+      mode: single
+    metric: accuracy
+    formal_evaluation: true
+
+  size:
+    protocol_origin: agentic
+    protocol: agentic_vlm_protocol
+    prompt_variant: generated
+    prompt: >-
+      Use the supplied source image or ordered images to produce one clear
+      visual answer to this spatial task:
+
+      {question}
+
+      Candidate answers, when present:
+
+      {choices}
+
+      Express the answer through large, task-relevant visual evidence in the
+      image itself. Use only the primitives that fit the task, such as object
+      outlines, a region overlay, arrows between referenced objects, a path,
+      measurement marks, correspondence marks, or a visibly rendered next
+      spatial state. Preserve unrelated scene content. Do not merely print an
+      answer label, option text, or prose explanation.
+    input:
+      mode: single
+    metric: accuracy
+    metric_config: {}
+    formal_evaluation: true
+    protocol_config:
+      generated_protocol_id: generated_spatialgen_bench_expansion_v3_agentic_size_vlm_fallback
+      include_source_images: false
+      parse_prompt: >-
+        Read only the concrete spatial evidence expressed in the generated
+        visual response. Identify the marked objects, regions, arrows, path,
+        measurement, correspondence, or generated state, then recover the
+        answer in the benchmark's required format. Candidate choices may be
+        used only to map that visible evidence to a label. Do not independently
+        solve the original task from the source image and do not accept a bare
+        answer label as evidence.
+      answer_format: "one candidate option label from: A, B"
+      invalid_conditions:
+        - no task-relevant spatial mark or generated state is visible
+        - the visible evidence is ambiguous or contradicts itself
+        - the response contains only an answer label or prose
+      visual_strategy: other_spatial
+      visual_evidence: >-
+        Task-grounded object outlines, region overlays, arrows, paths,
+        measurement marks, correspondence marks, or a visibly changed spatial
+        state.
+      parser_observation: >-
+        Read only the visible task-grounded object outlines, region overlays,
+        arrows, paths, measurement marks, correspondence marks, or visibly
+        changed spatial state, then map that evidence to the required answer
+        schema.
+      answer_recovery:
+        - answer_schema: binary_boolean
+          visual_readout: Recover the answer only from the required task-grounded spatial evidence.
+        - answer_schema: choice_selection
+          visual_readout: Recover the answer only from the required task-grounded spatial evidence.
+      label_role: none
+      rationale: >-
+        No validated deterministic visual readout remained after protocol
+        construction, so the task uses the generated-image-only VLM fallback.
+      metric: accuracy
+      metric_config: {}
+
+  relationship:
+    protocol_origin: manual
+    protocol: binary_color_presence
+    prompt_variant: relationship_mask_or_gray
+    input:
+      mode: single
+    metric: accuracy
+    formal_evaluation: true
+
+  perspective:
+    protocol_origin: manual
+    protocol: direction_grid
+    prompt_variant: perspective_choice
+    input:
+      mode: single
+    metric: accuracy
+    formal_evaluation: true
+
+  mental_modeling:
+    protocol_origin: manual
+    protocol: label_code
+    prompt_variant: choice_4_corners
+    input:
+      mode: metadata_images
+    metric: accuracy
+    formal_evaluation: true
+
+  grounding:
+    protocol_origin: agentic
+    protocol: agentic_point_marker
+    prompt_variant: cyan_point_marker
+    input:
+      mode: single
+    metric: point_in_mask
+    metric_config: {}
+    parser_output_kind: normalized_point
+    formal_evaluation: true
+    protocol_config: {}
+
+  multihop:
+    protocol_origin: manual
+    protocol: label_code
+    prompt_variant: choice_4_corners
+    input:
+      mode: single
+    metric: accuracy
+    formal_evaluation: true
+
+  prediction:
+    protocol_origin: manual
+    protocol: label_code
+    prompt_variant: numeric_hstrip_12
+    input:
+      mode: single
+    metric: accuracy
+    formal_evaluation: true
+
+  feasibility:
+    protocol_origin: agentic
+    protocol: agentic_vlm_protocol
+    prompt_variant: generated
+    prompt: >-
+      Given the source image and the question: {question}
+
+      Create a simple edited or overlaid image that shows the geometric
+      feasibility evidence directly. Highlight the relevant existing object(s)
+      and depict the queried object or person placed in the exact candidate
+      location or path implied by the question. Show the attempted fit or
+      placement at realistic scale, with clear visible overlap or clear remaining
+      clearance. If the question is about passing under, sitting between, placing
+      beside, fitting through, or similar, render the resulting spatial state so
+      that success is visible as non-overlap with adequate space and failure is
+      visible as collision or impossible overlap. Do not write yes/no, do not add
+      answer labels, and do not use generic verdict symbols.
+
+      Candidate answers:
+
+      {choices}
+    input:
+      mode: single
+    metric: accuracy
+    metric_config: {}
+    formal_evaluation: true
+    protocol_config:
+      generated_protocol_id: spatialgen_bench_feasibility_agentic_v1
+      include_source_images: false
+      parse_prompt: >-
+        Read only the generated image. Determine whether the depicted attempted
+        placement or motion is geometrically feasible from the visible result:
+        output true if the inserted or positioned object fits in the shown target
+        location or path without collision and with clear intended placement;
+        otherwise output false. Do not answer from the original question alone.
+      answer_format: "one candidate option label from: A, B"
+      invalid_conditions:
+        - the image only shows a check mark, X, color verdict, or textual yes/no instead of the spatial result
+        - the generated image does not depict the attempted placement, fit, clearance, or collision state
+        - the inserted object is not shown at realistic scale or the target location is ambiguous
+        - parsing would require solving from the source image rather than reading the generated evidence
+      visual_strategy: other_spatial
+      visual_evidence: >-
+        Relevant scene anchors and a depicted attempted placement at realistic
+        scale, showing either collision and overlap or successful fit and clearance.
+      parser_observation: >-
+        Inspect whether the inserted object or person occupies the target region
+        without intersecting blocking objects or boundaries, or visibly collides
+        with them.
+      answer_recovery:
+        - answer_schema: binary_boolean
+          visual_readout: Recover the answer only from the required task-grounded spatial evidence.
+      label_role: none
+      rationale: >-
+        Feasibility depends on inferred free space, scale compatibility, and
+        collision; available deterministic recipes cannot recover this contract
+        without re-solving the scene.
+      metric: accuracy
+      metric_config: {}
+
+  affordance:
+    protocol_origin: manual
+    protocol: region_mask
+    prompt_variant: binary_target_mask
+    input:
+      mode: single
+    metric: mask_precision
+    formal_evaluation: true
+
+  navigation:
+    protocol_origin: manual
+    protocol: state_similarity
+    prompt_variant: next_view
+    input:
+      mode: single
+    metric: accuracy
+    formal_evaluation: true
+
+  trajectory:
+    protocol_origin: manual
+    protocol: trajectory
+    prompt_variant: red_motion_path
+    input:
+      mode: single
+    metric: dfd
+    formal_evaluation: true

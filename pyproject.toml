@@ -1,0 +1,63 @@
+[build-system]
+requires = ["setuptools>=77", "wheel"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "provise"
+version = "0.1.0"
+description = "Agentic visual protocols for evaluating image generation models on spatial benchmarks."
+readme = "README.md"
+license = "Apache-2.0"
+license-files = ["LICENSE"]
+requires-python = ">=3.10"
+dependencies = [
+  "numpy",
+  "opencv-python-headless",
+  "pillow",
+  "python-dotenv",
+  "pyyaml",
+  "requests",
+]
+
+[project.urls]
+Homepage = "https://xuwang917.github.io/ProVisE/"
+Repository = "https://github.com/XuWang917/ProVisE"
+Issues = "https://github.com/XuWang917/ProVisE/issues"
+
+[project.optional-dependencies]
+dev = ["build", "pytest", "ruff"]
+benchmarks = ["pyarrow", "tfrecord"]
+similarity = ["sentence-transformers", "torch"]
+ocr = ["rapidocr-onnxruntime"]
+vlm = [
+  "qwen-vl-utils",
+  "timm>=1,<2",
+  "torch",
+  "torchvision",
+  "transformers>=4.57,<5",
+]
+agentic = [
+  "huggingface-hub",
+  "pyarrow",
+  "rapidocr-onnxruntime",
+  "sentence-transformers",
+  "tfrecord",
+  "torch",
+]
+
+[project.scripts]
+provise = "provise.cli:main"
+
+[tool.setuptools.packages.find]
+include = ["provise*"]
+
+[tool.setuptools.data-files]
+"share/provise/configs/protocol_specs" = ["configs/protocol_specs/*.yaml"]
+"share/provise/configs/benchmark_suites" = ["configs/benchmark_suites/*.yaml"]
+
+[tool.pytest.ini_options]
+testpaths = ["tests"]
+pythonpath = ["."]
+
+[tool.ruff.lint.per-file-ignores]
+"scripts/*.py" = ["E402"]

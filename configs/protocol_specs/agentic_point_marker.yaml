@@ -1,0 +1,97 @@
+name: agentic_point_marker
+description: >
+  Deterministic spatial-evidence protocol for 2D point, box, or point-in-mask
+  localization. The generated image marks the target with one cyan dot; the
+  Parser Ops pipeline recovers a normalized point with OpenCV and scores it
+  against a target point, box, or benchmark mask.
+
+visual_contract:
+  primitive: solid_circle
+  color: cyan
+  hex_color: "#00FFFF"
+  count: 1
+  semantics: center of the predicted target point or target object
+
+default_config:
+  min_pixels: 10
+  min_fill_ratio: 0.2
+  ambiguity_ratio: 0.85
+  distance_threshold: 0.05
+
+parser_ops:
+  output_kind: normalized_point
+  pipeline:
+    steps:
+      - id: image
+        op: load_generated
+      - id: mask
+        op: hsv_color_mask
+        inputs: [image]
+        params:
+          lower:
+            $config: cyan_lower
+            default: [80, 70, 70]
+          upper:
+            $config: cyan_upper
+            default: [100, 255, 255]
+      - id: source
+        op: load_source
+        params:
+          index: 0
+      - id: source_mask
+        op: hsv_color_mask
+        inputs: [source]
+        params:
+          lower:
+            $config: cyan_lower
+            default: [80, 70, 70]
+          upper:
+            $config: cyan_upper
+            default: [100, 255, 255]
+      - id: source_guard
+        op: morphology
+        inputs: [source_mask]
+        params:
+          operation: dilate
+          kernel_size: 7
+          iterations: 1
+      - id: novel_mask
+        op: mask_subtract
+        inputs: [mask, source_guard]
+      - id: components
+        op: connected_components
+        inputs: [novel_mask]
+      - id: candidates
+        op: filter_components
+        inputs: [components]
+        params:
+          min_area:
+            $config: min_pixels
+            default: 10
+          min_fill_ratio:
+            $config: min_fill_ratio
+            default: 0.2
+      - id: marker
+        op: select_largest_compact
+        inputs: [candidates]
+        params:
+          ambiguity_ratio:
+            $config: ambiguity_ratio
+            default: 0.85
+          empty_error: cyan point marker not found
+          ambiguous_error: multiple similarly prominent cyan point markers found
+      - id: centroid
+        op: component_centroid
+        inputs: [marker]
+      - id: point
+        op: normalize_point
+        inputs: [centroid, image]
+    output: point
+
+prompts:
+  cyan_point_marker:
+    template: >
+      Read the input image and follow the instruction: "{question}". Do not
+      answer in text. Output the image with exactly one solid cyan circular dot
+      (#00FFFF) centered on the target point or target object. Add no other cyan
+      marks.

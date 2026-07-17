@@ -1,0 +1,309 @@
+{
+  "benchmark": "q_spatial_plus_agentic",
+  "builder": "agentic_protocol_builder_v2",
+  "total_samples": 101,
+  "task_count": 3,
+  "completed_task_count": 3,
+  "active_task_count": 3,
+  "active_sample_count": 101,
+  "decision_counts": {
+    "build": 3
+  },
+  "route_rows": [
+    {
+      "task": "1d_horizontal",
+      "decision": "build",
+      "build_mode": "recipe",
+      "active": true,
+      "sample_count": 1,
+      "confidence": "high",
+      "recipe": "grounded_dimension",
+      "protocol": "agentic_parser_ops_protocol",
+      "parser_backend": "deterministic_ocr",
+      "parser_output_kind": "scalar_measurement",
+      "metric": "qspatial_ratio",
+      "formal_evaluation": true,
+      "reason": "The task asks for a scalar horizontal extent with unit, and the grounded_dimension recipe directly matches the numeric answer contract and qspatial_ratio evaluator expectations through deterministic OCR of a visibly drawn measurement."
+    },
+    {
+      "task": "horizontal_distance",
+      "decision": "build",
+      "build_mode": "recipe",
+      "active": true,
+      "sample_count": 98,
+      "confidence": "high",
+      "recipe": "grounded_dimension",
+      "protocol": "agentic_parser_ops_protocol",
+      "parser_backend": "deterministic_ocr",
+      "parser_output_kind": "scalar_measurement",
+      "metric": "qspatial_ratio",
+      "formal_evaluation": true,
+      "reason": "The task asks for a numeric physical distance between named objects in a single image, and the official metric consumes a scalar with unit. The grounded_dimension recipe directly preserves this contract with visible anchors, a dimension line, and OCR-readable measurement text."
+    },
+    {
+      "task": "vertical_distance",
+      "decision": "build",
+      "build_mode": "recipe",
+      "active": true,
+      "sample_count": 2,
+      "confidence": "high",
+      "recipe": "grounded_dimension",
+      "protocol": "agentic_parser_ops_protocol",
+      "parser_backend": "deterministic_ocr",
+      "parser_output_kind": "scalar_measurement",
+      "metric": "qspatial_ratio",
+      "formal_evaluation": true,
+      "reason": "The task requires a scalar vertical distance with unit, and the grounded_dimension recipe directly preserves that numeric answer contract by marking the two measured anchors and labeling the vertical gap for deterministic OCR readout."
+    }
+  ],
+  "task_contexts": {
+    "1d_horizontal": {
+      "representative_sample_ids": [
+        "sample_000077"
+      ],
+      "attached_media_count": 1,
+      "attached_media": [
+        {
+          "image_index": 1,
+          "sample_id": "sample_000077",
+          "media_index": 1,
+          "role": "primary",
+          "label": ""
+        }
+      ],
+      "missing_media": []
+    },
+    "horizontal_distance": {
+      "representative_sample_ids": [
+        "sample_000000",
+        "sample_000001",
+        "sample_000002"
+      ],
+      "attached_media_count": 3,
+      "attached_media": [
+        {
+          "image_index": 1,
+          "sample_id": "sample_000000",
+          "media_index": 1,
+          "role": "primary",
+          "label": ""
+        },
+        {
+          "image_index": 2,
+          "sample_id": "sample_000001",
+          "media_index": 1,
+          "role": "primary",
+          "label": ""
+        },
+        {
+          "image_index": 3,
+          "sample_id": "sample_000002",
+          "media_index": 1,
+          "role": "primary",
+          "label": ""
+        }
+      ],
+      "missing_media": []
+    },
+    "vertical_distance": {
+      "representative_sample_ids": [
+        "sample_000078",
+        "sample_000091"
+      ],
+      "attached_media_count": 2,
+      "attached_media": [
+        {
+          "image_index": 1,
+          "sample_id": "sample_000078",
+          "media_index": 1,
+          "role": "primary",
+          "label": ""
+        },
+        {
+          "image_index": 2,
+          "sample_id": "sample_000091",
+          "media_index": 1,
+          "role": "primary",
+          "label": ""
+        }
+      ],
+      "missing_media": []
+    }
+  },
+  "task_contracts": {
+    "1d_horizontal": {
+      "task": "1d_horizontal",
+      "sample_count": 1,
+      "answer_schemas": [
+        "numeric"
+      ],
+      "answer_types": [
+        "number"
+      ],
+      "input_mode": "single",
+      "media_counts": [
+        1
+      ],
+      "metric": "qspatial_ratio",
+      "metric_config": {
+        "delta": 2,
+        "unit_field": "answer_unit"
+      },
+      "formal_evaluation": true
+    },
+    "horizontal_distance": {
+      "task": "horizontal_distance",
+      "sample_count": 98,
+      "answer_schemas": [
+        "numeric"
+      ],
+      "answer_types": [
+        "number"
+      ],
+      "input_mode": "single",
+      "media_counts": [
+        1
+      ],
+      "metric": "qspatial_ratio",
+      "metric_config": {
+        "delta": 2,
+        "unit_field": "answer_unit"
+      },
+      "formal_evaluation": true
+    },
+    "vertical_distance": {
+      "task": "vertical_distance",
+      "sample_count": 2,
+      "answer_schemas": [
+        "numeric"
+      ],
+      "answer_types": [
+        "number"
+      ],
+      "input_mode": "single",
+      "media_counts": [
+        1
+      ],
+      "metric": "qspatial_ratio",
+      "metric_config": {
+        "delta": 2,
+        "unit_field": "answer_unit"
+      },
+      "formal_evaluation": true
+    }
+  },
+  "revision_counts": {},
+  "revision_history": [],
+  "automatic_vlm_fallback_tasks": [],
+  "fallback_history": [],
+  "disabled_tasks": [],
+  "deferred_external_failure_tasks": [],
+  "warnings": [],
+  "smoke_validation": {
+    "model": "gpt-image-2",
+    "limit": 3,
+    "smoke_data_file": "smoke/smoke_samples.jsonl",
+    "sample_ids": {
+      "1d_horizontal": [
+        "sample_000077"
+      ],
+      "horizontal_distance": [
+        "sample_000000",
+        "sample_000001",
+        "sample_000002"
+      ],
+      "vertical_distance": [
+        "sample_000078",
+        "sample_000091"
+      ]
+    },
+    "tasks": {
+      "1d_horizontal": {
+        "status": "passed",
+        "phase": "initial",
+        "valid_parse_rate": 100.0,
+        "valid_parse_rate_pass1": 100.0,
+        "valid_parse_rate_pass2": 100.0,
+        "readout_operational_rate": 100.0,
+        "readout_operational_rate_pass1": 100.0,
+        "readout_operational_rate_pass2": 100.0,
+        "generated_rate": 100.0,
+        "parser_agreement_rate": 100.0,
+        "spatial_evidence_rate": 100.0,
+        "spatial_evidence_rate_pass1": 100.0,
+        "spatial_evidence_rate_pass2": 100.0,
+        "metric_compatibility_rate": 100.0,
+        "mean_score": 0.8461538461538463,
+        "correct_count": 1,
+        "initial_generation_failure_count": 0,
+        "generation_retry_count": 0,
+        "failed_checks": [],
+        "parser_disagreements": [],
+        "failure_category_counts": {},
+        "failure_reasons": [],
+        "results_pass1": "smoke/1d_horizontal/results_pass1.json",
+        "results_pass2": "smoke/1d_horizontal/results_pass2.json"
+      },
+      "horizontal_distance": {
+        "status": "passed",
+        "phase": "initial",
+        "valid_parse_rate": 100.0,
+        "valid_parse_rate_pass1": 100.0,
+        "valid_parse_rate_pass2": 100.0,
+        "readout_operational_rate": 100.0,
+        "readout_operational_rate_pass1": 100.0,
+        "readout_operational_rate_pass2": 100.0,
+        "generated_rate": 100.0,
+        "parser_agreement_rate": 100.0,
+        "spatial_evidence_rate": 100.0,
+        "spatial_evidence_rate_pass1": 100.0,
+        "spatial_evidence_rate_pass2": 100.0,
+        "metric_compatibility_rate": 100.0,
+        "mean_score": 0.3333333333333333,
+        "correct_count": 2,
+        "initial_generation_failure_count": 0,
+        "generation_retry_count": 0,
+        "failed_checks": [],
+        "parser_disagreements": [],
+        "failure_category_counts": {
+          "incorrect_prediction": 1
+        },
+        "failure_reasons": [],
+        "results_pass1": "smoke/horizontal_distance/results_pass1.json",
+        "results_pass2": "smoke/horizontal_distance/results_pass2.json"
+      },
+      "vertical_distance": {
+        "status": "passed",
+        "phase": "initial",
+        "valid_parse_rate": 100.0,
+        "valid_parse_rate_pass1": 100.0,
+        "valid_parse_rate_pass2": 100.0,
+        "readout_operational_rate": 100.0,
+        "readout_operational_rate_pass1": 100.0,
+        "readout_operational_rate_pass2": 100.0,
+        "generated_rate": 100.0,
+        "parser_agreement_rate": 100.0,
+        "spatial_evidence_rate": 100.0,
+        "spatial_evidence_rate_pass1": 100.0,
+        "spatial_evidence_rate_pass2": 100.0,
+        "metric_compatibility_rate": 100.0,
+        "mean_score": 0.09375,
+        "correct_count": 1,
+        "initial_generation_failure_count": 0,
+        "generation_retry_count": 0,
+        "failed_checks": [],
+        "parser_disagreements": [],
+        "failure_category_counts": {
+          "incorrect_prediction": 1
+        },
+        "failure_reasons": [],
+        "results_pass1": "smoke/vertical_distance/results_pass1.json",
+        "results_pass2": "smoke/vertical_distance/results_pass2.json"
+      }
+    }
+  },
+  "protocol_artifact": {
+    "schema_version": "provise.protocol.v1",
+    "config_sha256": "347b78a29ecbb7205d4907c6759e362f06d550c86035ea07906d1d9d1cebc52e"
+  }
+}

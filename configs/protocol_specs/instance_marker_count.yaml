@@ -1,0 +1,98 @@
+name: instance_marker_count
+description: >
+  Mark every target instance with a vivid green marker, then parse the generated
+  image by counting green connected components. The question may select a
+  conditional subset, such as objects closer than a reference object; only the
+  qualifying instances are marked and counted.
+
+default_config:
+  min_area: 30
+  min_fill_ratio: 0.2
+  min_compactness: 0.4
+
+visual_contract:
+  primitive: five_pointed_star
+  color: green
+  hex_color: "#00FF00"
+  cardinality: one marker per qualifying instance
+
+parser_ops:
+  output_kind: integer_count
+  pipeline:
+    steps:
+      - id: image
+        op: load_generated
+      - id: source
+        op: load_source
+        params: {index: 0}
+      - id: generated_mask
+        op: hsv_color_mask
+        inputs: [image]
+        params:
+          lower: [35, 80, 80]
+          upper: [90, 255, 255]
+      - id: source_mask
+        op: hsv_color_mask
+        inputs: [source]
+        params:
+          lower: [35, 80, 80]
+          upper: [90, 255, 255]
+      - id: source_guard
+        op: morphology
+        inputs: [source_mask]
+        params: {operation: dilate, kernel_size: 7, iterations: 1}
+      - id: novel_mask
+        op: mask_subtract
+        inputs: [generated_mask, source_guard]
+      - id: opened_mask
+        op: morphology
+        inputs: [novel_mask]
+        params: {operation: open, kernel_size: 3, iterations: 1}
+      - id: clean_mask
+        op: morphology
+        inputs: [opened_mask]
+        params: {operation: close, kernel_size: 3, iterations: 1}
+      - id: components
+        op: connected_components
+        inputs: [clean_mask]
+      - id: candidates
+        op: filter_components
+        inputs: [components]
+        params:
+          min_area:
+            $config: min_area
+            default: 30
+          min_fill_ratio:
+            $config: min_fill_ratio
+            default: 0.2
+          min_compactness:
+            $config: min_compactness
+            default: 0.4
+      - id: count
+        op: count_components
+        inputs: [candidates]
+        params: {min_relative_area: 0.25, max_relative_area: 3.0}
+    output: count
+
+prompts:
+  green_star_count:
+    template: >
+      This is a spatial counting task. Keep the image unchanged. Identify every
+      visible target object mentioned in the question: "{question}". Add exactly
+      one vivid green five-pointed star (#00FF00) on each visible target object,
+      and do not add any marker anywhere else. Output only the annotated image.
+  green_star_amodal_count:
+    template: >
+      This is an occluded spatial counting task. Use the visible repetition in
+      the source image to infer how the target-object pattern continues through
+      every black-box occluder in the question: "{question}". Keep the source
+      image and each black box unchanged. The black-box pixels must remain solid
+      black except where a green star is overlaid: do not reveal, redraw, or
+      synthesize any hidden object. Add exactly one vivid green
+      five-pointed star (#00FF00) at the center of every in-frame target object:
+      mark each visible instance and also place one star at every inferred hidden
+      instance position inside the black box. Preserve row, column, ring, spacing,
+      and perspective cues when placing inferred stars. Before output, verify that
+      every inferred hidden position inside every black box has a star. Do not
+      write a number or answer text, do not add stars outside the inferred pattern,
+      and output only the annotated image.

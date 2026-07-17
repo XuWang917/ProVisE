@@ -1,0 +1,335 @@
+{
+  "benchmark": "roboafford_eval_agentic",
+  "builder": "agentic_protocol_builder_v2",
+  "total_samples": 338,
+  "task_count": 3,
+  "completed_task_count": 3,
+  "active_task_count": 3,
+  "active_sample_count": 338,
+  "decision_counts": {
+    "reuse": 3
+  },
+  "route_rows": [
+    {
+      "task": "object affordance",
+      "decision": "reuse",
+      "active": true,
+      "sample_count": 124,
+      "confidence": "high",
+      "protocol": "agentic_point_marker",
+      "prompt_variant": "cyan_point_marker",
+      "metric": "point_in_mask",
+      "formal_evaluation": true,
+      "reason": "The task is single-image localization scored by official point_in_mask, and one recovered grounded point is sufficient under the metric. The existing cyan point marker protocol exactly matches the visual output, parser contract, and normalized-point answer format."
+    },
+    {
+      "task": "object reference",
+      "decision": "reuse",
+      "active": true,
+      "sample_count": 114,
+      "confidence": "high",
+      "protocol": "agentic_point_marker",
+      "prompt_variant": "cyan_point_marker",
+      "metric": "point_in_mask",
+      "formal_evaluation": true,
+      "reason": "This task is single-image localization scored by official point_in_mask; the existing cyan point marker protocol matches the visual output, parser contract, and answer semantics, and one recovered point preserves the metric."
+    },
+    {
+      "task": "spatial affordance",
+      "decision": "reuse",
+      "active": true,
+      "sample_count": 100,
+      "confidence": "high",
+      "protocol": "agentic_point_marker",
+      "prompt_variant": "cyan_point_marker",
+      "metric": "point_in_mask",
+      "formal_evaluation": true,
+      "reason": "The task is single-image localization scored by official point_in_mask, where one valid predicted point preserves the metric contract. This exactly matches the existing deterministic cyan point protocol for normalized point output."
+    }
+  ],
+  "task_contexts": {
+    "object affordance": {
+      "representative_sample_ids": [
+        "sample_000000",
+        "sample_000001",
+        "sample_000002"
+      ],
+      "attached_media_count": 3,
+      "attached_media": [
+        {
+          "image_index": 1,
+          "sample_id": "sample_000000",
+          "media_index": 1,
+          "role": "primary",
+          "label": ""
+        },
+        {
+          "image_index": 2,
+          "sample_id": "sample_000001",
+          "media_index": 1,
+          "role": "primary",
+          "label": ""
+        },
+        {
+          "image_index": 3,
+          "sample_id": "sample_000002",
+          "media_index": 1,
+          "role": "primary",
+          "label": ""
+        }
+      ],
+      "missing_media": []
+    },
+    "object reference": {
+      "representative_sample_ids": [
+        "sample_000124",
+        "sample_000125",
+        "sample_000126"
+      ],
+      "attached_media_count": 3,
+      "attached_media": [
+        {
+          "image_index": 1,
+          "sample_id": "sample_000124",
+          "media_index": 1,
+          "role": "primary",
+          "label": ""
+        },
+        {
+          "image_index": 2,
+          "sample_id": "sample_000125",
+          "media_index": 1,
+          "role": "primary",
+          "label": ""
+        },
+        {
+          "image_index": 3,
+          "sample_id": "sample_000126",
+          "media_index": 1,
+          "role": "primary",
+          "label": ""
+        }
+      ],
+      "missing_media": []
+    },
+    "spatial affordance": {
+      "representative_sample_ids": [
+        "sample_000238",
+        "sample_000239",
+        "sample_000240"
+      ],
+      "attached_media_count": 3,
+      "attached_media": [
+        {
+          "image_index": 1,
+          "sample_id": "sample_000238",
+          "media_index": 1,
+          "role": "primary",
+          "label": ""
+        },
+        {
+          "image_index": 2,
+          "sample_id": "sample_000239",
+          "media_index": 1,
+          "role": "primary",
+          "label": ""
+        },
+        {
+          "image_index": 3,
+          "sample_id": "sample_000240",
+          "media_index": 1,
+          "role": "primary",
+          "label": ""
+        }
+      ],
+      "missing_media": []
+    }
+  },
+  "task_contracts": {
+    "object affordance": {
+      "task": "object affordance",
+      "sample_count": 124,
+      "answer_schemas": [
+        "localization"
+      ],
+      "answer_types": [
+        "points"
+      ],
+      "input_mode": "single",
+      "media_counts": [
+        1
+      ],
+      "metric": "point_in_mask",
+      "metric_config": {
+        "aggregation": "mean",
+        "correct_threshold": 1.0
+      },
+      "formal_evaluation": true
+    },
+    "object reference": {
+      "task": "object reference",
+      "sample_count": 114,
+      "answer_schemas": [
+        "localization"
+      ],
+      "answer_types": [
+        "points"
+      ],
+      "input_mode": "single",
+      "media_counts": [
+        1
+      ],
+      "metric": "point_in_mask",
+      "metric_config": {
+        "aggregation": "mean",
+        "correct_threshold": 1.0
+      },
+      "formal_evaluation": true
+    },
+    "spatial affordance": {
+      "task": "spatial affordance",
+      "sample_count": 100,
+      "answer_schemas": [
+        "localization"
+      ],
+      "answer_types": [
+        "points"
+      ],
+      "input_mode": "single",
+      "media_counts": [
+        1
+      ],
+      "metric": "point_in_mask",
+      "metric_config": {
+        "aggregation": "mean",
+        "correct_threshold": 1.0
+      },
+      "formal_evaluation": true
+    }
+  },
+  "revision_counts": {},
+  "revision_history": [],
+  "automatic_vlm_fallback_tasks": [],
+  "fallback_history": [],
+  "disabled_tasks": [],
+  "deferred_external_failure_tasks": [],
+  "warnings": [],
+  "smoke_validation": {
+    "model": "gpt-image-2",
+    "limit": 3,
+    "smoke_data_file": "smoke/smoke_samples.jsonl",
+    "sample_ids": {
+      "object affordance": [
+        "sample_000000",
+        "sample_000001",
+        "sample_000002"
+      ],
+      "object reference": [
+        "sample_000124",
+        "sample_000125",
+        "sample_000126"
+      ],
+      "spatial affordance": [
+        "sample_000238",
+        "sample_000239",
+        "sample_000240"
+      ]
+    },
+    "tasks": {
+      "object affordance": {
+        "status": "passed",
+        "phase": "initial",
+        "valid_parse_rate": 66.66666666666667,
+        "valid_parse_rate_pass1": 66.66666666666667,
+        "valid_parse_rate_pass2": 66.66666666666667,
+        "readout_operational_rate": 66.66666666666667,
+        "readout_operational_rate_pass1": 66.66666666666667,
+        "readout_operational_rate_pass2": 66.66666666666667,
+        "generated_rate": 100.0,
+        "parser_agreement_rate": 66.66666666666667,
+        "spatial_evidence_rate": 100.0,
+        "spatial_evidence_rate_pass1": 100.0,
+        "spatial_evidence_rate_pass2": 100.0,
+        "metric_compatibility_rate": 100.0,
+        "mean_score": 0.6666666666666666,
+        "correct_count": 2,
+        "initial_generation_failure_count": 0,
+        "generation_retry_count": 0,
+        "failed_checks": [],
+        "parser_disagreements": [
+          {
+            "id": "sample_000000",
+            "prediction_pass1": "",
+            "prediction_pass2": ""
+          }
+        ],
+        "failure_category_counts": {
+          "parser_failure": 1
+        },
+        "failure_reasons": [
+          "ambiguous_components"
+        ],
+        "results_pass1": "smoke/object affordance/results_pass1.json",
+        "results_pass2": "smoke/object affordance/results_pass2.json"
+      },
+      "object reference": {
+        "status": "passed",
+        "phase": "initial",
+        "valid_parse_rate": 100.0,
+        "valid_parse_rate_pass1": 100.0,
+        "valid_parse_rate_pass2": 100.0,
+        "readout_operational_rate": 100.0,
+        "readout_operational_rate_pass1": 100.0,
+        "readout_operational_rate_pass2": 100.0,
+        "generated_rate": 100.0,
+        "parser_agreement_rate": 100.0,
+        "spatial_evidence_rate": 100.0,
+        "spatial_evidence_rate_pass1": 100.0,
+        "spatial_evidence_rate_pass2": 100.0,
+        "metric_compatibility_rate": 100.0,
+        "mean_score": 0.6666666666666666,
+        "correct_count": 2,
+        "initial_generation_failure_count": 0,
+        "generation_retry_count": 0,
+        "failed_checks": [],
+        "parser_disagreements": [],
+        "failure_category_counts": {
+          "incorrect_prediction": 1
+        },
+        "failure_reasons": [],
+        "results_pass1": "smoke/object reference/results_pass1.json",
+        "results_pass2": "smoke/object reference/results_pass2.json"
+      },
+      "spatial affordance": {
+        "status": "passed",
+        "phase": "initial",
+        "valid_parse_rate": 100.0,
+        "valid_parse_rate_pass1": 100.0,
+        "valid_parse_rate_pass2": 100.0,
+        "readout_operational_rate": 100.0,
+        "readout_operational_rate_pass1": 100.0,
+        "readout_operational_rate_pass2": 100.0,
+        "generated_rate": 100.0,
+        "parser_agreement_rate": 100.0,
+        "spatial_evidence_rate": 100.0,
+        "spatial_evidence_rate_pass1": 100.0,
+        "spatial_evidence_rate_pass2": 100.0,
+        "metric_compatibility_rate": 100.0,
+        "mean_score": 1.0,
+        "correct_count": 3,
+        "initial_generation_failure_count": 0,
+        "generation_retry_count": 0,
+        "failed_checks": [],
+        "parser_disagreements": [],
+        "failure_category_counts": {},
+        "failure_reasons": [],
+        "results_pass1": "smoke/spatial affordance/results_pass1.json",
+        "results_pass2": "smoke/spatial affordance/results_pass2.json"
+      }
+    }
+  },
+  "protocol_artifact": {
+    "schema_version": "provise.protocol.v1",
+    "config_sha256": "28945e148b76b36fe338f0c9db28f5416ba03cce5f5d9367f19feff16434c0b3"
+  }
+}
