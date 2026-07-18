@@ -144,9 +144,9 @@ To evaluate a published protocol, place or link its normalized package under `be
 
 | Contribution | Location | Required contract |
 |---|---|---|
-| Benchmark adapter | `benchmark.yaml`, `data.jsonl`, and `assets/` | Task/media mapping, answer schema, metric contract, and a smoke fixture |
-| Visual protocol | [`configs/protocol_specs`](configs/protocol_specs/README.md) | Benchmark-independent response contract, parser, output kind, compatible metrics, and focused tests |
-| Parser Op | [`provise/parser_ops`](provise/parser_ops) | Typed inputs, parameters, deterministic behavior, and unit tests |
+| Benchmark&nbsp;adapter | `benchmark.yaml`,&nbsp;`data.jsonl`,&nbsp;and&nbsp;`assets/` | Task/media mapping, answer schema, metric contract, and a smoke fixture |
+| Visual&nbsp;protocol | [`configs/protocol_specs`](configs/protocol_specs/README.md) | Benchmark-independent response contract, parser, output kind, compatible metrics, and focused tests |
+| Parser&nbsp;Op | [`provise/parser_ops`](provise/parser_ops) | Typed inputs, parameters, deterministic behavior, and unit tests |
 
 Start with the [Unified Sample Schema](docs/unified_sample_schema.md) and [Agentic Benchmark Adapter](docs/agentic_benchmark_adapter.md).
 Before [submitting a PR](https://github.com/XuWang917/ProVisE/compare), install the contributor dependencies and run the repository checks:
