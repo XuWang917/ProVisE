@@ -344,6 +344,24 @@ const extraVisualModels = [
     capabilities: { Perception: 13.333333333333334, Understanding: 30.476190476190478, Reasoning: 16.666666666666664, Interaction: 19.65376611631269 },
     tasks: { counting: 10.0, depth: 10.0, orientation: 20.0, relationship: 40.0, perspective: 14.285714285714285, mental_modeling: 37.142857142857146, multihop: 33.33333333333333, prediction: 0.0, affordance: 5.627965015604739, navigation: 33.33333333333333, trajectory: 20.0 },
   },
+  {
+    model: "Qwen-Image-Edit-2511",
+    protocol: "Visual Answering",
+    protocolKey: "visual",
+    source: "Supplementary Evaluation",
+    overall: 19.847385467509834,
+    capabilities: { Perception: 11.666666666666666, Understanding: 26.666666666666668, Reasoning: 25.959523809523812, Interaction: 17.13406417452018 },
+    tasks: { counting: 10.0, depth: 10.0, orientation: 15.0, relationship: 31.428571428571427, perspective: 14.285714285714285, mental_modeling: 34.285714285714285, multihop: 23.333333333333332, prediction: 28.585714285714293, affordance: 4.735525856893873, navigation: 33.33333333333333, trajectory: 13.333333333333334 },
+  },
+  {
+    model: "OmniGen-v1",
+    protocol: "Visual Answering",
+    protocolKey: "visual",
+    source: "Supplementary Evaluation",
+    overall: 27.386093780234305,
+    capabilities: { Perception: 29.166666666666668, Understanding: 31.428571428571427, Reasoning: 25.247619047619047, Interaction: 22.988693067208317 },
+    tasks: { counting: 7.5, depth: 70.0, orientation: 10.0, relationship: 45.714285714285715, perspective: 5.714285714285714, mental_modeling: 42.857142857142854, multihop: 33.33333333333333, prediction: 17.161904761904765, affordance: 5.63274586829162, navigation: 40.0, trajectory: 23.333333333333332 },
+  },
 ];
 
 
@@ -2307,6 +2325,18 @@ function restoreInitialAnchor() {
 
   const target = document.getElementById(id);
   if (!target) return;
+
+  const revealNodes = [
+    ...(target.matches(".reveal-on-scroll") ? [target] : []),
+    ...target.querySelectorAll(".reveal-on-scroll"),
+  ];
+  revealNodes.forEach((node) => {
+    node.classList.add("is-visible");
+    if (node.matches(".table-motion")) {
+      node.classList.add("is-table-visible");
+    }
+  });
+
   window.requestAnimationFrame(() => {
     target.scrollIntoView({ behavior: "instant", block: "start" });
   });

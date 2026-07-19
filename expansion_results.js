@@ -1,7 +1,7 @@
 window.SPATIALGEN_EXPANSION_RESULTS = {
   "schema_version": "spatialgen.homepage_expansion.v2",
   "manifest_sha256": "dd9733a1173d790bdd5888a9b944d3a9e3edaef5356426a6da237b09ab176dd6",
-  "updated_at": "2026-07-16T18:25:57+10:00",
+  "updated_at": "2026-07-19T00:06:51+10:00",
   "systems": {
     "Nano Banana 2::visual": {
       "status": "complete",
@@ -311,6 +311,26 @@ window.SPATIALGEN_EXPANSION_RESULTS = {
         "size": 42.86,
         "grounding": 2.86,
         "feasibility": 40.0
+      }
+    },
+    "Qwen-Image-Edit-2511::visual": {
+      "status": "complete",
+      "samples": 105,
+      "overall": 36.19,
+      "tasks": {
+        "size": 54.29,
+        "grounding": 17.14,
+        "feasibility": 37.14
+      }
+    },
+    "OmniGen-v1::visual": {
+      "status": "complete",
+      "samples": 105,
+      "overall": 13.33,
+      "tasks": {
+        "size": 8.57,
+        "grounding": 2.86,
+        "feasibility": 28.57
       }
     }
   },
