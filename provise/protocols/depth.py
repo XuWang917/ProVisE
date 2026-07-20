@@ -1,9 +1,10 @@
 from __future__ import annotations
 
+import json
 import math
 import os
 import re
-from typing import Any, Dict
+from typing import Any, Dict, Mapping
 
 import cv2
 import numpy as np
@@ -13,20 +14,8 @@ from ..benchmark.media import resolve_path
 from .base import BaseProtocol, ParseResult, ScoreResult
 
 
-DEPTH_VLM_PARSE_PROMPT = """You are given two images of the same scene.
-
-Image 1 is the original RGB image, where points A and B may be marked.
-Image 2 is a grayscale depth map of the same scene, where brighter means closer
-and darker means farther.
-
-Use Image 1 to understand the marked points or options, then use Image 2 to
-decide which point is closer to the camera.
-
-Answer with ONLY one letter: A or B."""
-
-
 DEPTH_COORDINATE_PROMPT = (
-    "Two points are circled on the image, labeled by A and B beside each red circle."
+    "Two points are circled on the image, labeled by A and B beside each red circle. "
     "Output the coordinates strictly in the format: [[x_A, y_A], [x_B, y_B]], ranging from 0 to 1."
 )
 
@@ -42,31 +31,7 @@ class DenseDepthABProtocol(BaseProtocol):
         image = cv2.imread(generated_path, cv2.IMREAD_GRAYSCALE)
         if image is None:
             return ParseResult("", False, {"error": "generated image unreadable"})
-
-        eval_mode = str(self.config.get("eval_mode", "coords")).strip().lower()
-        if eval_mode == "coords":
-            return self._parse_with_coords(image, item, benchmark_root)
-
-        original_path = self._original_image_path(item, benchmark_root)
-        try:
-            vlm = self._get_eval_vlm()
-            if hasattr(vlm, "predict_multi"):
-                response = vlm.predict_multi([original_path, generated_path], DEPTH_VLM_PARSE_PROMPT)
-            else:
-                response = vlm.predict(generated_path, DEPTH_VLM_PARSE_PROMPT)
-            pred = parse_depth_answer(response)
-            return ParseResult(
-                pred,
-                bool(pred),
-                {"depth_eval_mode": "vlm", "vlm_response": response[:500]},
-            )
-        except Exception as exc:
-            if self.config.get("fallback_to_coords", False):
-                parsed = self._parse_with_coords(image, item, benchmark_root)
-                parsed.extra["vlm_error"] = str(exc)
-                parsed.extra["depth_eval_mode"] = "coords_fallback"
-                return parsed
-            return ParseResult("", False, {"error": str(exc), "depth_eval_mode": "vlm"})
+        return self._parse_with_coords(image, item, benchmark_root)
 
     def _parse_with_coords(
         self,
@@ -92,10 +57,26 @@ class DenseDepthABProtocol(BaseProtocol):
             return ParseResult("", False, extra)
         da = self._sample(image, float(coords[0][0]), float(coords[0][1]))
         db = self._sample(image, float(coords[1][0]), float(coords[1][1]))
+        delta = abs(da - db)
+        minimum_delta = float(self.config.get("minimum_depth_delta", 0.0))
+        if delta <= minimum_delta:
+            extra = {
+                "error": "indistinguishable depth values",
+                "depth_a": da,
+                "depth_b": db,
+                "depth_delta": delta,
+                "minimum_depth_delta": minimum_delta,
+                "depth_eval_mode": "coords",
+                "coordinates": coords,
+            }
+            extra.update(coord_extra)
+            return ParseResult("", False, extra)
         pred = "(A)" if da >= db else "(B)"
         extra = {
             "depth_a": da,
             "depth_b": db,
+            "depth_delta": delta,
+            "minimum_depth_delta": minimum_delta,
             "depth_eval_mode": "coords",
             "coordinates": coords,
         }
@@ -171,12 +152,29 @@ class DenseDepthABProtocol(BaseProtocol):
 
 
 def coordinates_from_item(item: Dict[str, Any]) -> list[list[float]]:
-    for container in (item.get("evaluation", {}), item.get("metadata", {})):
-        raw_coords = container.get("coordinates") if isinstance(container, dict) else None
+    metadata = item.get("metadata")
+    containers = [item.get("evaluation"), metadata, item.get("metadata_json")]
+    if isinstance(metadata, Mapping):
+        containers.append(metadata.get("metadata_json"))
+    for value in containers:
+        container = _metadata_mapping(value)
+        raw_coords = container.get("coordinates")
         coords = normalize_depth_coordinates(raw_coords)
         if coords:
             return coords
     return []
+
+
+def _metadata_mapping(value: Any) -> Dict[str, Any]:
+    if isinstance(value, Mapping):
+        return dict(value)
+    if isinstance(value, str) and value.strip():
+        try:
+            parsed = json.loads(value)
+        except json.JSONDecodeError:
+            return {}
+        return dict(parsed) if isinstance(parsed, Mapping) else {}
+    return {}
 
 
 def parse_depth_coordinates(response: str) -> list[list[float]]:
@@ -214,18 +212,6 @@ def normalize_depth_coordinates(value: Any) -> list[list[float]]:
             return []
         coords.append([x, y])
     return coords
-
-
-def parse_depth_answer(response: str) -> str:
-    text = str(response or "").strip().upper()
-    if text in {"A", "B", "(A)", "(B)"}:
-        return normalize_depth_label(text)
-    if "(A)" in text or "A IS CLOSER" in text or "POINT A" in text:
-        return "(A)"
-    if "(B)" in text or "B IS CLOSER" in text or "POINT B" in text:
-        return "(B)"
-    match = re.search(r"\b([AB])\b", text)
-    return f"({match.group(1)})" if match else ""
 
 
 def normalize_depth_label(value: Any) -> str:

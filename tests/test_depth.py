@@ -5,16 +5,8 @@ from provise.protocols.depth import (
     DenseDepthABProtocol,
     coordinates_from_item,
     normalize_depth_label,
-    parse_depth_answer,
     parse_depth_coordinates,
 )
-
-
-def test_parse_depth_answer_variants():
-    assert parse_depth_answer("A") == "(A)"
-    assert parse_depth_answer("(B)") == "(B)"
-    assert parse_depth_answer("Point A is closer.") == "(A)"
-    assert parse_depth_answer("B is closer") == "(B)"
 
 
 def test_normalize_depth_label_variants():
@@ -46,12 +38,30 @@ def test_coordinates_from_item_prefers_evaluation_coordinates():
     assert coordinates_from_item(item) == [[0.2, 0.3], [0.7, 0.8]]
 
 
+def test_coordinates_from_item_reads_huggingface_metadata_json():
+    item = {
+        "metadata_json": '{"coordinates":[[0.2,0.3],[0.7,0.8]],"source":"BLINK"}'
+    }
+
+    assert coordinates_from_item(item) == [[0.2, 0.3], [0.7, 0.8]]
+
+
+def test_coordinates_from_item_reads_nested_metadata_json():
+    item = {
+        "metadata": {
+            "metadata_json": '{"coordinates":[[0.2,0.3],[0.7,0.8]]}'
+        }
+    }
+
+    assert coordinates_from_item(item) == [[0.2, 0.3], [0.7, 0.8]]
+
+
 def test_parse_with_coords_samples_generated_depth_map():
     image = np.zeros((10, 10), dtype=np.uint8)
     image[:, 2] = 200
     image[:, 8] = 50
     item = {"evaluation": {"coordinates": [[0.2, 0.5], [0.8, 0.5]]}}
-    protocol = DenseDepthABProtocol({"eval_mode": "coords", "kernel_size": 1})
+    protocol = DenseDepthABProtocol({"kernel_size": 1})
 
     parsed = protocol._parse_with_coords(image, item)
 
@@ -60,6 +70,20 @@ def test_parse_with_coords_samples_generated_depth_map():
     assert parsed.extra["coordinate_source"] == "benchmark"
     assert parsed.extra["depth_a"] == 200.0
     assert parsed.extra["depth_b"] == 50.0
+    assert parsed.extra["depth_delta"] == 150.0
+
+
+def test_parse_with_coords_rejects_indistinguishable_depth_values():
+    image = np.full((10, 10), 80, dtype=np.uint8)
+    item = {"evaluation": {"coordinates": [[0.2, 0.5], [0.8, 0.5]]}}
+    protocol = DenseDepthABProtocol({"kernel_size": 1})
+
+    parsed = protocol._parse_with_coords(image, item)
+
+    assert parsed.parse_success is False
+    assert parsed.prediction == ""
+    assert parsed.extra["error"] == "indistinguishable depth values"
+    assert parsed.extra["depth_delta"] == 0.0
 
 
 def test_parse_with_coords_infers_missing_coordinates(tmp_path):
@@ -73,7 +97,7 @@ def test_parse_with_coords_infers_missing_coordinates(tmp_path):
         "evaluation": {"coordinates": []},
         "metadata": {"coordinates": []},
     }
-    protocol = DenseDepthABProtocol({"eval_mode": "coords", "kernel_size": 1})
+    protocol = DenseDepthABProtocol({"kernel_size": 1})
 
     class FakeVLM:
         def predict(self, image_path, prompt):
