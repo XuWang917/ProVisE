@@ -243,6 +243,33 @@ const specialistModels = [
 
 const extraTextModels = [
   {
+    model: "GPT-5.6 Sol",
+    protocol: "Text Answering",
+    protocolKey: "text",
+    source: "Supplementary API Evaluation",
+    overall: 80.98095238095239,
+    capabilities: { Perception: 85.23809523809524, Understanding: 70.71428571428571, Reasoning: 85.35555555555555, Interaction: 84.61904761904763 },
+    tasks: { counting: 82.5, depth: 86.66666666666667, orientation: 77.5, relationship: 40.0, perspective: 74.28571428571429, mental_modeling: 80.0, multihop: 86.66666666666667, prediction: 89.4, affordance: 80.52380952380953, navigation: 96.66666666666667, trajectory: 76.66666666666667 },
+  },
+  {
+    model: "Kimi K3",
+    protocol: "Text Answering",
+    protocolKey: "text",
+    source: "Supplementary API Evaluation",
+    overall: 63.36496598639456,
+    capabilities: { Perception: 81.16071428571428, Understanding: 50.0, Reasoning: 53.4888888888889, Interaction: 67.33333333333333 },
+    tasks: { counting: 95.0, depth: 80.0, orientation: 72.5, relationship: 48.57142857142857, perspective: 34.285714285714285, mental_modeling: 40.0, multihop: 26.666666666666668, prediction: 53.80000000000001, affordance: 75.33333333333333, navigation: 46.666666666666664, trajectory: 80.0 },
+  },
+  {
+    model: "Claude Opus 4.8",
+    protocol: "Text Answering",
+    protocolKey: "text",
+    source: "Supplementary API Evaluation",
+    overall: 57.785908649173955,
+    capabilities: { Perception: 81.54761904761904, Understanding: 45.71428571428571, Reasoning: 49.42380952380953, Interaction: 50.561224489795926 },
+    tasks: { counting: 82.5, depth: 83.33333333333333, orientation: 77.5, relationship: 51.42857142857143, perspective: 45.714285714285715, mental_modeling: 37.142857142857146, multihop: 30.0, prediction: 49.70000000000002, affordance: 51.683673469387756, navigation: 33.333333333333336, trajectory: 66.66666666666667 },
+  },
+  {
     model: "GPT-5.4",
     protocol: "Text Answering",
     protocolKey: "text",

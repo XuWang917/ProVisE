@@ -1,7 +1,7 @@
 window.SPATIALGEN_EXPANSION_RESULTS = {
   "schema_version": "spatialgen.homepage_expansion.v2",
   "manifest_sha256": "dd9733a1173d790bdd5888a9b944d3a9e3edaef5356426a6da237b09ab176dd6",
-  "updated_at": "2026-07-21T01:36:05+10:00",
+  "updated_at": "2026-07-21T01:48:24+10:00",
   "systems": {
     "Nano Banana 2::visual": {
       "status": "complete",
@@ -331,6 +331,36 @@ window.SPATIALGEN_EXPANSION_RESULTS = {
         "size": 8.57142857,
         "grounding": 2.85714286,
         "feasibility": 28.57142857
+      }
+    },
+    "GPT-5.6 Sol::text": {
+      "status": "complete",
+      "samples": 105,
+      "overall": 87.61904762,
+      "tasks": {
+        "size": 94.28571429,
+        "grounding": 88.57142857,
+        "feasibility": 80.0
+      }
+    },
+    "Kimi K3::text": {
+      "status": "complete",
+      "samples": 105,
+      "overall": 78.09523809,
+      "tasks": {
+        "size": 77.14285714,
+        "grounding": 77.14285714,
+        "feasibility": 80.0
+      }
+    },
+    "Claude Opus 4.8::text": {
+      "status": "complete",
+      "samples": 105,
+      "overall": 66.66666667,
+      "tasks": {
+        "size": 82.85714286,
+        "grounding": 48.57142857,
+        "feasibility": 68.57142857
       }
     }
   },
@@ -1101,6 +1131,78 @@ window.SPATIALGEN_EXPANSION_RESULTS = {
         "affordance": 89.48025379,
         "navigation": 83.33333333,
         "trajectory": 90.0
+      }
+    },
+    "GPT-5.6 Sol::text": {
+      "status": "complete",
+      "samples": 365,
+      "overall": 79.17056277,
+      "capabilities": {
+        "Perception": 82.22222222,
+        "Understanding": 64.76190476,
+        "Reasoning": 88.03333334,
+        "Interaction": 84.61904762
+      },
+      "tasks": {
+        "counting": 82.5,
+        "depth": 86.66666667,
+        "orientation": 77.5,
+        "relationship": 40.0,
+        "perspective": 74.28571429,
+        "mental_modeling": 80.0,
+        "multihop": 86.66666667,
+        "prediction": 89.4,
+        "affordance": 80.52380952,
+        "navigation": 96.66666667,
+        "trajectory": 76.66666667
+      }
+    },
+    "Kimi K3::text": {
+      "status": "complete",
+      "samples": 365,
+      "overall": 59.34761905,
+      "capabilities": {
+        "Perception": 82.5,
+        "Understanding": 40.95238095,
+        "Reasoning": 40.23333333,
+        "Interaction": 67.33333333
+      },
+      "tasks": {
+        "counting": 95.0,
+        "depth": 80.0,
+        "orientation": 72.5,
+        "relationship": 48.57142857,
+        "perspective": 34.28571429,
+        "mental_modeling": 40.0,
+        "multihop": 26.66666667,
+        "prediction": 53.8,
+        "affordance": 75.33333333,
+        "navigation": 46.66666667,
+        "trajectory": 80.0
+      }
+    },
+    "Claude Opus 4.8::text": {
+      "status": "complete",
+      "samples": 365,
+      "overall": 55.36388373,
+      "capabilities": {
+        "Perception": 81.11111111,
+        "Understanding": 44.76190476,
+        "Reasoning": 39.85,
+        "Interaction": 50.56122449
+      },
+      "tasks": {
+        "counting": 82.5,
+        "depth": 83.33333333,
+        "orientation": 77.5,
+        "relationship": 51.42857143,
+        "perspective": 45.71428571,
+        "mental_modeling": 37.14285714,
+        "multihop": 30.0,
+        "prediction": 49.7,
+        "affordance": 51.68367347,
+        "navigation": 33.33333333,
+        "trajectory": 66.66666667
       }
     }
   },
