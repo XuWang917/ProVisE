@@ -1179,36 +1179,107 @@ def _ocr_measurement(
     inputs: Sequence[ParserValue],
     params: Mapping[str, Any],
 ) -> ParserValue:
-    image = np.asarray(inputs[0].value)
-    rows = _run_local_ocr(image)
     min_confidence = float(params.get("min_confidence", 0.35))
     pattern = re.compile(str(params.get("numeric_pattern") or r"[-+]?(?:\d+(?:\.\d*)?|\.\d+)"))
     unit_hint = str(params.get("unit_hint") or "").strip().lower()
     unit_pattern = re.compile(
-        r"(?i)\b(mm|cm|m|ft|in|meters?|metres?|centimeters?|centimetres?|millimeters?|feet|foot|inches?|inch)\b"
+        r"(?i)(?<![A-Za-z])(mm|cm|m|ft|in|meters?|metres?|centimeters?|centimetres?|millimeters?|feet|foot|inches?|inch)(?![A-Za-z])"
     )
-    candidates = []
-    for text, confidence, box in rows:
-        match = pattern.search(text.replace(",", "."))
-        if not match or float(confidence) < min_confidence:
-            continue
-        unit_match = unit_pattern.search(text)
-        unit = unit_match.group(1).lower() if unit_match else unit_hint
-        candidates.append(
-            {
-                "value": float(match.group(0)),
-                "unit": unit,
-                "text": text,
-                "confidence": float(confidence),
-                "box": box,
-                "has_unit": bool(unit_match),
-            }
-        )
+
+    def collect_candidates(
+        image: np.ndarray,
+        source: str,
+        *,
+        allow_unit_hint: bool = True,
+    ) -> tuple[list[dict[str, Any]], list[tuple[str, float, Any]]]:
+        rows = _run_local_ocr(image)
+        found = []
+        for text, confidence, box in rows:
+            match = pattern.search(text.replace(",", "."))
+            if not match or float(confidence) < min_confidence:
+                continue
+            unit_match = unit_pattern.search(text)
+            if not unit_match and not allow_unit_hint:
+                continue
+            unit = unit_match.group(1).lower() if unit_match else unit_hint
+            found.append(
+                {
+                    "value": float(match.group(0)),
+                    "unit": unit,
+                    "text": text,
+                    "confidence": float(confidence),
+                    "box": box,
+                    "has_unit": bool(unit_match),
+                    "ocr_source": source,
+                }
+            )
+        return found, rows
+
+    def unit_neighborhood_candidates(
+        image: np.ndarray,
+        rows: Sequence[tuple[str, float, Any]],
+    ) -> tuple[list[dict[str, Any]], int]:
+        found: list[dict[str, Any]] = []
+        crop_count = 0
+        height, width = image.shape[:2]
+        for text, confidence, box in rows:
+            if float(confidence) < min_confidence or not unit_pattern.search(text):
+                continue
+            if pattern.search(text.replace(",", ".")) or not box:
+                continue
+            points = np.asarray(box, dtype=np.float32).reshape(-1, 2)
+            if points.size == 0:
+                continue
+            x1, y1 = points.min(axis=0)
+            x2, y2 = points.max(axis=0)
+            token_width = max(1.0, float(x2 - x1))
+            token_height = max(1.0, float(y2 - y1))
+            left = max(0, int(np.floor(x1 - max(4.0 * token_width, 8.0 * token_height))))
+            right = min(width, int(np.ceil(x2 + 2.0 * token_width)))
+            top = max(0, int(np.floor(y1 - 2.0 * token_height)))
+            bottom = min(height, int(np.ceil(y2 + 2.0 * token_height)))
+            if right <= left or bottom <= top:
+                continue
+            crop_count += 1
+            candidates, _ = collect_candidates(
+                image[top:bottom, left:right],
+                "unit_neighborhood",
+                allow_unit_hint=False,
+            )
+            found.extend(candidates)
+        return found, crop_count
+
+    image = np.asarray(inputs[0].value)
+    candidates, primary_ocr_rows = collect_candidates(image, "local_crop")
+    fallback_ocr_rows: list[tuple[str, float, Any]] = []
+    unit_neighborhood_crop_count = 0
+    if not any(candidate["has_unit"] for candidate in candidates):
+        generated = cv2.imread(context.generated_path)
+        if generated is not None and (
+            generated.shape != image.shape or not np.array_equal(generated, image)
+        ):
+            fallback_candidates, fallback_ocr_rows = collect_candidates(
+                generated,
+                "full_generated_image",
+                allow_unit_hint=False,
+            )
+            candidates.extend(fallback_candidates)
+            if not fallback_candidates:
+                neighborhood_candidates, unit_neighborhood_crop_count = (
+                    unit_neighborhood_candidates(generated, fallback_ocr_rows)
+                )
+                candidates.extend(neighborhood_candidates)
     if not candidates:
         raise ParserOpError(
             "no numeric measurement was recovered by local OCR",
             code="ocr_measurement_missing",
-            diagnostics={"ocr_rows": len(rows), "min_confidence": min_confidence},
+            diagnostics={
+                "ocr_rows": len(primary_ocr_rows) + len(fallback_ocr_rows),
+                "primary_ocr_rows": len(primary_ocr_rows),
+                "fallback_ocr_rows": len(fallback_ocr_rows),
+                "unit_neighborhood_crop_count": unit_neighborhood_crop_count,
+                "min_confidence": min_confidence,
+            },
         )
     candidates.sort(key=lambda row: (row["has_unit"], row["confidence"]), reverse=True)
     best = candidates[0]
@@ -1220,6 +1291,7 @@ def _ocr_measurement(
             "prediction": prediction,
             "ocr_text": best["text"],
             "ocr_confidence": best["confidence"],
+            "ocr_source": best["ocr_source"],
             "candidate_count": len(candidates),
         },
     )
@@ -1231,17 +1303,23 @@ def _validate_dimension_between(
     params: Mapping[str, Any],
 ) -> ParserValue:
     measurement, first, second, line = [value.value for value in inputs]
-    _validate_dimension_components(first, line, params)
-    _validate_dimension_components(second, line, params)
+    _validate_dimension_anchor(first, params)
+    _validate_dimension_anchor(second, params)
     if first.get("index") == second.get("index") and first == second:
         raise ParserOpError("dimension anchors are not distinct", code="invalid_dimension_anchors")
+    line_diagnostics = _validate_dimension_line(
+        context,
+        line,
+        params,
+        anchors=(first, second),
+    )
     return ParserValue(
         "scalar_measurement",
         measurement,
         {
             "prediction": measurement,
             "anchor_areas": [int(first["area"]), int(second["area"])],
-            "line_elongation": _component_elongation(line),
+            **line_diagnostics,
             "grounded": True,
         },
     )
@@ -1253,14 +1331,20 @@ def _validate_dimension_extent(
     params: Mapping[str, Any],
 ) -> ParserValue:
     measurement, anchor, line = [value.value for value in inputs]
-    _validate_dimension_components(anchor, line, params)
+    _validate_dimension_anchor(anchor, params)
+    line_diagnostics = _validate_dimension_line(
+        context,
+        line,
+        params,
+        anchors=(anchor,),
+    )
     return ParserValue(
         "scalar_measurement",
         measurement,
         {
             "prediction": measurement,
             "anchor_area": int(anchor["area"]),
-            "line_elongation": _component_elongation(line),
+            **line_diagnostics,
             "grounded": True,
         },
     )
@@ -1619,20 +1703,194 @@ def _component_elongation(component: Mapping[str, Any]) -> float:
     return max(width / height, height / width)
 
 
-def _validate_dimension_components(
+def _validate_dimension_anchor(
     anchor: Mapping[str, Any],
-    line: Mapping[str, Any],
     params: Mapping[str, Any],
 ) -> None:
     if float(anchor["area"]) < float(params.get("min_anchor_area", 30)):
         raise ParserOpError("dimension anchor is too small", code="invalid_dimension_anchor")
+
+
+def _validate_dimension_line(
+    context: ParserContext,
+    line: Mapping[str, Any],
+    params: Mapping[str, Any],
+    *,
+    anchors: Sequence[Mapping[str, Any]],
+) -> dict[str, Any]:
     elongation = _component_elongation(line)
-    if elongation < float(params.get("min_line_elongation", 2.5)):
-        raise ParserOpError(
-            "dimension line is not sufficiently elongated",
-            code="invalid_dimension_line",
-            diagnostics={"line_elongation": elongation},
-        )
+    min_elongation = float(params.get("min_line_elongation", 2.5))
+    if elongation >= min_elongation:
+        return {
+            "line_elongation": elongation,
+            "line_evidence": "connected_component",
+        }
+
+    hough = _dimension_hough_evidence(context, anchors)
+    if hough["valid"]:
+        return {
+            "line_elongation": elongation,
+            "line_evidence": "source_aware_hough",
+            "hough_line_count": hough["line_count"],
+            "hough_longest_line": hough["longest_line"],
+        }
+    raise ParserOpError(
+        "dimension line is not sufficiently elongated",
+        code="invalid_dimension_line",
+        diagnostics={
+            "line_elongation": elongation,
+            "hough_line_count": hough["line_count"],
+            "hough_longest_line": hough["longest_line"],
+        },
+    )
+
+
+def _dimension_hough_evidence(
+    context: ParserContext,
+    anchors: Sequence[Mapping[str, Any]],
+) -> dict[str, Any]:
+    generated = cv2.imread(context.generated_path)
+    if generated is None:
+        return {"valid": False, "line_count": 0, "longest_line": 0.0}
+
+    lower = np.asarray([18, 80, 100], dtype=np.uint8)
+    upper = np.asarray([40, 255, 255], dtype=np.uint8)
+    mask = cv2.inRange(cv2.cvtColor(generated, cv2.COLOR_BGR2HSV), lower, upper)
+    if context.source_paths:
+        source = cv2.imread(context.source_paths[0])
+        if source is not None:
+            if source.shape[:2] != generated.shape[:2]:
+                source = cv2.resize(
+                    source,
+                    (generated.shape[1], generated.shape[0]),
+                    interpolation=cv2.INTER_LANCZOS4,
+                )
+            source_mask = cv2.inRange(
+                cv2.cvtColor(source, cv2.COLOR_BGR2HSV),
+                lower,
+                upper,
+            )
+            color_delta = cv2.absdiff(generated, source).max(axis=2)
+            unchanged_source_yellow = cv2.bitwise_and(
+                source_mask,
+                np.where(color_delta < 35, 255, 0).astype(np.uint8),
+            )
+            mask = cv2.bitwise_and(mask, cv2.bitwise_not(unchanged_source_yellow))
+            mask = cv2.morphologyEx(
+                mask,
+                cv2.MORPH_CLOSE,
+                np.ones((3, 3), np.uint8),
+            )
+
+    height, width = mask.shape[:2]
+    diagonal = float(np.hypot(width, height))
+    min_length = max(20, int(round(diagonal * 0.006)))
+    max_gap = max(12, int(round(diagonal * 0.008)))
+    lines = cv2.HoughLinesP(
+        mask,
+        1,
+        np.pi / 180.0,
+        threshold=max(10, min_length // 3),
+        minLineLength=min_length,
+        maxLineGap=max_gap,
+    )
+    if lines is None:
+        return {"valid": False, "line_count": 0, "longest_line": 0.0}
+
+    x1 = min(float(anchor["x"]) for anchor in anchors)
+    y1 = min(float(anchor["y"]) for anchor in anchors)
+    x2 = max(float(anchor["x"] + anchor["width"]) for anchor in anchors)
+    y2 = max(float(anchor["y"] + anchor["height"]) for anchor in anchors)
+    margin = max(12.0, diagonal * 0.04)
+    bounds = (x1 - margin, y1 - margin, x2 + margin, y2 + margin)
+    gap_start = gap_end = None
+    gap_distance = 0.0
+    if len(anchors) >= 2:
+        gap_start, gap_end = _closest_box_points(anchors[0], anchors[1])
+        gap_distance = float(np.hypot(gap_end[0] - gap_start[0], gap_end[1] - gap_start[1]))
+    required_length = max(float(min_length), gap_distance * 0.35)
+    corridor_radius = max(24.0, diagonal * 0.025)
+    lengths = []
+    for raw_line in np.asarray(lines).reshape(-1, 4):
+        lx1, ly1, lx2, ly2 = [float(value) for value in raw_line]
+        midpoint = ((lx1 + lx2) / 2.0, (ly1 + ly2) / 2.0)
+        if not (bounds[0] <= midpoint[0] <= bounds[2] and bounds[1] <= midpoint[1] <= bounds[3]):
+            continue
+        length = float(np.hypot(lx2 - lx1, ly2 - ly1))
+        if gap_start is not None and gap_end is not None and gap_distance > 1.0:
+            line_direction = np.asarray([lx2 - lx1, ly2 - ly1], dtype=np.float64)
+            gap_direction = np.asarray(
+                [gap_end[0] - gap_start[0], gap_end[1] - gap_start[1]],
+                dtype=np.float64,
+            )
+            alignment = abs(float(np.dot(line_direction, gap_direction))) / max(
+                length * gap_distance,
+                1.0,
+            )
+            if alignment < 0.65:
+                continue
+            if _point_segment_distance(midpoint, gap_start, gap_end) > corridor_radius:
+                continue
+        lengths.append(length)
+    longest = max(lengths, default=0.0)
+    return {
+        "valid": longest >= required_length,
+        "line_count": len(lengths),
+        "longest_line": longest,
+    }
+
+
+def _closest_box_points(
+    first: Mapping[str, Any],
+    second: Mapping[str, Any],
+) -> tuple[tuple[float, float], tuple[float, float]]:
+    first_box = _component_box(first)
+    second_box = _component_box(second)
+
+    def closest_interval(
+        first_min: float,
+        first_max: float,
+        second_min: float,
+        second_max: float,
+    ) -> tuple[float, float]:
+        if first_max < second_min:
+            return first_max, second_min
+        if second_max < first_min:
+            return first_min, second_max
+        overlap_min = max(first_min, second_min)
+        overlap_max = min(first_max, second_max)
+        midpoint = (overlap_min + overlap_max) / 2.0
+        return midpoint, midpoint
+
+    first_x, second_x = closest_interval(
+        first_box[0],
+        first_box[2],
+        second_box[0],
+        second_box[2],
+    )
+    first_y, second_y = closest_interval(
+        first_box[1],
+        first_box[3],
+        second_box[1],
+        second_box[3],
+    )
+    return (first_x, first_y), (second_x, second_y)
+
+
+def _point_segment_distance(
+    point: tuple[float, float],
+    start: tuple[float, float],
+    end: tuple[float, float],
+) -> float:
+    point_vector = np.asarray(point, dtype=np.float64)
+    start_vector = np.asarray(start, dtype=np.float64)
+    segment = np.asarray(end, dtype=np.float64) - start_vector
+    denominator = float(np.dot(segment, segment))
+    if denominator <= 1e-9:
+        return float(np.linalg.norm(point_vector - start_vector))
+    position = float(np.dot(point_vector - start_vector, segment) / denominator)
+    projection = start_vector + np.clip(position, 0.0, 1.0) * segment
+    return float(np.linalg.norm(point_vector - projection))
 
 
 def _choice_prediction(item: Mapping[str, Any], choices: Sequence[Any], index: int) -> Any:

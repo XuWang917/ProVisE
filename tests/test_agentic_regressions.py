@@ -413,6 +413,150 @@ def test_grounded_dimension_round_trip_with_local_ocr(monkeypatch, tmp_path):
     assert result.diagnostics["steps"]["grounded_measurement"]["grounded"]
 
 
+def test_grounded_dimension_prefers_full_image_ocr_with_explicit_unit(
+    monkeypatch, tmp_path
+):
+    source_path = tmp_path / "source.png"
+    generated_path = tmp_path / "generated.png"
+    source = np.full((600, 1000, 3), 245, dtype=np.uint8)
+    generated = source.copy()
+    cv2.rectangle(generated, (50, 180), (220, 420), (255, 0, 255), 9)
+    cv2.rectangle(generated, (780, 180), (950, 420), (255, 255, 0), 9)
+    cv2.line(generated, (230, 300), (770, 300), (0, 255, 255), 8)
+    cv2.imwrite(str(source_path), source)
+    cv2.imwrite(str(generated_path), generated)
+    calls = []
+
+    def fake_ocr(image):
+        calls.append(image.shape[:2])
+        if len(calls) == 1:
+            return [("1", 0.99, [])]
+        return [("15cm", 0.95, [])]
+
+    monkeypatch.setattr("provise.parser_ops.operators._run_local_ocr", fake_ocr)
+    result = DEFAULT_REGISTRY.execute(
+        grounded_dimension_pipeline(anchor_count=2),
+        ParserContext(
+            str(generated_path),
+            _numeric_item(source_path.name),
+            str(tmp_path),
+            source_paths=(str(source_path),),
+            protocol_config={"unit": "cm"},
+        ),
+    )
+
+    assert result.success, result.error
+    assert result.prediction == {"value": 15.0, "unit": "cm"}
+    assert result.diagnostics["steps"]["measurement"]["ocr_source"] == "full_generated_image"
+    assert len(calls) == 2
+
+
+def test_grounded_dimension_recovers_number_next_to_split_unit_token(
+    monkeypatch, tmp_path
+):
+    source_path = tmp_path / "source.png"
+    generated_path = tmp_path / "generated.png"
+    source = np.full((600, 1000, 3), 245, dtype=np.uint8)
+    generated = source.copy()
+    cv2.rectangle(generated, (50, 180), (220, 420), (255, 0, 255), 9)
+    cv2.rectangle(generated, (780, 180), (950, 420), (255, 255, 0), 9)
+    cv2.line(generated, (230, 300), (770, 300), (0, 255, 255), 8)
+    cv2.imwrite(str(source_path), source)
+    cv2.imwrite(str(generated_path), generated)
+    calls = []
+
+    def fake_ocr(image):
+        calls.append(image.shape[:2])
+        if len(calls) == 1:
+            return []
+        if len(calls) == 2:
+            return [
+                ("605", 0.99, [[20, 20], [60, 20], [60, 40], [20, 40]]),
+                ("cm", 0.99, [[700, 300], [750, 300], [750, 330], [700, 330]]),
+            ]
+        return [("7 cm", 0.95, [])]
+
+    monkeypatch.setattr("provise.parser_ops.operators._run_local_ocr", fake_ocr)
+    result = DEFAULT_REGISTRY.execute(
+        grounded_dimension_pipeline(anchor_count=2),
+        ParserContext(
+            str(generated_path),
+            _numeric_item(source_path.name),
+            str(tmp_path),
+            source_paths=(str(source_path),),
+            protocol_config={"unit": "cm"},
+        ),
+    )
+
+    assert result.success, result.error
+    assert result.prediction == {"value": 7.0, "unit": "cm"}
+    assert result.diagnostics["steps"]["measurement"]["ocr_source"] == "unit_neighborhood"
+    assert len(calls) == 3
+
+
+def test_grounded_dimension_uses_geometric_line_fallback(monkeypatch, tmp_path):
+    source_path = tmp_path / "source.png"
+    generated_path = tmp_path / "generated.png"
+    source = np.full((600, 1000, 3), 245, dtype=np.uint8)
+    generated = source.copy()
+    cv2.rectangle(generated, (50, 180), (220, 420), (255, 0, 255), 9)
+    cv2.rectangle(generated, (780, 180), (950, 420), (255, 255, 0), 9)
+    cv2.line(generated, (230, 300), (770, 300), (0, 255, 255), 8)
+    cv2.rectangle(generated, (450, 380), (550, 480), (0, 255, 255), -1)
+    cv2.imwrite(str(source_path), source)
+    cv2.imwrite(str(generated_path), generated)
+    monkeypatch.setattr(
+        "provise.parser_ops.operators._run_local_ocr",
+        lambda image: [("42 cm", 0.99, [])],
+    )
+
+    result = DEFAULT_REGISTRY.execute(
+        grounded_dimension_pipeline(anchor_count=2),
+        ParserContext(
+            str(generated_path),
+            _numeric_item(source_path.name),
+            str(tmp_path),
+            source_paths=(str(source_path),),
+            protocol_config={"unit": "cm"},
+        ),
+    )
+
+    assert result.success, result.error
+    diagnostics = result.diagnostics["steps"]["grounded_measurement"]
+    assert diagnostics["line_evidence"] == "source_aware_hough"
+    assert diagnostics["hough_longest_line"] >= 500
+
+
+def test_grounded_dimension_rejects_yellow_block_without_line(monkeypatch, tmp_path):
+    source_path = tmp_path / "source.png"
+    generated_path = tmp_path / "generated.png"
+    source = np.full((600, 1000, 3), 245, dtype=np.uint8)
+    generated = source.copy()
+    cv2.rectangle(generated, (50, 180), (220, 420), (255, 0, 255), 9)
+    cv2.rectangle(generated, (780, 180), (950, 420), (255, 255, 0), 9)
+    cv2.rectangle(generated, (450, 250), (550, 350), (0, 255, 255), -1)
+    cv2.imwrite(str(source_path), source)
+    cv2.imwrite(str(generated_path), generated)
+    monkeypatch.setattr(
+        "provise.parser_ops.operators._run_local_ocr",
+        lambda image: [("42 cm", 0.99, [])],
+    )
+
+    result = DEFAULT_REGISTRY.execute(
+        grounded_dimension_pipeline(anchor_count=2),
+        ParserContext(
+            str(generated_path),
+            _numeric_item(source_path.name),
+            str(tmp_path),
+            source_paths=(str(source_path),),
+            protocol_config={"unit": "cm"},
+        ),
+    )
+
+    assert not result.success
+    assert result.error_type == "invalid_dimension_line"
+
+
 def test_dimension_label_crop_expands_across_the_minor_axis(tmp_path):
     path = tmp_path / "vertical_dimension.png"
     image = np.full((800, 600, 3), 245, dtype=np.uint8)
