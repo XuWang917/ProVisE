@@ -164,7 +164,7 @@ def expected_answer_format(item: Dict[str, Any]) -> str:
                 labels.append(str(idx + 1))
         return f"one candidate option label from: {', '.join(labels)}"
     if answer_type == "choice":
-        return "one option label printed in the image, such as A, B, C, or D"
+        return "one option label explicitly shown in the generated response"
     if answer_type:
         return answer_type
     if metric:

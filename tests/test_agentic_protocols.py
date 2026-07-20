@@ -208,7 +208,7 @@ def test_fallback_prompt_supports_image_embedded_choice_labels():
         "",
     )
 
-    assert "one option label printed in the image, such as A, B, C, or D" in prompt
+    assert "one option label explicitly shown in the generated response" in prompt
 
 
 def test_visual_change_gate_rejects_copy_and_accepts_spatial_edit(tmp_path):

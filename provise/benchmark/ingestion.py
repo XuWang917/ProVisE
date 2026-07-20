@@ -138,7 +138,10 @@ Rules:
 - Use choices.mode=field only when one record field contains the complete choice
   list or mapping. When choices are stored in separate columns such as A/B/C/D
   or option_1/option_2, use choices.mode=fields and list those columns in display
-  order. Optional labels must have the same length as fields.
+  order. Use choices.labels to declare the official labels in index order. This
+  is required when option content is carried only by the input media and the
+  annotation stores a numeric answer index; also declare answer.choice_index_base.
+  Do not infer a label convention without evidence from the benchmark contract.
 - Use point_in_mask only when the official evaluation checks predicted points
   against a target mask.
 - For chat-style multimodal records, use conversation_user_text and
@@ -190,7 +193,7 @@ Return JSON only:
         "mode": "none | boolean | inline_mcq | field | fields",
         "field": "one field containing the complete choice collection",
         "fields": ["separate option columns in display order"],
-        "labels": ["optional labels aligned with fields"]
+        "labels": ["optional official labels in index order"]
       },
       "media": [
         {"field": "field name", "mode": "embedded_images | hf_image | path | path_list | path_template | conversation_images", "template": "required for path_template", "value_transform": "text | first_underscore | basename | stem", "role": "primary | view | frame", "order_field": "optional"}
@@ -1509,6 +1512,15 @@ def validate_source_mapping(mapping: Dict[str, Any], fields: set[str], index: in
     choice_mode = str(choices.get("mode") or "none")
     if choice_mode not in ALLOWED_CHOICE_MODES:
         errors.append(f"{prefix}.choices.mode is unsupported: {choice_mode}")
+    labels = choices.get("labels")
+    if labels is not None:
+        if (
+            not isinstance(labels, list)
+            or len(labels) < 2
+            or any(not str(label).strip() for label in labels)
+            or len({str(label) for label in labels}) != len(labels)
+        ):
+            errors.append(f"{prefix}.choices.labels must contain at least two unique labels")
     if choice_mode == "field":
         validate_field(choices.get("field"), fields, f"{prefix}.choices.field", errors)
     elif choice_mode == "fields":
@@ -1518,7 +1530,6 @@ def validate_source_mapping(mapping: Dict[str, Any], fields: set[str], index: in
         else:
             for field in choice_fields:
                 validate_field(field, fields, f"{prefix}.choices.fields", errors)
-        labels = choices.get("labels")
         if labels is not None and (
             not isinstance(labels, list) or len(labels) != len(choice_fields or [])
         ):
@@ -1935,8 +1946,9 @@ def namespace_duplicate_item_ids(items: List[Dict[str, Any]]) -> Dict[str, Any]:
 
 def build_choices(record: Dict[str, Any], config: Dict[str, Any], question: str) -> List[Dict[str, str]]:
     mode = str(config.get("mode") or "none")
+    configured_labels = [str(label) for label in config.get("labels") or []]
     if mode == "none":
-        return []
+        return [{"label": label, "text": ""} for label in configured_labels]
     if mode == "boolean":
         return [{"label": "yes", "text": "yes"}, {"label": "no", "text": "no"}]
     if mode == "inline_mcq":
@@ -1946,23 +1958,38 @@ def build_choices(record: Dict[str, Any], config: Dict[str, Any], question: str)
         return choices
     if mode == "fields":
         fields = list(config.get("fields") or [])
-        labels = list(config.get("labels") or [])
         return [
             {
-                "label": str(labels[index] if index < len(labels) else chr(ord("A") + index)),
+                "label": str(
+                    configured_labels[index]
+                    if index < len(configured_labels)
+                    else chr(ord("A") + index)
+                ),
                 "text": text_value(record.get(str(field))),
             }
             for index, field in enumerate(fields)
         ]
     raw = record.get(str(config.get("field") or ""))
     values = sequence_values(raw)
+    if not values and configured_labels:
+        return [{"label": label, "text": ""} for label in configured_labels]
+    if configured_labels and len(configured_labels) < len(values):
+        raise ValueError("choices.labels does not cover every annotated choice")
     choices = []
     for index, value in enumerate(values):
         if isinstance(value, dict):
-            label = value.get("label") or chr(ord("A") + index)
+            label = (
+                value.get("label")
+                or (configured_labels[index] if index < len(configured_labels) else None)
+                or chr(ord("A") + index)
+            )
             text = value.get("text") or value.get("value") or label
         else:
-            label = chr(ord("A") + index)
+            label = (
+                configured_labels[index]
+                if index < len(configured_labels)
+                else chr(ord("A") + index)
+            )
             text = text_value(value)
         choices.append({"label": str(label), "text": str(text)})
     return choices
@@ -2039,14 +2066,22 @@ def normalize_answer(
     if answer_type == "choice":
         numeric = scalar_value(answer)
         if isinstance(numeric, (int, np.integer)) and not isinstance(numeric, bool):
+            if not choices:
+                raise ValueError(
+                    "numeric choice answer requires annotated choices or explicit choices.labels"
+                )
+            if (
+                all(not str(choice.get("text") or "").strip() for choice in choices)
+                and choice_index_base not in {0, 1, "0", "1"}
+            ):
+                raise ValueError(
+                    "numeric choice answer with label-only choices requires "
+                    "an explicit choice_index_base"
+                )
             base = int(choice_index_base) if choice_index_base in {0, 1, "0", "1"} else 0
             index = int(numeric) - base
             if 0 <= index < len(choices):
                 return choices[index]["label"]
-            if choice_index_base in {0, 1, "0", "1"} and 0 <= index < 26:
-                # Some visual MCQ datasets print A-Z options inside the image
-                # instead of repeating their text in the annotation file.
-                return chr(ord("A") + index)
         text = text_value(answer).strip()
         labels = {choice["label"] for choice in choices}
         if text in labels:

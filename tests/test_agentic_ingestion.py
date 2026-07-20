@@ -5,6 +5,7 @@ from pathlib import Path
 
 import pyarrow as pa
 import pyarrow.parquet as pq
+import pytest
 from PIL import Image
 from tfrecord.writer import TFRecordWriter
 
@@ -13,6 +14,7 @@ from provise.benchmark.ingestion import (
     discover_metric_evidence,
     discover_sources,
     metric_evidence_supports,
+    normalize_answer,
     parse_inline_choices,
     write_ingestion_outputs,
 )
@@ -256,7 +258,7 @@ def test_json_ingestion_resolves_field_derived_image_path_template(tmp_path: Pat
 
 def test_json_ingestion_normalizes_image_embedded_choice_index(tmp_path: Path):
     source_root = tmp_path / "source"
-    image_dir = source_root / "Complex_Logic"
+    image_dir = source_root / "Visual_Choice"
     image_dir.mkdir(parents=True)
     Image.new("RGB", (24, 16), "teal").save(image_dir / "0.png")
     (source_root / "data.json").write_text(
@@ -267,7 +269,7 @@ def test_json_ingestion_normalizes_image_embedded_choice_index(tmp_path: Path):
                     "question": "Which option printed in the image is correct?",
                     "options": [],
                     "answer": 3,
-                    "task_type": "Complex_Logic",
+                    "task_type": "Visual_Choice",
                 }
             ]
         ),
@@ -285,7 +287,11 @@ def test_json_ingestion_normalizes_image_embedded_choice_index(tmp_path: Path):
             "choice_index_base": 0,
         },
         "answer_type": "choice",
-        "choices": {"mode": "field", "field": "options"},
+        "choices": {
+            "mode": "field",
+            "field": "options",
+            "labels": ["A", "B", "C", "D"],
+        },
         "media": [
             {
                 "field": "id",
@@ -305,8 +311,25 @@ def test_json_ingestion_normalizes_image_embedded_choice_index(tmp_path: Path):
     ).build(raw_response=_response(mapping, benchmark="image_embedded_choices"))
 
     assert result.decision == "ingest"
-    assert result.items[0]["choices"] == []
+    assert result.items[0]["choices"] == [
+        {"label": "A", "text": ""},
+        {"label": "B", "text": ""},
+        {"label": "C", "text": ""},
+        {"label": "D", "text": ""},
+    ]
     assert result.items[0]["answer"] == "D"
+
+
+def test_numeric_choice_without_choices_requires_explicit_labels():
+    with pytest.raises(ValueError, match="explicit choices.labels"):
+        normalize_answer(3, "choice", [], choice_index_base=0)
+
+
+def test_label_only_numeric_choice_requires_explicit_index_base():
+    choices = [{"label": str(index), "text": ""} for index in range(1, 5)]
+    with pytest.raises(ValueError, match="explicit choice_index_base"):
+        normalize_answer(3, "choice", choices)
+    assert normalize_answer(3, "choice", choices, choice_index_base=0) == "4"
 
 
 def test_json_ingestion_repairs_zero_coverage_path_template_transform(tmp_path: Path):
