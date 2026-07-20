@@ -1,7 +1,7 @@
 window.SPATIALGEN_EXPANSION_RESULTS = {
   "schema_version": "spatialgen.homepage_expansion.v2",
   "manifest_sha256": "dd9733a1173d790bdd5888a9b944d3a9e3edaef5356426a6da237b09ab176dd6",
-  "updated_at": "2026-07-20T23:18:52+10:00",
+  "updated_at": "2026-07-20T23:52:02+10:00",
   "systems": {
     "Nano Banana 2::visual": {
       "status": "complete",
@@ -1078,9 +1078,33 @@ window.SPATIALGEN_EXPANSION_RESULTS = {
         "navigation": 33.33333333,
         "trajectory": 40.0
       }
+    },
+    "Human::human": {
+      "status": "complete",
+      "samples": 365,
+      "overall": 86.53933043,
+      "capabilities": {
+        "Perception": 97.5,
+        "Understanding": 84.76190476,
+        "Reasoning": 71.16666667,
+        "Interaction": 87.60452904
+      },
+      "tasks": {
+        "counting": 100.0,
+        "depth": 100.0,
+        "orientation": 92.5,
+        "relationship": 88.57142857,
+        "perspective": 91.42857143,
+        "mental_modeling": 74.28571429,
+        "multihop": 63.33333333,
+        "prediction": 79.0,
+        "affordance": 89.48025379,
+        "navigation": 83.33333333,
+        "trajectory": 90.0
+      }
     }
   },
   "benchmark_version": "v1.1",
   "benchmark_sha256": "8fd835687063d1579bc36a5c06b1eefed869bf4494d656f2aa8c10a69211f0a4",
-  "result_manifest_sha256": "8ac4a289ee051b0ee492b5c322b92a0323e2cd4dc5c7aff51828963299526d8d"
+  "result_manifest_sha256": "d091ea54885102ee51a7a5cec6700df6d4da1da0444ff4af19498ddf03131e10"
 };
