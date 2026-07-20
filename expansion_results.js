@@ -1,86 +1,86 @@
 window.SPATIALGEN_EXPANSION_RESULTS = {
   "schema_version": "spatialgen.homepage_expansion.v2",
   "manifest_sha256": "dd9733a1173d790bdd5888a9b944d3a9e3edaef5356426a6da237b09ab176dd6",
-  "updated_at": "2026-07-20T23:52:02+10:00",
+  "updated_at": "2026-07-21T01:36:05+10:00",
   "systems": {
     "Nano Banana 2::visual": {
       "status": "complete",
       "samples": 105,
-      "overall": 54.29,
+      "overall": 54.28571428,
       "tasks": {
         "size": 60.0,
-        "grounding": 65.71,
-        "feasibility": 37.14
+        "grounding": 65.71428571,
+        "feasibility": 37.14285714
       }
     },
     "LLaVA-OV-1.5-8B::text": {
       "status": "complete",
       "samples": 105,
-      "overall": 62.86,
+      "overall": 62.85714286,
       "tasks": {
-        "size": 88.57,
-        "grounding": 45.71,
-        "feasibility": 54.29
+        "size": 88.57142857,
+        "grounding": 45.71428571,
+        "feasibility": 54.28571429
       }
     },
     "GPT-5 Image Mini::visual": {
       "status": "complete",
       "samples": 105,
-      "overall": 42.86,
+      "overall": 42.85714286,
       "tasks": {
-        "size": 54.29,
-        "grounding": 34.29,
+        "size": 54.28571429,
+        "grounding": 34.28571429,
         "feasibility": 40.0
       }
     },
     "InternVL3.5-8B::text": {
       "status": "complete",
       "samples": 105,
-      "overall": 75.24,
+      "overall": 75.23809524,
       "tasks": {
-        "size": 94.29,
-        "grounding": 77.14,
-        "feasibility": 54.29
+        "size": 94.28571429,
+        "grounding": 77.14285714,
+        "feasibility": 54.28571429
       }
     },
     "Seedream 4.5::visual": {
       "status": "complete",
       "samples": 105,
-      "overall": 45.71,
+      "overall": 45.71428571,
       "tasks": {
-        "size": 45.71,
-        "grounding": 51.43,
+        "size": 45.71428571,
+        "grounding": 51.42857143,
         "feasibility": 40.0
       }
     },
     "Qwen3-VL-8B::text": {
       "status": "complete",
       "samples": 105,
-      "overall": 75.24,
+      "overall": 75.23809524,
       "tasks": {
         "size": 80.0,
-        "grounding": 77.14,
-        "feasibility": 68.57
+        "grounding": 77.14285714,
+        "feasibility": 68.57142857
       }
     },
     "GLM-4.6V-Flash::text": {
       "status": "complete",
       "samples": 105,
-      "overall": 76.19,
+      "overall": 76.19047619,
       "tasks": {
-        "size": 94.29,
-        "grounding": 68.57,
-        "feasibility": 65.71
+        "size": 94.28571429,
+        "grounding": 68.57142857,
+        "feasibility": 65.71428571
       }
     },
     "JoyAI-Image::visual": {
       "status": "complete",
       "samples": 105,
-      "overall": 48.57,
+      "overall": 48.57142857,
       "tasks": {
-        "size": 54.29,
-        "grounding": 57.14,
-        "feasibility": 34.29
+        "size": 54.28571429,
+        "grounding": 57.14285714,
+        "feasibility": 34.28571429
       }
     },
     "FLUX.2 [dev]::visual": {
@@ -106,159 +106,159 @@ window.SPATIALGEN_EXPANSION_RESULTS = {
     "SpaceR::text": {
       "status": "complete",
       "samples": 105,
-      "overall": 55.24,
+      "overall": 55.23809524,
       "tasks": {
         "size": 80.0,
-        "grounding": 25.71,
+        "grounding": 25.71428571,
         "feasibility": 60.0
       }
     },
     "Cambrian-S-7B::text": {
       "status": "complete",
       "samples": 105,
-      "overall": 51.43,
+      "overall": 51.42857143,
       "tasks": {
-        "size": 82.86,
-        "grounding": 5.71,
-        "feasibility": 65.71
+        "size": 82.85714286,
+        "grounding": 5.71428571,
+        "feasibility": 65.71428571
       }
     },
     "GEM-2B::text": {
       "status": "complete",
       "samples": 105,
-      "overall": 63.81,
+      "overall": 63.80952381,
       "tasks": {
-        "size": 74.29,
-        "grounding": 54.29,
-        "feasibility": 62.86
+        "size": 74.28571429,
+        "grounding": 54.28571429,
+        "feasibility": 62.85714286
       }
     },
     "SpatialThinker-3B::text": {
       "status": "complete",
       "samples": 105,
-      "overall": 70.48,
+      "overall": 70.47619048,
       "tasks": {
-        "size": 91.43,
-        "grounding": 65.71,
-        "feasibility": 54.29
+        "size": 91.42857143,
+        "grounding": 65.71428571,
+        "feasibility": 54.28571429
       }
     },
     "SpaceOm::text": {
       "status": "complete",
       "samples": 105,
-      "overall": 77.14,
+      "overall": 77.14285714,
       "tasks": {
-        "size": 88.57,
-        "grounding": 77.14,
-        "feasibility": 65.71
+        "size": 88.57142857,
+        "grounding": 77.14285714,
+        "feasibility": 65.71428571
       }
     },
     "VLM-3R-7B::text": {
       "status": "complete",
       "samples": 105,
-      "overall": 56.19,
+      "overall": 56.19047619,
       "tasks": {
-        "size": 91.43,
-        "grounding": 11.43,
-        "feasibility": 65.71
+        "size": 91.42857143,
+        "grounding": 11.42857143,
+        "feasibility": 65.71428571
       }
     },
     "SpatialRGPT-8B::text": {
       "status": "complete",
       "samples": 105,
-      "overall": 47.62,
+      "overall": 47.61904762,
       "tasks": {
-        "size": 71.43,
-        "grounding": 17.14,
-        "feasibility": 54.29
+        "size": 71.42857143,
+        "grounding": 17.14285714,
+        "feasibility": 54.28571429
       }
     },
     "Spatial-MLLM::text": {
       "status": "complete",
       "samples": 105,
-      "overall": 58.1,
+      "overall": 58.0952381,
       "tasks": {
-        "size": 88.57,
-        "grounding": 34.29,
-        "feasibility": 51.43
+        "size": 88.57142857,
+        "grounding": 34.28571429,
+        "feasibility": 51.42857143
       }
     },
     "SpatialBot-3B::text": {
       "status": "complete",
       "samples": 105,
-      "overall": 44.76,
+      "overall": 44.76190476,
       "tasks": {
         "size": 60.0,
-        "grounding": 22.86,
-        "feasibility": 51.43
+        "grounding": 22.85714286,
+        "feasibility": 51.42857143
       }
     },
     "GPT-5.4::text": {
       "status": "complete",
       "samples": 105,
-      "overall": 67.62,
+      "overall": 67.61904762,
       "tasks": {
-        "size": 74.29,
-        "grounding": 57.14,
-        "feasibility": 71.43
+        "size": 74.28571429,
+        "grounding": 57.14285714,
+        "feasibility": 71.42857143
       }
     },
     "Cosmos3-Nano::text": {
       "status": "complete",
       "samples": 105,
-      "overall": 78.1,
+      "overall": 78.09523809,
       "tasks": {
-        "size": 91.43,
-        "grounding": 85.71,
-        "feasibility": 57.14
+        "size": 91.42857143,
+        "grounding": 85.71428571,
+        "feasibility": 57.14285714
       }
     },
     "SenseNova-Vision-7B-MoT::text": {
       "status": "complete",
       "samples": 105,
-      "overall": 63.81,
+      "overall": 63.80952381,
       "tasks": {
-        "size": 74.29,
-        "grounding": 74.29,
-        "feasibility": 42.86
+        "size": 74.28571429,
+        "grounding": 74.28571429,
+        "feasibility": 42.85714286
       }
     },
     "RynnBrain-8B::text": {
       "status": "complete",
       "samples": 105,
-      "overall": 74.29,
+      "overall": 74.28571429,
       "tasks": {
-        "size": 85.71,
-        "grounding": 82.86,
-        "feasibility": 54.29
+        "size": 85.71428571,
+        "grounding": 82.85714286,
+        "feasibility": 54.28571429
       }
     },
     "RoboBrain2.5-8B-NV::text": {
       "status": "complete",
       "samples": 105,
-      "overall": 77.14,
+      "overall": 77.14285714,
       "tasks": {
-        "size": 88.57,
+        "size": 88.57142857,
         "grounding": 80.0,
-        "feasibility": 62.86
+        "feasibility": 62.85714286
       }
     },
     "Janus-Pro-7B::text": {
       "status": "complete",
       "samples": 105,
-      "overall": 49.52,
+      "overall": 49.52380952,
       "tasks": {
-        "size": 74.29,
-        "grounding": 8.57,
-        "feasibility": 65.71
+        "size": 74.28571429,
+        "grounding": 8.57142857,
+        "feasibility": 65.71428571
       }
     },
     "Janus-1.3B::text": {
       "status": "complete",
       "samples": 105,
-      "overall": 36.19,
+      "overall": 36.19047619,
       "tasks": {
-        "size": 48.57,
+        "size": 48.57142857,
         "grounding": 0.0,
         "feasibility": 60.0
       }
@@ -266,71 +266,71 @@ window.SPATIALGEN_EXPANSION_RESULTS = {
     "GPT-5 Image 2::visual": {
       "status": "complete",
       "samples": 105,
-      "overall": 62.86,
+      "overall": 62.85714286,
       "tasks": {
         "size": 80.0,
-        "grounding": 77.14,
-        "feasibility": 31.43
+        "grounding": 77.14285714,
+        "feasibility": 31.42857143
       }
     },
     "SenseNova-Vision-7B-MoT::visual": {
       "status": "complete",
       "samples": 105,
-      "overall": 33.33,
+      "overall": 33.33333333,
       "tasks": {
-        "size": 11.43,
-        "grounding": 88.57,
+        "size": 11.42857143,
+        "grounding": 88.57142857,
         "feasibility": 0.0
       }
     },
     "FLUX.2 [klein] 4B::visual": {
       "status": "complete",
       "samples": 105,
-      "overall": 36.19,
+      "overall": 36.19047619,
       "tasks": {
-        "size": 68.57,
-        "grounding": 22.86,
-        "feasibility": 17.14
+        "size": 68.57142857,
+        "grounding": 22.85714286,
+        "feasibility": 17.14285714
       }
     },
     "FLUX.2 [klein] 9B::visual": {
       "status": "complete",
       "samples": 105,
-      "overall": 35.24,
+      "overall": 35.23809524,
       "tasks": {
-        "size": 65.71,
-        "grounding": 11.43,
-        "feasibility": 28.57
+        "size": 65.71428571,
+        "grounding": 11.42857143,
+        "feasibility": 28.57142857
       }
     },
     "BAGEL-7B-MoT::visual": {
       "status": "complete",
       "samples": 105,
-      "overall": 28.57,
+      "overall": 28.57142857,
       "tasks": {
-        "size": 42.86,
-        "grounding": 2.86,
+        "size": 42.85714286,
+        "grounding": 2.85714286,
         "feasibility": 40.0
       }
     },
     "Qwen-Image-Edit-2511::visual": {
       "status": "complete",
       "samples": 105,
-      "overall": 36.19,
+      "overall": 36.19047619,
       "tasks": {
-        "size": 54.29,
-        "grounding": 17.14,
-        "feasibility": 37.14
+        "size": 54.28571429,
+        "grounding": 17.14285714,
+        "feasibility": 37.14285714
       }
     },
     "OmniGen-v1::visual": {
       "status": "complete",
       "samples": 105,
-      "overall": 13.33,
+      "overall": 13.33333333,
       "tasks": {
-        "size": 8.57,
-        "grounding": 2.86,
-        "feasibility": 28.57
+        "size": 8.57142857,
+        "grounding": 2.85714286,
+        "feasibility": 28.57142857
       }
     }
   },
@@ -1106,5 +1106,5 @@ window.SPATIALGEN_EXPANSION_RESULTS = {
   },
   "benchmark_version": "v1.1",
   "benchmark_sha256": "8fd835687063d1579bc36a5c06b1eefed869bf4494d656f2aa8c10a69211f0a4",
-  "result_manifest_sha256": "d091ea54885102ee51a7a5cec6700df6d4da1da0444ff4af19498ddf03131e10"
+  "result_manifest_sha256": "fe26a6ef762e3e61f513fea5492d4312043d08dd39932b1fcf5b7cd9d0ed7a54"
 };
