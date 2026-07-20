@@ -3,7 +3,7 @@ from __future__ import annotations
 import base64
 import os
 import time
-from typing import List
+from typing import Any, List
 
 import requests
 from dotenv import load_dotenv
@@ -40,17 +40,27 @@ class OpenAICompatibleVisionLanguageModel(BaseVLM):
         max_tokens: int = 16,
         max_retries: int = 2,
         retry_backoff: float = 1.0,
+        system_prompt: str | None = None,
+        response_format: dict | None = None,
+        temperature: float | None = 0.0,
+        reasoning: dict[str, Any] | None = None,
+        provider: str | None = None,
     ):
         super().__init__(model_name=model_name)
         self.timeout = timeout
         self.max_tokens = max_tokens
         self.max_retries = max(0, max_retries)
         self.retry_backoff = max(0.0, retry_backoff)
+        self.system_prompt = system_prompt
+        self.response_format = response_format
+        self.temperature = temperature
+        self.reasoning = dict(reasoning) if reasoning is not None else None
+        self.provider = provider
         self.api_key = None
         self.api_base = None
 
     def load_model(self):
-        config = resolve_openai_compatible_config()
+        config = resolve_openai_compatible_config(self.provider)
         self.api_key, self.api_base = config.api_key, config.api_base
         if not self.api_key:
             raise ValueError(
@@ -85,12 +95,21 @@ class OpenAICompatibleVisionLanguageModel(BaseVLM):
                 }
             )
 
+        messages = []
+        if self.system_prompt:
+            messages.append({"role": "system", "content": self.system_prompt})
+        messages.append({"role": "user", "content": content})
         payload = {
             "model": self.model_name,
-            "messages": [{"role": "user", "content": content}],
-            "temperature": 0,
+            "messages": messages,
             "max_tokens": self.max_tokens,
         }
+        if self.temperature is not None:
+            payload["temperature"] = self.temperature
+        if self.reasoning is not None:
+            payload["reasoning"] = self.reasoning
+        if self.response_format is not None:
+            payload["response_format"] = self.response_format
         for attempt in range(self.max_retries + 1):
             try:
                 response = self._post_with_proxy_fallback(payload)
@@ -105,7 +124,10 @@ class OpenAICompatibleVisionLanguageModel(BaseVLM):
 
             if response.status_code == 200:
                 try:
-                    return response.json()["choices"][0]["message"]["content"]
+                    content = response.json()["choices"][0]["message"]["content"]
+                    if not isinstance(content, str) or not content.strip():
+                        raise ValueError("empty response content")
+                    return content
                 except (KeyError, IndexError, TypeError, ValueError) as exc:
                     if attempt == self.max_retries:
                         raise RuntimeError(

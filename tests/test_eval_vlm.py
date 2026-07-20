@@ -37,6 +37,21 @@ def test_eval_vlm_defaults_to_openrouter_base(monkeypatch):
     assert model.api_base == DEFAULT_OPENROUTER_API_BASE
 
 
+def test_eval_vlm_explicit_openrouter_provider_overrides_proxy_config(monkeypatch):
+    monkeypatch.setenv("PROVISE_API_KEY", "proxy-key")
+    monkeypatch.setenv("PROVISE_API_BASE", "https://proxy.example/v1")
+    monkeypatch.setenv("OPENROUTER_API_KEY", "router-key")
+    monkeypatch.delenv("OPENROUTER_API_BASE", raising=False)
+
+    model = OpenAICompatibleVisionLanguageModel(
+        "moonshotai/kimi-k3", provider="openrouter"
+    )
+    model.load_model()
+
+    assert model.api_key == "router-key"
+    assert model.api_base == DEFAULT_OPENROUTER_API_BASE
+
+
 def test_create_eval_vlm_uses_default_model(monkeypatch):
     monkeypatch.delenv("PROVISE_PARSER_MODEL", raising=False)
     monkeypatch.delenv("PROVISE_PARSER_MAX_TOKENS", raising=False)
@@ -55,6 +70,50 @@ def test_eval_vlm_retries_transient_http_error(monkeypatch, tmp_path: Path):
     model.api_key = "test-key"
     model.api_base = "https://example.test/v1"
     responses = iter([_Response(502, text="temporary"), _Response(200, content="parsed")])
+    monkeypatch.setattr(model, "_post_with_proxy_fallback", lambda payload: next(responses))
+
+    assert model.predict(str(image_path), "question") == "parsed"
+
+
+def test_eval_vlm_supports_request_controls(monkeypatch, tmp_path: Path):
+    image_path = tmp_path / "image.png"
+    image_path.write_bytes(b"image")
+    model = OpenAICompatibleVisionLanguageModel(
+        "test-model",
+        system_prompt="Return structured output.",
+        response_format={"type": "json_object"},
+        temperature=None,
+        reasoning={"enabled": False},
+    )
+    model.api_key = "test-key"
+    model.api_base = "https://example.test/v1"
+    payloads = []
+
+    def request(payload):
+        payloads.append(payload)
+        return _Response(200, content="parsed")
+
+    monkeypatch.setattr(model, "_post_with_proxy_fallback", request)
+
+    assert model.predict(str(image_path), "question") == "parsed"
+    assert payloads[0]["messages"][0] == {
+        "role": "system",
+        "content": "Return structured output.",
+    }
+    assert payloads[0]["response_format"] == {"type": "json_object"}
+    assert payloads[0]["reasoning"] == {"enabled": False}
+    assert "temperature" not in payloads[0]
+
+
+def test_eval_vlm_retries_empty_success_response(monkeypatch, tmp_path: Path):
+    image_path = tmp_path / "image.png"
+    image_path.write_bytes(b"image")
+    model = OpenAICompatibleVisionLanguageModel(
+        "test-model", max_retries=1, retry_backoff=0
+    )
+    model.api_key = "test-key"
+    model.api_base = "https://example.test/v1"
+    responses = iter([_Response(200, content=None), _Response(200, content="parsed")])
     monkeypatch.setattr(model, "_post_with_proxy_fallback", lambda payload: next(responses))
 
     assert model.predict(str(image_path), "question") == "parsed"
