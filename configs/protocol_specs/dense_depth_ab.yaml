@@ -1,17 +1,18 @@
 name: dense_depth_ab
 description: >
   Generate a grayscale depth map and compare brightness at two A/B coordinates.
+  If the benchmark omits coordinates, locate the markers on the source image
+  before sampling the generated map.
 
 default_config:
-  eval_mode: coords
   kernel_size: 5
+  minimum_depth_delta: 0.0
   vlm_model: ""
   vlm_max_tokens: 64
   coordinate_prompt: >
     Two points are circled on the image, labeled by A and B beside each red
     circle. Output the coordinates strictly in the format: [[x_A, y_A],
     [x_B, y_B]], ranging from 0 to 1.
-  fallback_to_coords: false
 
 prompts:
   grayscale_depth_map:
