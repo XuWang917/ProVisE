@@ -172,6 +172,21 @@ def test_published_protocols_are_portable_and_verifiable():
                 assert '"metric_status"' not in text
 
 
+def test_omnispatial_contract_incomplete_task_is_not_formally_evaluable():
+    root = Path(__file__).resolve().parents[1] / "configs" / "protocols" / "omnispatial"
+
+    artifact = resolve_frozen_protocol(root)
+    task = "complex_logic__structured_or_text__accuracy"
+    generated_path = next((root / "generated").glob("*.agentic_protocols.yaml"))
+    generated = yaml.safe_load(generated_path.read_text(encoding="utf-8"))
+
+    assert artifact.config["tasks"][task]["formal_evaluation"] is False
+    assert task not in evaluation_cli._evaluation_tasks(artifact.config, "")
+    assert task not in {row["task"] for row in generated["protocols"]}
+    assert generated["excluded_protocols"][0]["task"] == task
+    assert generated["excluded_protocols"][0]["status"] == "contract_incomplete"
+
+
 def test_spatialgen_published_protocol_preserves_manual_and_agentic_origins():
     root = Path(__file__).resolve().parents[1]
     artifact_root = root / "configs" / "protocols" / "spatialgen_bench"

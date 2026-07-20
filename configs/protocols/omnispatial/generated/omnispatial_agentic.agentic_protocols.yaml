@@ -1,3 +1,10 @@
+excluded_protocols:
+- id: generated_omnispatial_agentic_complex_logic__structured_or_text__accuracy_vlm_fallback
+  task: complex_logic__structured_or_text__accuracy
+  status: contract_incomplete
+  reason: Released annotations encode numeric answer indices but omit the corresponding
+    choice mapping, so this parser cannot map a visual prediction into the original
+    metric without inventing missing benchmark semantics.
 protocols:
 - id: generated_omnispatial_agentic_Dynamic_Reasoning_vlm_fallback
   task: Dynamic_Reasoning
@@ -217,43 +224,3 @@ protocols:
     parser-ops contract that preserves the choice-selection answer across the task.
     A task-level visual reasoning parser is needed to read the generated worked visual
     evidence rather than answer codes.
-- id: generated_omnispatial_agentic_complex_logic__structured_or_text__accuracy_vlm_fallback
-  task: complex_logic__structured_or_text__accuracy
-  decision: fallback
-  generation_prompt: 'Use the supplied source image or ordered images to produce one
-    clear visual answer to this spatial task:
-
-    {question}
-
-
-    Candidate answers, when present:
-
-    {choices}
-
-
-    Express the answer through large, task-relevant visual evidence in the image itself.
-    Use only the primitives that fit the task, such as object outlines, a region overlay,
-    arrows between referenced objects, a path, measurement marks, correspondence marks,
-    or a visibly rendered next spatial state. Preserve unrelated scene content. Do
-    not merely print an answer label, option text, or prose explanation.'
-  parse_prompt: Read only the concrete spatial evidence expressed in the generated
-    visual response. Identify the marked objects, regions, arrows, path, measurement,
-    correspondence, or generated state, then recover the answer in the benchmark's
-    required format. Candidate choices may be used only to map that visible evidence
-    to a label. Do not independently solve the original task from the source image
-    and do not accept a bare answer label as evidence.
-  parser_inputs:
-  - generated_response
-  visual_evidence: task-grounded object outlines, region overlays, arrows, paths,
-    measurement marks, correspondence marks, or a visibly changed spatial state
-  invalid_conditions:
-  - no task-relevant spatial mark or generated state is visible
-  - the visible evidence is ambiguous or contradicts itself
-  - the response contains only an answer label or prose
-  metric_contract:
-    metric: accuracy
-    config: {}
-    formal_evaluation: true
-  rationale: 'No validated deterministic visual readout remained after protocol construction:
-    fallback may not use a pure answer-code layout; fallback must require concrete
-    task-grounded spatial evidence'
