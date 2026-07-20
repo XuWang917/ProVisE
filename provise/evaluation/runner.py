@@ -201,7 +201,7 @@ def deep_merge(base: Dict[str, Any], override: Dict[str, Any]) -> Dict[str, Any]
 def ensure_model(model_key: str):
     if model_key.startswith("mock-"):
         return MockProtocolModel(model_key)
-    from .models.generative import create_model
+    from ..models.generative import create_model
 
     model = create_model(model_key)
     model.load_model()
