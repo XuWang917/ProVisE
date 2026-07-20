@@ -9,7 +9,7 @@ media, smoke images, raw Agent prompts, and credentials are intentionally exclud
 |---|---|
 | `spatialgen_bench` | Manual x11 + Agentic x3 |
 | `embspatial` | Build x1 |
-| `omnispatial` | Fallback x4; one contract-incomplete task excluded |
+| `omnispatial` | Fallback x5 |
 | `q_spatial_plus` | Build x3 |
 | `robospatial_home` | Build x2 + Reuse x1 |
 | `sat` | Build x5 + Fallback x3 |

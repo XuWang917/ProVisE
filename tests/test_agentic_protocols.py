@@ -194,6 +194,23 @@ def test_fallback_prompt_includes_expected_answer_format():
     assert "one candidate option label from: A, B" in prompt
 
 
+def test_fallback_prompt_supports_image_embedded_choice_labels():
+    protocol = create_protocol("generic_vlm_fallback")
+    item = {
+        "question": "Which option printed in the image is correct?",
+        "answer_type": "choice",
+        "choices": [],
+    }
+
+    prompt = protocol.render_prompt(
+        "Instruction: {question}\nFormat: {answer_format}\nChoices: {choices}",
+        item,
+        "",
+    )
+
+    assert "one option label printed in the image, such as A, B, C, or D" in prompt
+
+
 def test_visual_change_gate_rejects_copy_and_accepts_spatial_edit(tmp_path):
     source = np.full((100, 100, 3), 255, dtype=np.uint8)
     source_path = tmp_path / "source.png"

@@ -7,12 +7,6 @@ protocol_build:
   agent_model: gpt-5.4
   parser_model: gpt-5.4
   validation_model: gpt-image-2
-contract_exclusions:
-- task: complex_logic__structured_or_text__accuracy
-  status: contract_incomplete
-  reason: Released annotations encode numeric answer indices but omit the corresponding
-    choice mapping, so a generated-image parser cannot produce a metric-compatible
-    prediction without inventing missing benchmark semantics.
 tasks:
   Dynamic_Reasoning:
     protocol: agentic_vlm_protocol
@@ -268,11 +262,7 @@ tasks:
       mode: single
     metric: accuracy
     metric_config: &id009 {}
-    formal_evaluation: false
-    contract_status: contract_incomplete
-    contract_exclusion_reason: Released annotations encode numeric answer indices but
-      omit the corresponding choice mapping, so this task is excluded from formal
-      evaluation rather than scored through an invented label conversion.
+    formal_evaluation: true
     protocol_config:
       generated_protocol_id: generated_omnispatial_agentic_complex_logic__structured_or_text__accuracy_vlm_fallback
       include_source_images: false

@@ -4,23 +4,10 @@
   "total_samples": 1533,
   "task_count": 5,
   "completed_task_count": 5,
-  "active_task_count": 4,
-  "active_sample_count": 1304,
+  "active_task_count": 5,
+  "active_sample_count": 1533,
   "decision_counts": {
-    "fallback": 4,
-    "contract_incomplete": 1
-  },
-  "post_build_contract_audit": {
-    "status": "passed_with_exclusion",
-    "active_records": 1304,
-    "excluded_records": 229,
-    "exclusions": [
-      {
-        "task": "complex_logic__structured_or_text__accuracy",
-        "status": "contract_incomplete",
-        "reason": "Released annotations encode numeric answer indices but omit the corresponding choice mapping, so a generated-image parser cannot produce a metric-compatible prediction without inventing missing benchmark semantics."
-      }
-    ]
+    "fallback": 5
   },
   "route_rows": [
     {
@@ -95,19 +82,24 @@
     },
     {
       "task": "complex_logic__structured_or_text__accuracy",
-      "decision": "contract_incomplete",
-      "active": false,
+      "decision": "fallback",
+      "active": true,
       "sample_count": 229,
-      "confidence": "none",
-      "protocol_id": "",
-      "protocol": "",
-      "parser_backend": "",
-      "parser_inputs": [],
+      "confidence": "medium",
+      "protocol_id": "generated_omnispatial_agentic_complex_logic__structured_or_text__accuracy_vlm_fallback",
+      "protocol": "agentic_vlm_protocol",
+      "parser_backend": "vlm_fallback",
+      "parser_inputs": [
+        "generated_response"
+      ],
       "metric": "accuracy",
-      "formal_evaluation": false,
-      "reason": "Released annotations encode numeric answer indices but omit the corresponding choice mapping, so no parser can map a visual prediction into the original metric without inventing missing benchmark semantics.",
-      "source": "post_build_contract_audit",
-      "historical_protocol_id": "generated_omnispatial_agentic_complex_logic__structured_or_text__accuracy_vlm_fallback"
+      "formal_evaluation": true,
+      "reason": "No validated deterministic visual readout remained after protocol construction: fallback may not use a pure answer-code layout; fallback must require concrete task-grounded spatial evidence",
+      "source": "automatic_vlm_fallback",
+      "fallback_origin": "compile:fallback_validation",
+      "pre_fallback_decision": "unsupported",
+      "pre_fallback_source": "fallback_validation",
+      "pre_fallback_reason": "fallback may not use a pure answer-code layout; fallback must require concrete task-grounded spatial evidence"
     }
   ],
   "task_contexts": {
@@ -356,8 +348,7 @@
       ],
       "metric": "accuracy",
       "metric_config": {},
-      "formal_evaluation": false,
-      "contract_status": "contract_incomplete"
+      "formal_evaluation": true
     }
   },
   "revision_counts": {
@@ -378,7 +369,8 @@
     }
   ],
   "automatic_vlm_fallback_tasks": [
-    "Perspective_Taking"
+    "Perspective_Taking",
+    "complex_logic__structured_or_text__accuracy"
   ],
   "fallback_history": [
     {
@@ -392,13 +384,12 @@
       "reason": "No validated deterministic visual readout remained after protocol construction: fallback may not use a pure answer-code layout; fallback must require concrete task-grounded spatial evidence"
     }
   ],
-  "disabled_tasks": [
-    "complex_logic__structured_or_text__accuracy"
-  ],
+  "disabled_tasks": [],
   "deferred_external_failure_tasks": [],
   "warnings": [
     "Task Perspective_Taking entered automatic VLM fallback after smoke:deterministic_protocol_failed.",
-    "Task complex_logic__structured_or_text__accuracy is excluded from formal evaluation after post-build contract audit because its released option mapping is missing."
+    "Rejected VLM fallback for task=complex_logic__structured_or_text__accuracy: fallback may not use a pure answer-code layout; fallback must require concrete task-grounded spatial evidence",
+    "Task complex_logic__structured_or_text__accuracy entered automatic VLM fallback after compile:fallback_validation."
   ],
   "smoke_validation": {
     "model": "gpt-image-2",
@@ -549,8 +540,6 @@
       },
       "complex_logic__structured_or_text__accuracy": {
         "status": "passed",
-        "post_build_status": "excluded_contract_incomplete",
-        "post_build_reason": "Released annotations encode numeric answer indices but omit the corresponding choice mapping.",
         "phase": "initial",
         "valid_parse_rate": 100.0,
         "valid_parse_rate_pass1": 100.0,
@@ -628,6 +617,6 @@
   },
   "protocol_artifact": {
     "schema_version": "provise.protocol.v1",
-    "config_sha256": "e610a2a205e641cf248a126341dcc24be141fafb773a55d6de4267172307a7be"
+    "config_sha256": "ec46166c04eeac2a0e13fbcc4c3d560b12ba614c93482ebf46c344821953141a"
   }
 }

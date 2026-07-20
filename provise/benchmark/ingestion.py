@@ -2043,6 +2043,10 @@ def normalize_answer(
             index = int(numeric) - base
             if 0 <= index < len(choices):
                 return choices[index]["label"]
+            if choice_index_base in {0, 1, "0", "1"} and 0 <= index < 26:
+                # Some visual MCQ datasets print A-Z options inside the image
+                # instead of repeating their text in the annotation file.
+                return chr(ord("A") + index)
         text = text_value(answer).strip()
         labels = {choice["label"] for choice in choices}
         if text in labels:

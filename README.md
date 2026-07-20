@@ -54,15 +54,13 @@ Each validated benchmark has an independent artifact in the [Protocol Pool](conf
 |:---:|:---:|:---:|:---:|:---:|
 | [SpatialGen-Bench](https://huggingface.co/datasets/wx91726/SpatialGen-Bench) | 14 | Manual 11 + Agentic 3 | <a href="https://huggingface.co/datasets/wx91726/SpatialGen-Bench"><img src="https://huggingface.co/front/assets/huggingface_logo-noborder.svg" alt="" width="15" align="absmiddle"> Hugging Face</a> | [View](configs/protocols/spatialgen_bench) |
 | [EmbSpatial-Bench](https://github.com/mengfeidu/EmbSpatial-Bench) | 1 | Build 1 | <a href="https://github.com/mengfeidu/EmbSpatial-Bench"><img src="https://cdn.simpleicons.org/github/181717/FFFFFF" alt="" width="15" align="absmiddle"> GitHub</a> | [View](configs/protocols/embspatial) |
-| [OmniSpatial](https://huggingface.co/datasets/qizekun/OmniSpatial) | 4 active + 1 excluded | Fallback 4 | <a href="https://huggingface.co/datasets/qizekun/OmniSpatial"><img src="https://huggingface.co/front/assets/huggingface_logo-noborder.svg" alt="" width="15" align="absmiddle"> Hugging Face</a> | [View](configs/protocols/omnispatial) |
+| [OmniSpatial](https://huggingface.co/datasets/qizekun/OmniSpatial) | 5 | Fallback 5 | <a href="https://huggingface.co/datasets/qizekun/OmniSpatial"><img src="https://huggingface.co/front/assets/huggingface_logo-noborder.svg" alt="" width="15" align="absmiddle"> Hugging Face</a> | [View](configs/protocols/omnispatial) |
 | [Q-Spatial+](https://huggingface.co/datasets/andrewliao11/Q-Spatial-Bench) | 3 | Build 3 | <a href="https://huggingface.co/datasets/andrewliao11/Q-Spatial-Bench"><img src="https://huggingface.co/front/assets/huggingface_logo-noborder.svg" alt="" width="15" align="absmiddle"> Hugging Face</a> | [View](configs/protocols/q_spatial_plus) |
 | [RoboSpatial-Home](https://huggingface.co/datasets/chanhee-luke/RoboSpatial-Home) | 3 | Build 2 + Reuse 1 | <a href="https://huggingface.co/datasets/chanhee-luke/RoboSpatial-Home"><img src="https://huggingface.co/front/assets/huggingface_logo-noborder.svg" alt="" width="15" align="absmiddle"> Hugging Face</a> | [View](configs/protocols/robospatial_home) |
 | [SAT](https://github.com/arijitray1993/SAT) | 8 | Build 5 + Fallback 3 | <a href="https://github.com/arijitray1993/SAT"><img src="https://cdn.simpleicons.org/github/181717/FFFFFF" alt="" width="15" align="absmiddle"> GitHub</a> | [View](configs/protocols/sat) |
 | [RoboAfford](https://github.com/tyb197/RoboAfford) | 3 | Reuse 3 | <a href="https://github.com/tyb197/RoboAfford"><img src="https://cdn.simpleicons.org/github/181717/FFFFFF" alt="" width="15" align="absmiddle"> GitHub</a> | [View](configs/protocols/roboafford) |
 
 <p>🔄 <em>Continuously updated with newly validated spatial benchmarks and protocol artifacts.</em></p>
-
-The omitted OmniSpatial task stores numeric answer indices without the released option mapping. ProVisE preserves this limitation as a documented contract exclusion rather than inventing a parser-side label conversion.
 
 ## 🚀 Quick Start
 

@@ -254,6 +254,61 @@ def test_json_ingestion_resolves_field_derived_image_path_template(tmp_path: Pat
     assert "path_template" in result.prompt
 
 
+def test_json_ingestion_normalizes_image_embedded_choice_index(tmp_path: Path):
+    source_root = tmp_path / "source"
+    image_dir = source_root / "Complex_Logic"
+    image_dir.mkdir(parents=True)
+    Image.new("RGB", (24, 16), "teal").save(image_dir / "0.png")
+    (source_root / "data.json").write_text(
+        json.dumps(
+            [
+                {
+                    "id": "0_0",
+                    "question": "Which option printed in the image is correct?",
+                    "options": [],
+                    "answer": 3,
+                    "task_type": "Complex_Logic",
+                }
+            ]
+        ),
+        encoding="utf-8",
+    )
+    mapping = {
+        "source": "data.json",
+        "split": "test",
+        "id": {"mode": "field", "field": "id", "prefix": "embedded"},
+        "task": {"field": "task_type", "transform": "slug"},
+        "question": {"field": "question", "transform": "text"},
+        "answer": {
+            "field": "answer",
+            "transform": "raw",
+            "choice_index_base": 0,
+        },
+        "answer_type": "choice",
+        "choices": {"mode": "field", "field": "options"},
+        "media": [
+            {
+                "field": "id",
+                "mode": "path_template",
+                "template": "{task_type}/{value}",
+                "value_transform": "first_underscore",
+                "role": "primary",
+            }
+        ],
+        "evaluation": {"metric": "accuracy"},
+    }
+
+    result = AgenticBenchmarkIngestor(
+        source_root=source_root,
+        benchmark_name="image_embedded_choices",
+        output_root=tmp_path / "out",
+    ).build(raw_response=_response(mapping, benchmark="image_embedded_choices"))
+
+    assert result.decision == "ingest"
+    assert result.items[0]["choices"] == []
+    assert result.items[0]["answer"] == "D"
+
+
 def test_json_ingestion_repairs_zero_coverage_path_template_transform(tmp_path: Path):
     source_root = tmp_path / "source"
     data_dir = source_root / "data"
