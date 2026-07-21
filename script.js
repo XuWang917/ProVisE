@@ -740,6 +740,13 @@ const filters = {
   visual: integratedModels.filter((model) => model.protocolKey === "visual"),
 };
 
+const frontierModelNames = new Set([
+  "GPT-5.6 Sol",
+  "Claude Fable 5",
+  "Claude Opus 4.8",
+  "Kimi K3",
+]);
+
 const filterLabels = {
   all: "models + human reference",
   text: "text-answering models",
@@ -749,6 +756,7 @@ const filterLabels = {
 
 
 let activeFilter = "all";
+let comparableSetOnly = false;
 let activeExampleLevel = "Perception";
 let activeExampleId = "counting";
 let activeExampleStep = "input";
@@ -961,7 +969,10 @@ function fmt(value) {
 }
 
 function sortedModels() {
-  return [...filters[activeFilter]].sort((a, b) => {
+  const scopedModels = comparableSetOnly
+    ? filters[activeFilter].filter((model) => !frontierModelNames.has(model.model))
+    : filters[activeFilter];
+  return [...scopedModels].sort((a, b) => {
     if (a.protocolKey === "human" && b.protocolKey !== "human") return -1;
     if (b.protocolKey === "human" && a.protocolKey !== "human") return 1;
     const aScore = Number.isFinite(a.overall) ? a.overall : -Infinity;
@@ -1053,7 +1064,8 @@ function renderLeaderboard() {
   const count = document.querySelector("#leaderboard-model-count");
   if (count) {
     const modelCount = data.filter((model) => model.protocolKey !== "human").length;
-    count.innerHTML = `<strong>${modelCount}</strong><span>${filterLabels[activeFilter]}</span>`;
+    const scope = comparableSetOnly ? " · comparable set" : "";
+    count.innerHTML = `<strong>${modelCount}</strong><span>${filterLabels[activeFilter]}${scope}</span>`;
   }
 
   renderLeaderboardSummary(data);
@@ -2354,6 +2366,17 @@ function setFilter(filter) {
   renderTaskMatrix();
 }
 
+function setComparableSet(enabled) {
+  comparableSetOnly = enabled;
+  const button = document.querySelector("#ranking-scope-toggle");
+  if (button) {
+    button.classList.toggle("is-active", enabled);
+    button.setAttribute("aria-pressed", String(enabled));
+  }
+  renderLeaderboard();
+  renderTaskMatrix();
+}
+
 function animateNumbers(root = document) {
   if (window.matchMedia("(prefers-reduced-motion: reduce)").matches) return;
   root.querySelectorAll("[data-count]").forEach((node) => {
@@ -2534,6 +2557,9 @@ document.addEventListener("DOMContentLoaded", () => {
 
   document.querySelectorAll("[data-filter]").forEach((button) => {
     button.addEventListener("click", () => setFilter(button.dataset.filter));
+  });
+  document.querySelector("#ranking-scope-toggle")?.addEventListener("click", (event) => {
+    setComparableSet(event.currentTarget.getAttribute("aria-pressed") !== "true");
   });
   document.querySelector("#example-replay")?.addEventListener("click", () => {
     clearExampleAutoplay();

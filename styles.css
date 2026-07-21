@@ -2885,6 +2885,13 @@ h3 {
   border-bottom: 1px solid var(--line);
 }
 
+.leaderboard-controls {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  min-width: 0;
+}
+
 .leaderboard-model-count {
   display: inline-flex;
   align-items: baseline;
@@ -2936,6 +2943,63 @@ h3 {
   background: var(--teal-dark);
   box-shadow: 0 5px 12px rgba(15, 70, 71, 0.16);
 }
+
+.ranking-scope-toggle {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 9px;
+  min-height: 46px;
+  padding: 7px 12px;
+  border: 1px solid var(--line-strong);
+  border-radius: 8px;
+  color: var(--muted);
+  font-size: 0.84rem;
+  font-weight: 790;
+  background: #fff;
+  cursor: pointer;
+  white-space: nowrap;
+  transition: color var(--transition), border-color var(--transition), background var(--transition), box-shadow var(--transition);
+}
+
+.ranking-scope-toggle:hover {
+  color: var(--teal-dark);
+  border-color: rgba(23, 107, 106, 0.35);
+  background: #f7faf8;
+}
+
+.ranking-scope-toggle.is-active {
+  color: var(--teal-dark);
+  border-color: rgba(23, 107, 106, 0.42);
+  background: rgba(23, 107, 106, 0.08);
+  box-shadow: inset 0 0 0 1px rgba(23, 107, 106, 0.05);
+}
+
+.ranking-toggle-track {
+  position: relative;
+  display: inline-block;
+  flex: 0 0 auto;
+  width: 32px;
+  height: 18px;
+  border-radius: 9px;
+  background: #c9d0cf;
+  transition: background var(--transition);
+}
+
+.ranking-toggle-track span {
+  position: absolute;
+  top: 3px;
+  left: 3px;
+  width: 12px;
+  height: 12px;
+  border-radius: 50%;
+  background: #fff;
+  box-shadow: 0 1px 3px rgba(23, 27, 31, 0.24);
+  transition: transform var(--transition);
+}
+
+.ranking-scope-toggle.is-active .ranking-toggle-track { background: var(--teal-dark); }
+.ranking-scope-toggle.is-active .ranking-toggle-track span { transform: translateX(14px); }
 
 .table-wrap { width: 100%; }
 .leaderboard-panel .table-wrap,
@@ -3681,8 +3745,10 @@ table { width: 100%; border-collapse: collapse; }
   .example-image-frame.is-navigation-gallery .input-tile:first-child { grid-row: auto; }
   .section { padding: 58px 18px; }
   .leaderboard-toolbar { align-items: stretch; flex-direction: column; }
+  .leaderboard-controls { align-items: stretch; flex-direction: column; }
   .leaderboard-model-count { justify-content: flex-end; }
   .segmented-control { width: 100%; grid-template-columns: 1fr; }
+  .ranking-scope-toggle { width: 100%; }
   .leaderboard-table { min-width: 1066px; }
   .leaderboard-table col.column-model { width: 186px; }
   .leaderboard-table col.column-protocol { width: 132px; }

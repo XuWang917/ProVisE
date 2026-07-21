@@ -9,9 +9,9 @@
       content="Project page for Show, Don't Tell: Evaluating Spatial Cognition in Generative Pixels Rather Than LLM Text."
     >
     <link rel="icon" type="image/svg+xml" href="assets/provise-mark.svg?v=20260716-01">
-    <link rel="stylesheet" href="styles.css?v=20260721-sticky-task-header">
+    <link rel="stylesheet" href="styles.css?v=20260721-comparable-set">
     <script src="expansion_results.js?v=20260721-full-results-v2"></script>
-    <script src="script.js?v=20260721-leaderboard-v2" defer></script>
+    <script src="script.js?v=20260721-comparable-set" defer></script>
   </head>
   <body>
     <header class="site-nav">
@@ -272,10 +272,22 @@
 
         <div class="leaderboard-panel table-motion reveal-on-scroll">
           <div class="leaderboard-toolbar">
-            <div class="segmented-control" role="tablist" aria-label="Leaderboard filter">
-              <button class="is-active" type="button" data-filter="all" role="tab" aria-selected="true">All</button>
-              <button type="button" data-filter="text" role="tab" aria-selected="false">Text Answering</button>
-              <button type="button" data-filter="visual" role="tab" aria-selected="false">Visual Answering</button>
+            <div class="leaderboard-controls">
+              <div class="segmented-control" role="tablist" aria-label="Leaderboard filter">
+                <button class="is-active" type="button" data-filter="all" role="tab" aria-selected="true">All</button>
+                <button type="button" data-filter="text" role="tab" aria-selected="false">Text Answering</button>
+                <button type="button" data-filter="visual" role="tab" aria-selected="false">Visual Answering</button>
+              </div>
+              <button
+                class="ranking-scope-toggle"
+                id="ranking-scope-toggle"
+                type="button"
+                aria-pressed="false"
+                title="Exclude GPT-5.6 Sol, Claude Fable 5, Claude Opus 4.8, and Kimi K3"
+              >
+                <span class="ranking-toggle-track" aria-hidden="true"><span></span></span>
+                <span>Comparable Set</span>
+              </button>
             </div>
             <p class="leaderboard-model-count" id="leaderboard-model-count" aria-live="polite"></p>
           </div>
