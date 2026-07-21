@@ -223,6 +223,16 @@ window.SPATIALGEN_EXPANSION_RESULTS = {
         "feasibility": 42.85714286
       }
     },
+    "BAGEL-7B-MoT::text": {
+      "status": "complete",
+      "samples": 105,
+      "overall": 75.23809524,
+      "tasks": {
+        "size": 91.42857143,
+        "grounding": 62.85714286,
+        "feasibility": 71.42857143
+      }
+    },
     "RynnBrain-8B::text": {
       "status": "complete",
       "samples": 105,
@@ -747,6 +757,30 @@ window.SPATIALGEN_EXPANSION_RESULTS = {
         "affordance": 63.80952381,
         "navigation": 26.66666667,
         "trajectory": 50.0
+      }
+    },
+    "BAGEL-7B-MoT::text": {
+      "status": "complete",
+      "samples": 365,
+      "overall": 48.23982684,
+      "capabilities": {
+        "Perception": 71.94444444,
+        "Understanding": 37.14285714,
+        "Reasoning": 34.78333333,
+        "Interaction": 44.6031746
+      },
+      "tasks": {
+        "counting": 77.5,
+        "depth": 73.33333333,
+        "orientation": 65.0,
+        "relationship": 40.0,
+        "perspective": 28.57142857,
+        "mental_modeling": 42.85714286,
+        "multihop": 26.66666667,
+        "prediction": 42.9,
+        "affordance": 30.47619048,
+        "navigation": 26.66666667,
+        "trajectory": 76.66666667
       }
     },
     "RynnBrain-8B::text": {

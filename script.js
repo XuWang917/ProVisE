@@ -282,6 +282,15 @@ const extraTextModels = [
     tasks: { counting: 82.5, depth: 83.33333333333333, orientation: 77.5, relationship: 51.42857142857143, perspective: 45.714285714285715, mental_modeling: 37.142857142857146, multihop: 30.0, prediction: 49.70000000000002, affordance: 51.683673469387756, navigation: 33.333333333333336, trajectory: 66.66666666666667 },
   },
   {
+    model: "BAGEL-7B-MoT",
+    protocol: "Text Answering",
+    protocolKey: "text",
+    source: "Supplementary Local Evaluation",
+    overall: 48.23982683982684,
+    capabilities: { Perception: 71.94444444444444, Understanding: 37.14285714285714, Reasoning: 34.78333333333333, Interaction: 44.60317460317461 },
+    tasks: { counting: 77.5, depth: 73.33333333333333, orientation: 65.0, relationship: 40.0, perspective: 28.57142857142857, mental_modeling: 42.857142857142854, multihop: 26.666666666666668, prediction: 42.9, affordance: 30.476190476190485, navigation: 26.666666666666668, trajectory: 76.66666666666667 },
+  },
+  {
     model: "GPT-5.4",
     protocol: "Text Answering",
     protocolKey: "text",
@@ -379,6 +388,7 @@ const extraVisualModels = [
     protocol: "Visual Answering",
     protocolKey: "visual",
     source: "Supplementary Evaluation",
+    provisional: true,
     overall: 22.763018464622075,
     capabilities: { Perception: 22.223333333333333, Understanding: 30.476190476190478, Reasoning: 16.666666666666664, Interaction: 19.65376611631269 },
     tasks: { counting: 10.0, depth: 36.67, orientation: 20.0, relationship: 40.0, perspective: 14.285714285714285, mental_modeling: 37.142857142857146, multihop: 33.33333333333333, prediction: 0.0, affordance: 5.627965015604739, navigation: 33.33333333333333, trajectory: 20.0 },
