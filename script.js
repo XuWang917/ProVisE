@@ -252,6 +252,18 @@ const extraTextModels = [
     tasks: { counting: 82.5, depth: 86.66666666666667, orientation: 77.5, relationship: 40.0, perspective: 74.28571428571429, mental_modeling: 80.0, multihop: 86.66666666666667, prediction: 89.4, affordance: 80.52380952380953, navigation: 96.66666666666667, trajectory: 76.66666666666667 },
   },
   {
+    model: "Claude Fable 5",
+    protocol: "Text Answering",
+    protocolKey: "text",
+    source: "Supplementary API Evaluation",
+    provisional: true,
+    completedSamples: 331,
+    totalSamples: 470,
+    overall: 78.5687117480221,
+    capabilities: { Perception: 87.77777777777779, Understanding: 63.492063492063494, Reasoning: 81.1, Interaction: 82.7487684729064 },
+    tasks: { counting: 91.66666666666667, depth: 86.66666666666667, orientation: 85.0, relationship: 53.333333333333336, perspective: 74.28571428571429, mental_modeling: 62.857142857142854, multihop: 90.0, prediction: 72.2, affordance: 71.80952380952381, navigation: 93.10344827586206, trajectory: 83.33333333333333 },
+  },
+  {
     model: "Kimi K3",
     protocol: "Text Answering",
     protocolKey: "text",
@@ -653,6 +665,14 @@ function meanScore(values) {
 }
 
 function integrateExpansionScores(model) {
+  if (model.provisional) {
+    return {
+      ...model,
+      coreOverall: null,
+      coreCapabilities: Object.fromEntries(capabilityKeys.map((capability) => [capability, null])),
+    };
+  }
+
   const systemKey = expansionSystemKey(model);
   const coreEntry = expansionResults.coreSystems?.[systemKey];
   const entry = expansionResults.systems[systemKey];
@@ -938,6 +958,8 @@ function sortedModels() {
   return [...filters[activeFilter]].sort((a, b) => {
     if (a.protocolKey === "human" && b.protocolKey !== "human") return -1;
     if (b.protocolKey === "human" && a.protocolKey !== "human") return 1;
+    if (a.provisional && !b.provisional) return -1;
+    if (b.provisional && !a.provisional) return 1;
     const aScore = Number.isFinite(a.overall) ? a.overall : -Infinity;
     const bScore = Number.isFinite(b.overall) ? b.overall : -Infinity;
     return bScore - aScore;
@@ -957,8 +979,27 @@ function protocolBadge(model) {
 }
 
 function modelRowsForSummary(data) {
-  const models = data.filter((model) => model.protocolKey !== "human");
+  const models = data.filter((model) => model.protocolKey !== "human" && !model.provisional);
   return models.length ? models : data;
+}
+
+function modelLabel(model) {
+  if (!model.provisional) return model.model;
+  return `${model.model}<sup class="model-status-marker" title="Evaluation in progress">*</sup>`;
+}
+
+function rankDisplay(rank) {
+  if (rank > 3) return `<span class="rank-number">${rank}</span>`;
+  const place = ["first", "second", "third"][rank - 1];
+  const tone = ["gold", "silver", "bronze"][rank - 1];
+  return `
+    <span class="rank-trophy rank-trophy-${tone}" role="img" aria-label="${place} place" title="${place} place">
+      <svg aria-hidden="true" viewBox="0 0 24 24">
+        <path d="M6 9a6 6 0 0 0 12 0V3a1 1 0 0 0-1-1H7a1 1 0 0 0-1 1z"/>
+        <path d="M6 4H4.5a1 1 0 0 0 0 5H6M18 4h1.5a1 1 0 0 1 0 5H18M12 15v4M8 22h8M10 19h4"/>
+      </svg>
+    </span>
+  `;
 }
 
 function renderLeaderboard() {
@@ -977,25 +1018,29 @@ function renderLeaderboard() {
   let rank = 0;
   body.innerHTML = data
     .map((model, index) => {
-      const displayedRank = model.protocolKey === "human" ? "–" : String(++rank);
+      const displayedRank = model.protocolKey === "human"
+        ? `<span class="rank-reference" aria-label="Human reference">–</span>`
+        : model.provisional
+          ? `<span class="rank-testing" aria-label="Evaluation in progress" title="Evaluation in progress">*</span>`
+          : rankDisplay(++rank);
       const capabilityCells = capabilityKeys
         .map((key) => `<td class="score-td">${scoreCell(model.capabilities[key], {
-          best: model.protocolKey !== "human" && Number.isFinite(model.capabilities[key]) && model.capabilities[key] === bestCapabilities[key],
+          best: model.protocolKey !== "human" && !model.provisional && Number.isFinite(model.capabilities[key]) && model.capabilities[key] === bestCapabilities[key],
         })}</td>`)
         .join("");
 
       return `
-        <tr class="${model.protocolKey === "human" ? "is-human-row" : ""}" style="--row-delay: ${Math.min(index, 8) * 18}ms">
+        <tr class="${model.protocolKey === "human" ? "is-human-row" : ""}${model.provisional ? " is-provisional-row" : ""}" style="--row-delay: ${Math.min(index, 8) * 18}ms">
           <td class="rank">${displayedRank}</td>
           <th class="model-column" scope="row">
             <div class="model-name">
-              <strong>${model.model}</strong>
+              <strong>${modelLabel(model)}</strong>
             </div>
           </th>
           <td class="protocol-column">${protocolBadge(model)}</td>
           <td class="score-td overall-td">${scoreCell(model.overall, {
             emphasis: true,
-            best: model.protocolKey !== "human" && model.overall === bestOverall,
+            best: model.protocolKey !== "human" && !model.provisional && model.overall === bestOverall,
           })}</td>
           ${capabilityCells}
         </tr>
@@ -1085,19 +1130,66 @@ function renderTaskMatrix() {
           if (!Number.isFinite(score)) {
             return `<td class="heat-cell is-unavailable${boundary}">N/A</td>`;
           }
-          const isBest = model.protocolKey !== "human" && score === bestTasks[key];
+          const isBest = model.protocolKey !== "human" && !model.provisional && score === bestTasks[key];
           return `<td class="heat-cell${isBest ? " is-best" : ""}${boundary}" style="--heat-color: ${heatColor(score)}">${fmt(score)}</td>`;
         })
         .join("");
 
       return `
-        <tr class="${model.protocolKey === "human" ? "is-human-row" : ""}" style="--row-delay: ${Math.min(index, 8) * 18}ms">
-          <th class="task-model" scope="row">${model.model}</th>
+        <tr class="${model.protocolKey === "human" ? "is-human-row" : ""}${model.provisional ? " is-provisional-row" : ""}" style="--row-delay: ${Math.min(index, 8) * 18}ms">
+          <th class="task-model" scope="row">${modelLabel(model)}</th>
           ${cells}
         </tr>
       `;
     })
     .join("");
+}
+
+function setupTaskStickyHeader() {
+  const panel = document.querySelector(".task-panel");
+  const wrap = panel?.querySelector(":scope > .table-wrap");
+  const table = wrap?.querySelector(".task-table");
+  const head = table?.querySelector("thead");
+  const colgroup = table?.querySelector("colgroup");
+  if (!panel || !wrap || !table || !head || !colgroup || panel.querySelector(".task-sticky-header")) return;
+
+  const sticky = document.createElement("div");
+  const clip = document.createElement("div");
+  const stickyTable = table.cloneNode(false);
+  const stickyHead = head.cloneNode(true);
+
+  sticky.className = "task-sticky-header";
+  sticky.setAttribute("aria-hidden", "true");
+  clip.className = "task-sticky-clip";
+  stickyTable.classList.add("task-sticky-table");
+  stickyTable.removeAttribute("aria-label");
+  stickyTable.setAttribute("role", "presentation");
+  stickyHead.removeAttribute("id");
+  stickyTable.append(colgroup.cloneNode(true), stickyHead);
+  clip.append(stickyTable);
+  sticky.append(clip);
+  panel.insertBefore(sticky, wrap);
+  panel.classList.add("has-sticky-task-header");
+
+  const syncScroll = () => {
+    sticky.style.setProperty("--task-scroll-x", `${wrap.scrollLeft}px`);
+    sticky.style.setProperty("--task-scroll-offset", `${-wrap.scrollLeft}px`);
+  };
+  const syncGeometry = () => {
+    const height = head.getBoundingClientRect().height;
+    if (height > 0) panel.style.setProperty("--task-header-height", `${height}px`);
+    syncScroll();
+  };
+
+  wrap.addEventListener("scroll", syncScroll, { passive: true });
+  if ("ResizeObserver" in window) {
+    const observer = new ResizeObserver(syncGeometry);
+    observer.observe(wrap);
+    observer.observe(head);
+  } else {
+    window.addEventListener("resize", syncGeometry);
+  }
+  window.requestAnimationFrame(syncGeometry);
 }
 
 function examplesForLevel(level) {
@@ -2448,6 +2540,7 @@ document.addEventListener("DOMContentLoaded", () => {
   });
   createCapabilityAtlas();
   setFilter(activeFilter);
+  setupTaskStickyHeader();
   setupExampleAnimationPacing();
   const requestedExampleId = new URLSearchParams(window.location.search).get("example");
   const requestedStep = new URLSearchParams(window.location.search).get("step");
