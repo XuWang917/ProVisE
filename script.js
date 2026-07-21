@@ -2368,7 +2368,6 @@ function setFilter(filter) {
 function setFrontierExclusion(enabled) {
   excludeFrontierModels = enabled;
   const button = document.querySelector("#ranking-scope-toggle");
-  const state = document.querySelector("#ranking-scope-state");
   const note = document.querySelector("#ranking-scope-note");
   if (button) {
     button.classList.toggle("is-active", enabled);
@@ -2380,7 +2379,6 @@ function setFrontierExclusion(enabled) {
         : "Frontier models included. Activate to exclude them from ranking.",
     );
   }
-  if (state) state.textContent = enabled ? "On" : "Off";
   if (note) {
     note.textContent = `${enabled ? "Excludes" : "Includes"} Fable 5 and other frontier models`;
   }
