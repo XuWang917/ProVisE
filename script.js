@@ -958,8 +958,6 @@ function sortedModels() {
   return [...filters[activeFilter]].sort((a, b) => {
     if (a.protocolKey === "human" && b.protocolKey !== "human") return -1;
     if (b.protocolKey === "human" && a.protocolKey !== "human") return 1;
-    if (a.provisional && !b.provisional) return -1;
-    if (b.provisional && !a.provisional) return 1;
     const aScore = Number.isFinite(a.overall) ? a.overall : -Infinity;
     const bScore = Number.isFinite(b.overall) ? b.overall : -Infinity;
     return bScore - aScore;
@@ -979,13 +977,13 @@ function protocolBadge(model) {
 }
 
 function modelRowsForSummary(data) {
-  const models = data.filter((model) => model.protocolKey !== "human" && !model.provisional);
+  const models = data.filter((model) => model.protocolKey !== "human");
   return models.length ? models : data;
 }
 
 function modelLabel(model) {
   if (!model.provisional) return model.model;
-  return `${model.model}<sup class="model-status-marker" title="Evaluation in progress">*</sup>`;
+  return `${model.model}<span class="model-testing-label" title="331 of 470 samples completed"> · Testing</span>`;
 }
 
 function rankDisplay(rank) {
@@ -1020,12 +1018,10 @@ function renderLeaderboard() {
     .map((model, index) => {
       const displayedRank = model.protocolKey === "human"
         ? `<span class="rank-reference" aria-label="Human reference">–</span>`
-        : model.provisional
-          ? `<span class="rank-testing" aria-label="Evaluation in progress" title="Evaluation in progress">*</span>`
-          : rankDisplay(++rank);
+        : rankDisplay(++rank);
       const capabilityCells = capabilityKeys
         .map((key) => `<td class="score-td">${scoreCell(model.capabilities[key], {
-          best: model.protocolKey !== "human" && !model.provisional && Number.isFinite(model.capabilities[key]) && model.capabilities[key] === bestCapabilities[key],
+          best: model.protocolKey !== "human" && Number.isFinite(model.capabilities[key]) && model.capabilities[key] === bestCapabilities[key],
         })}</td>`)
         .join("");
 
@@ -1040,7 +1036,7 @@ function renderLeaderboard() {
           <td class="protocol-column">${protocolBadge(model)}</td>
           <td class="score-td overall-td">${scoreCell(model.overall, {
             emphasis: true,
-            best: model.protocolKey !== "human" && !model.provisional && model.overall === bestOverall,
+            best: model.protocolKey !== "human" && model.overall === bestOverall,
           })}</td>
           ${capabilityCells}
         </tr>
@@ -1130,7 +1126,7 @@ function renderTaskMatrix() {
           if (!Number.isFinite(score)) {
             return `<td class="heat-cell is-unavailable${boundary}">N/A</td>`;
           }
-          const isBest = model.protocolKey !== "human" && !model.provisional && score === bestTasks[key];
+          const isBest = model.protocolKey !== "human" && score === bestTasks[key];
           return `<td class="heat-cell${isBest ? " is-best" : ""}${boundary}" style="--heat-color: ${heatColor(score)}">${fmt(score)}</td>`;
         })
         .join("");
