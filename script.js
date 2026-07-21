@@ -756,7 +756,7 @@ const filterLabels = {
 
 
 let activeFilter = "all";
-let comparableSetOnly = false;
+let paperScopeOnly = false;
 let activeExampleLevel = "Perception";
 let activeExampleId = "counting";
 let activeExampleStep = "input";
@@ -969,7 +969,7 @@ function fmt(value) {
 }
 
 function sortedModels() {
-  const scopedModels = comparableSetOnly
+  const scopedModels = paperScopeOnly
     ? filters[activeFilter].filter((model) => !frontierModelNames.has(model.model))
     : filters[activeFilter];
   return [...scopedModels].sort((a, b) => {
@@ -1064,7 +1064,7 @@ function renderLeaderboard() {
   const count = document.querySelector("#leaderboard-model-count");
   if (count) {
     const modelCount = data.filter((model) => model.protocolKey !== "human").length;
-    const scope = comparableSetOnly ? " · comparable set" : "";
+    const scope = paperScopeOnly ? " · paper scope" : "";
     count.innerHTML = `<strong>${modelCount}</strong><span>${filterLabels[activeFilter]}${scope}</span>`;
   }
 
@@ -2366,8 +2366,8 @@ function setFilter(filter) {
   renderTaskMatrix();
 }
 
-function setComparableSet(enabled) {
-  comparableSetOnly = enabled;
+function setPaperScope(enabled) {
+  paperScopeOnly = enabled;
   const button = document.querySelector("#ranking-scope-toggle");
   if (button) {
     button.classList.toggle("is-active", enabled);
@@ -2559,7 +2559,7 @@ document.addEventListener("DOMContentLoaded", () => {
     button.addEventListener("click", () => setFilter(button.dataset.filter));
   });
   document.querySelector("#ranking-scope-toggle")?.addEventListener("click", (event) => {
-    setComparableSet(event.currentTarget.getAttribute("aria-pressed") !== "true");
+    setPaperScope(event.currentTarget.getAttribute("aria-pressed") !== "true");
   });
   document.querySelector("#example-replay")?.addEventListener("click", () => {
     clearExampleAutoplay();

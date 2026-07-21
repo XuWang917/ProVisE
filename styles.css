@@ -2944,19 +2944,33 @@ h3 {
   box-shadow: 0 5px 12px rgba(15, 70, 71, 0.16);
 }
 
+.ranking-scope-control {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.ranking-scope-control small {
+  max-width: 180px;
+  color: #8a9393;
+  font-size: 0.68rem;
+  font-weight: 620;
+  line-height: 1.3;
+}
+
 .ranking-scope-toggle {
   display: inline-flex;
   align-items: center;
   justify-content: center;
-  gap: 9px;
-  min-height: 46px;
-  padding: 7px 12px;
-  border: 1px solid var(--line-strong);
-  border-radius: 8px;
+  gap: 7px;
+  min-height: 32px;
+  padding: 5px 8px;
+  border: 1px solid var(--line);
+  border-radius: 7px;
   color: var(--muted);
-  font-size: 0.84rem;
-  font-weight: 790;
-  background: #fff;
+  font-size: 0.76rem;
+  font-weight: 760;
+  background: rgba(255, 255, 255, 0.72);
   cursor: pointer;
   white-space: nowrap;
   transition: color var(--transition), border-color var(--transition), background var(--transition), box-shadow var(--transition);
@@ -2979,9 +2993,9 @@ h3 {
   position: relative;
   display: inline-block;
   flex: 0 0 auto;
-  width: 32px;
-  height: 18px;
-  border-radius: 9px;
+  width: 28px;
+  height: 16px;
+  border-radius: 8px;
   background: #c9d0cf;
   transition: background var(--transition);
 }
@@ -2990,8 +3004,8 @@ h3 {
   position: absolute;
   top: 3px;
   left: 3px;
-  width: 12px;
-  height: 12px;
+  width: 10px;
+  height: 10px;
   border-radius: 50%;
   background: #fff;
   box-shadow: 0 1px 3px rgba(23, 27, 31, 0.24);
@@ -2999,7 +3013,7 @@ h3 {
 }
 
 .ranking-scope-toggle.is-active .ranking-toggle-track { background: var(--teal-dark); }
-.ranking-scope-toggle.is-active .ranking-toggle-track span { transform: translateX(14px); }
+.ranking-scope-toggle.is-active .ranking-toggle-track span { transform: translateX(12px); }
 
 .table-wrap { width: 100%; }
 .leaderboard-panel .table-wrap,
@@ -3748,7 +3762,9 @@ table { width: 100%; border-collapse: collapse; }
   .leaderboard-controls { align-items: stretch; flex-direction: column; }
   .leaderboard-model-count { justify-content: flex-end; }
   .segmented-control { width: 100%; grid-template-columns: 1fr; }
-  .ranking-scope-toggle { width: 100%; }
+  .ranking-scope-control { align-items: flex-start; flex-direction: column; gap: 4px; }
+  .ranking-scope-control small { max-width: none; padding-left: 2px; }
+  .ranking-scope-toggle { width: max-content; }
   .leaderboard-table { min-width: 1066px; }
   .leaderboard-table col.column-model { width: 186px; }
   .leaderboard-table col.column-protocol { width: 132px; }
