@@ -9,9 +9,9 @@
       content="Project page for Show, Don't Tell: Evaluating Spatial Cognition in Generative Pixels Rather Than LLM Text."
     >
     <link rel="icon" type="image/svg+xml" href="assets/provise-mark.svg?v=20260716-01">
-    <link rel="stylesheet" href="styles.css?v=20260721-paper-scope">
+    <link rel="stylesheet" href="styles.css?v=20260721-frontier-toggle">
     <script src="expansion_results.js?v=20260721-full-results-v2"></script>
-    <script src="script.js?v=20260721-paper-scope" defer></script>
+    <script src="script.js?v=20260721-frontier-toggle" defer></script>
   </head>
   <body>
     <header class="site-nav">
@@ -283,14 +283,14 @@
                   class="ranking-scope-toggle"
                   id="ranking-scope-toggle"
                   type="button"
-                  aria-label="Toggle the model set used for paper analysis"
+                  aria-label="Frontier models included. Activate to exclude them from ranking."
                   aria-pressed="false"
-                  title="Excludes GPT-5.6 Sol, Claude Fable 5, Claude Opus 4.8, and Kimi K3"
+                  title="GPT-5.6 Sol, Claude Fable 5, Claude Opus 4.8, and Kimi K3"
                 >
                   <span class="ranking-toggle-track" aria-hidden="true"><span></span></span>
-                  <span>Paper Scope</span>
+                  <span id="ranking-scope-state">Off</span>
                 </button>
-                <small>Excludes Fable 5 and other frontier-scale APIs</small>
+                <small id="ranking-scope-note">Includes Fable 5 and other frontier models</small>
               </div>
             </div>
             <p class="leaderboard-model-count" id="leaderboard-model-count" aria-live="polite"></p>

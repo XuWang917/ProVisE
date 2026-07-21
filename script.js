@@ -756,7 +756,7 @@ const filterLabels = {
 
 
 let activeFilter = "all";
-let paperScopeOnly = false;
+let excludeFrontierModels = false;
 let activeExampleLevel = "Perception";
 let activeExampleId = "counting";
 let activeExampleStep = "input";
@@ -969,7 +969,7 @@ function fmt(value) {
 }
 
 function sortedModels() {
-  const scopedModels = paperScopeOnly
+  const scopedModels = excludeFrontierModels
     ? filters[activeFilter].filter((model) => !frontierModelNames.has(model.model))
     : filters[activeFilter];
   return [...scopedModels].sort((a, b) => {
@@ -1064,8 +1064,7 @@ function renderLeaderboard() {
   const count = document.querySelector("#leaderboard-model-count");
   if (count) {
     const modelCount = data.filter((model) => model.protocolKey !== "human").length;
-    const scope = paperScopeOnly ? " · paper scope" : "";
-    count.innerHTML = `<strong>${modelCount}</strong><span>${filterLabels[activeFilter]}${scope}</span>`;
+    count.innerHTML = `<strong>${modelCount}</strong><span>${filterLabels[activeFilter]}</span>`;
   }
 
   renderLeaderboardSummary(data);
@@ -2366,12 +2365,24 @@ function setFilter(filter) {
   renderTaskMatrix();
 }
 
-function setPaperScope(enabled) {
-  paperScopeOnly = enabled;
+function setFrontierExclusion(enabled) {
+  excludeFrontierModels = enabled;
   const button = document.querySelector("#ranking-scope-toggle");
+  const state = document.querySelector("#ranking-scope-state");
+  const note = document.querySelector("#ranking-scope-note");
   if (button) {
     button.classList.toggle("is-active", enabled);
     button.setAttribute("aria-pressed", String(enabled));
+    button.setAttribute(
+      "aria-label",
+      enabled
+        ? "Frontier models excluded. Activate to include them in ranking."
+        : "Frontier models included. Activate to exclude them from ranking.",
+    );
+  }
+  if (state) state.textContent = enabled ? "On" : "Off";
+  if (note) {
+    note.textContent = `${enabled ? "Excludes" : "Includes"} Fable 5 and other frontier models`;
   }
   renderLeaderboard();
   renderTaskMatrix();
@@ -2559,7 +2570,7 @@ document.addEventListener("DOMContentLoaded", () => {
     button.addEventListener("click", () => setFilter(button.dataset.filter));
   });
   document.querySelector("#ranking-scope-toggle")?.addEventListener("click", (event) => {
-    setPaperScope(event.currentTarget.getAttribute("aria-pressed") !== "true");
+    setFrontierExclusion(event.currentTarget.getAttribute("aria-pressed") !== "true");
   });
   document.querySelector("#example-replay")?.addEventListener("click", () => {
     clearExampleAutoplay();
