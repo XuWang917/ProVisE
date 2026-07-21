@@ -3436,14 +3436,14 @@ table { width: 100%; border-collapse: collapse; }
 
 @media (max-width: 1320px) {
   .task-panel .table-wrap {
-    max-height: min(72vh, 720px);
-    overflow: auto;
+    max-height: none;
+    overflow-x: auto;
+    overflow-y: visible;
     overscroll-behavior-x: contain;
-    overscroll-behavior-y: auto;
-    scrollbar-gutter: stable;
+    scrollbar-gutter: auto;
   }
 
-  .task-table thead th,
+  .task-table thead th { top: var(--nav-height); }
   .expansion-table thead th { top: 0; }
 }
 
@@ -3461,16 +3461,15 @@ table { width: 100%; border-collapse: collapse; }
   .pipeline-stepper { grid-template-columns: repeat(4, minmax(0, 1fr)); }
   .pipeline-stepper button { grid-template-columns: 34px minmax(0, 1fr) 34px; }
   .step-transition { display: none; }
-  .leaderboard-panel .table-wrap,
-  .task-panel .table-wrap {
+  .leaderboard-panel .table-wrap {
     max-height: min(72vh, 720px);
     overflow: auto;
     overscroll-behavior-x: contain;
     overscroll-behavior-y: auto;
     scrollbar-gutter: stable;
   }
+
   .leaderboard-table thead th,
-  .task-table thead th,
   .expansion-table thead th { top: 0; }
 }
 
