@@ -385,7 +385,6 @@ const extraVisualModels = [
     protocol: "Visual Answering",
     protocolKey: "visual",
     source: "Supplementary Evaluation",
-    provisional: true,
     overall: 22.763018464622075,
     capabilities: { Perception: 22.223333333333333, Understanding: 30.476190476190478, Reasoning: 16.666666666666664, Interaction: 19.65376611631269 },
     tasks: { counting: 10.0, depth: 36.67, orientation: 20.0, relationship: 40.0, perspective: 14.285714285714285, mental_modeling: 37.142857142857146, multihop: 33.33333333333333, prediction: 0.0, affordance: 5.627965015604739, navigation: 33.33333333333333, trajectory: 20.0 },

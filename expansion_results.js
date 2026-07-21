@@ -363,6 +363,16 @@ window.SPATIALGEN_EXPANSION_RESULTS = {
         "feasibility": 80.0
       }
     },
+    "Claude Fable 5::text": {
+      "status": "complete",
+      "samples": 105,
+      "overall": 88.57142857,
+      "tasks": {
+        "size": 94.28571429,
+        "grounding": 85.71428571,
+        "feasibility": 85.71428571
+      }
+    },
     "Claude Opus 4.8::text": {
       "status": "complete",
       "samples": 105,
@@ -1213,6 +1223,30 @@ window.SPATIALGEN_EXPANSION_RESULTS = {
         "affordance": 75.33333333,
         "navigation": 46.66666667,
         "trajectory": 80.0
+      }
+    },
+    "Claude Fable 5::text": {
+      "status": "complete",
+      "samples": 365,
+      "overall": 79.27142857,
+      "capabilities": {
+        "Perception": 88.05555556,
+        "Understanding": 65.71428571,
+        "Reasoning": 81.1,
+        "Interaction": 82.82539683
+      },
+      "tasks": {
+        "counting": 92.5,
+        "depth": 86.66666667,
+        "orientation": 85.0,
+        "relationship": 60.0,
+        "perspective": 74.28571429,
+        "mental_modeling": 62.85714286,
+        "multihop": 90.0,
+        "prediction": 72.2,
+        "affordance": 71.80952381,
+        "navigation": 93.33333333,
+        "trajectory": 83.33333333
       }
     },
     "Claude Opus 4.8::text": {
