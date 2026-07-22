@@ -20,9 +20,9 @@ dependencies = [
 ]
 
 [project.urls]
-Homepage = "https://xuwang917.github.io/ProVisE/"
-Repository = "https://github.com/XuWang917/ProVisE"
-Issues = "https://github.com/XuWang917/ProVisE/issues"
+Homepage = "https://zju-omniai.github.io/ProVisE/"
+Repository = "https://github.com/ZJU-OmniAI/ProVisE"
+Issues = "https://github.com/ZJU-OmniAI/ProVisE/issues"
 
 [project.optional-dependencies]
 dev = ["build", "pytest", "ruff"]

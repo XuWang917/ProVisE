@@ -3,9 +3,9 @@
   <p><img src="assets/provise-subtitle.svg" alt="Evaluating Spatial Cognition in Generative Pixels Rather Than LLM Text" width="900"></p>
   <p>
     <img src="https://img.shields.io/badge/-arXiv-B31B1B?style=for-the-badge&amp;logo=arxiv&amp;logoColor=white" alt="arXiv link pending">
-    <a href="https://xuwang917.github.io/ProVisE/"><img src="https://img.shields.io/badge/-Project_Page-0F5354?style=for-the-badge&amp;logo=googlechrome&amp;logoColor=white" alt="Project page"></a>
+    <a href="https://zju-omniai.github.io/ProVisE/"><img src="https://img.shields.io/badge/-Project_Page-0F5354?style=for-the-badge&amp;logo=googlechrome&amp;logoColor=white" alt="Project page"></a>
     <a href="https://huggingface.co/datasets/wx91726/SpatialGen-Bench"><img src="https://img.shields.io/badge/HF-SpatialGen--Bench-FFD21E?style=for-the-badge&amp;logo=huggingface&amp;logoColor=FFD21E&amp;labelColor=3A3B45" alt="SpatialGen-Bench on Hugging Face"></a>
-    <a href="https://github.com/XuWang917/ProVisE"><img src="https://img.shields.io/badge/-Code-171B1F?style=for-the-badge&amp;logo=github&amp;logoColor=white" alt="Code"></a>
+    <a href="https://github.com/ZJU-OmniAI/ProVisE"><img src="https://img.shields.io/badge/-Code-171B1F?style=for-the-badge&amp;logo=github&amp;logoColor=white" alt="Code"></a>
   </p>
   <p>
     <a href="pyproject.toml"><img src="https://img.shields.io/badge/Python-3.10%2B-3776AB?logo=python&amp;logoColor=white" alt="Python 3.10+"></a>
@@ -67,7 +67,7 @@ Each validated benchmark has an independent artifact in the [Protocol Pool](conf
 ### 1. Install
 
 ```bash
-git clone https://github.com/XuWang917/ProVisE.git
+git clone https://github.com/ZJU-OmniAI/ProVisE.git
 cd ProVisE
 
 conda create -n provise python=3.10 -y
@@ -140,7 +140,7 @@ To evaluate a published protocol, place or link its normalized package under `be
 
 ## 🧩 Extending ProVisE
 
-🤝 **Issues and pull requests are welcome.** Use [issues](https://github.com/XuWang917/ProVisE/issues) for bug reports, benchmark requests, and proposed public interfaces; submit focused PRs for benchmark adapters, visual protocols, or Parser Ops.
+🤝 **Issues and pull requests are welcome.** Use [issues](https://github.com/ZJU-OmniAI/ProVisE/issues) for bug reports, benchmark requests, and proposed public interfaces; submit focused PRs for benchmark adapters, visual protocols, or Parser Ops.
 
 | Contribution | Location | Required contract |
 |---|---|---|
@@ -149,7 +149,7 @@ To evaluate a published protocol, place or link its normalized package under `be
 | Parser&nbsp;Op | [`provise/parser_ops`](provise/parser_ops) | Typed inputs, parameters, deterministic behavior, and unit tests |
 
 Start with the [Unified Sample Schema](docs/unified_sample_schema.md) and [Agentic Benchmark Adapter](docs/agentic_benchmark_adapter.md).
-Before [submitting a PR](https://github.com/XuWang917/ProVisE/compare), install the contributor dependencies and run the repository checks:
+Before [submitting a PR](https://github.com/ZJU-OmniAI/ProVisE/compare), install the contributor dependencies and run the repository checks:
 
 ```bash
 pip install -e ".[agentic,dev]"
