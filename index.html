@@ -9,7 +9,7 @@
       content="Project page for Show, Don't Tell: Evaluating Spatial Cognition in Generative Pixels Rather Than LLM Text."
     >
     <link rel="icon" type="image/svg+xml" href="assets/provise-mark.svg?v=20260716-01">
-    <link rel="stylesheet" href="styles.css?v=20260721-frontier-toggle-compact">
+    <link rel="stylesheet" href="styles.css?v=20260724-project-video">
     <script src="expansion_results.js?v=20260721-full-results-v2"></script>
     <script src="script.js?v=20260721-frontier-toggle-compact" defer></script>
   </head>
@@ -63,7 +63,12 @@
             </ul>
             <p class="hero-affiliation">Zhejiang University</p>
             <div class="hero-actions" aria-label="Primary actions">
-              <a class="button button-primary" href="#citation">
+              <a
+                class="button button-primary"
+                href="https://arxiv.org/abs/2607.21072"
+                target="_blank"
+                rel="noopener noreferrer"
+              >
                 <svg aria-hidden="true" viewBox="0 0 24 24"><path d="M6 3h8l4 4v14H6z"/><path d="M14 3v5h5"/><path d="M9 13h6M9 17h6M9 9h2"/></svg>
                 Paper
               </a>
@@ -103,6 +108,19 @@
             </div>
           </div>
 
+        </div>
+      </section>
+
+      <section class="project-video-section" id="video" aria-label="Project overview video">
+        <div class="project-video-frame reveal-on-scroll">
+          <video
+            controls
+            playsinline
+            preload="metadata"
+            poster="assets/provise-overview-poster.webp"
+          >
+            <source src="assets/provise-overview.mp4" type="video/mp4">
+          </video>
         </div>
       </section>
 
@@ -359,14 +377,14 @@
         <div class="section-heading wide reveal-on-scroll">
           <p class="eyebrow">Citation</p>
           <h2>Reference</h2>
-          <p>Preprint citation; the arXiv link will be added with the public project links.</p>
+          <p><a href="https://arxiv.org/abs/2607.21072" target="_blank" rel="noopener noreferrer">arXiv:2607.21072</a></p>
         </div>
         <div class="citation-card reveal-on-scroll">
           <button class="button citation-copy" type="button" id="copy-citation">Copy BibTeX</button>
           <pre class="citation-box"><code id="bibtex">@article{wang2026show,
   title = {Show, Don't Tell: Evaluating Spatial Cognition in Generative Pixels Rather Than LLM Text},
   author = {Wang, Xu and Yao, Kaixiang and Pan, Miao and Zhou, Xiaohe and Liu, Xuanyu and Zhang, Wenqi and Zhang, Xuhong},
-  journal = {arXiv preprint},
+  journal = {arXiv preprint arXiv:2607.21072},
   year = {2026}
 }</code></pre>
         </div>

@@ -369,6 +369,31 @@ h3 {
   white-space: nowrap;
 }
 
+.project-video-section {
+  padding: clamp(38px, 4.5vw, 64px) 24px;
+  border-bottom: 1px solid var(--line);
+  background: var(--paper);
+  scroll-margin-top: var(--nav-height);
+}
+
+.project-video-frame {
+  width: min(100%, 1040px);
+  margin: 0 auto;
+  overflow: hidden;
+  border: 1px solid var(--line-strong);
+  border-radius: var(--radius);
+  background: #0b1012;
+  box-shadow: var(--shadow-md);
+}
+
+.project-video-frame video {
+  display: block;
+  width: 100%;
+  aspect-ratio: 16 / 9;
+  background: #0b1012;
+  object-fit: contain;
+}
+
 .section {
   padding: clamp(62px, 7vw, 104px) max(28px, calc((100vw - var(--content)) / 2));
   scroll-margin-top: var(--nav-height);
