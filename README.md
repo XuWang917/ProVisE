@@ -14,15 +14,9 @@
   <p><img src="assets/provise-quote.svg" alt="When words fall short, images give form to spatial intent. From Xici Zhuan, The Book of Changes." width="720"></p>
 </div>
 
-<p align="center">
-  <a href="assets/protocolized-visual-evaluation.png">
-    <img src="assets/protocolized-visual-evaluation.png"
-         alt="ProVisE compares a discrete text interface with protocolized visual evaluation"
-         width="100%">
-  </a>
-</p>
-
-<p align="center"><sub>ProVisE turns spatial tasks into visual response contracts and scores them with the original benchmark metrics.</sub></p>
+<div align="center">
+  <video src="https://github.com/user-attachments/assets/199f556c-d1be-402a-88ae-2ddb91965c8c" controls width="80%"></video>
+</div>
 
 ## 📖 Overview
 
