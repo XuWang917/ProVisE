@@ -15,7 +15,7 @@
 </div>
 
 <div align="center">
-  <video src="https://github.com/user-attachments/assets/199f556c-d1be-402a-88ae-2ddb91965c8c" controls width="80%"></video>
+  <video src="https://github.com/user-attachments/assets/3d63f668-e9fe-48ce-aaca-3a51b1940c41" controls width="80%"></video>
 </div>
 
 ## 📖 Overview
