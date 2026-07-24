@@ -2,7 +2,7 @@
   <h1><img src="assets/provise-mark.svg" alt="ProVisE logo" height="50" align="absmiddle">&nbsp; Show, Don't Tell</h1>
   <p><img src="assets/provise-subtitle.svg" alt="Evaluating Spatial Cognition in Generative Pixels Rather Than LLM Text" width="900"></p>
   <p>
-    <img src="https://img.shields.io/badge/-arXiv-B31B1B?style=for-the-badge&amp;logo=arxiv&amp;logoColor=white" alt="arXiv link pending">
+    <a href="https://arxiv.org/abs/2607.21072"><img src="https://img.shields.io/badge/arXiv-2607.21072-B31B1B?style=for-the-badge&amp;logo=arxiv&amp;logoColor=white" alt="arXiv:2607.21072"></a>
     <a href="https://zju-omniai.github.io/ProVisE/"><img src="https://img.shields.io/badge/-Project_Page-0F5354?style=for-the-badge&amp;logo=googlechrome&amp;logoColor=white" alt="Project page"></a>
     <a href="https://huggingface.co/datasets/wx91726/SpatialGen-Bench"><img src="https://img.shields.io/badge/HF-SpatialGen--Bench-FFD21E?style=for-the-badge&amp;logo=huggingface&amp;logoColor=FFD21E&amp;labelColor=3A3B45" alt="SpatialGen-Bench on Hugging Face"></a>
     <a href="https://github.com/ZJU-OmniAI/ProVisE"><img src="https://img.shields.io/badge/-Code-171B1F?style=for-the-badge&amp;logo=github&amp;logoColor=white" alt="Code"></a>
@@ -196,9 +196,10 @@ We sincerely appreciate [CountBench](https://teaching-clip-to-count.github.io/),
 ## 📝 Citation
 
 ```bibtex
-@misc{wang2026showdonttell,
+@article{wang2026showdonttell,
   title  = {Show, Don't Tell: Evaluating Spatial Cognition in Generative Pixels Rather Than LLM Text},
   author = {Wang, Xu and Yao, Kaixiang and Pan, Miao and Zhou, Xiaohe and Liu, Xuanyu and Zhang, Wenqi and Zhang, Xuhong},
+  journal = {arXiv preprint arXiv:2607.21072},
   year   = {2026}
 }
 ```
